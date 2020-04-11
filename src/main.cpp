@@ -123,6 +123,8 @@ int main(int argc, char **argv)
     look_at(view_matrix, 10, 10, 10, 0, 0, 0, 0, 1, 0);
     std::cout << projection_matrix << "\n";
     std::cout << view_matrix << "\n";
+    translate(view_matrix, 10, 10, 10);
+    std::cout << view_matrix << "\n";
     //configure uniforms and vbo
     init_uniforms(prog, {1, 1, 1, 1}, projection_matrix, view_matrix);
     vao = initVBO(prog);

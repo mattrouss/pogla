@@ -136,9 +136,9 @@ void look_at(mygl::matrix4 &mat,
 void translate(mygl::matrix4 &mat, float x, float y, float z)
 {
     auto translation = mygl::matrix4{{
-        1, 0, 0, x,
-        0, 1, 0, y,
-        0, 0, 1, z,
+        1, 0, 0, -x,
+        0, 1, 0, -y,
+        0, 0, 1, -z,
         0, 0, 0, 1
     }};
 
