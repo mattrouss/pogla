@@ -3,6 +3,8 @@
 #include <array>
 #include <iostream>
 
+#include "vec3.h"
+
 namespace mygl
 {
 class matrix4

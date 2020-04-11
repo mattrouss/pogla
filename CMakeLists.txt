@@ -12,6 +12,6 @@ add_executable(pogl1 src/main.cpp
     src/matrix4.h
     src/matrix4.cpp
     src/program.h
-    src/program.cpp src/mesh.h src/mesh.cpp src/verts.h)
+    src/program.cpp src/mesh.h src/mesh.cpp src/verts.h src/vec3.cpp src/vec3.h)
 
 target_link_libraries(pogl1 -lGL -lGLEW -lglut -lpthread)

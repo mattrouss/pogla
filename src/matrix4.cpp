@@ -98,35 +98,18 @@ void look_at(mygl::matrix4 &mat,
         const float &centerX, const float &centerY, const float &centerZ,
         float upX, float upY, float upZ)
 {
-    auto F = std::array<float, 3>{centerX - eyeX, centerY - eyeY, centerZ - eyeZ};
-    auto UP = std::array<float, 3>{upX, upY, upZ};
+    auto F = mygl::Vec3({centerX - eyeX, centerY - eyeY, centerZ - eyeZ});
+    auto up = mygl::Vec3({upX, upY, upZ});
+    F = F.normalized();
+    up = up.normalized();
 
-    float Fmag = std::sqrt(F[0] * F[0] + F[1] * F[1] + F[2] * F[2]);
-    float UPmag = std::sqrt(UP[0] * UP[0] + UP[1] * UP[1] + UP[2] * UP[2]);
-
-    auto f = std::array<float, 3>{F[0] / Fmag, F[1] / Fmag, F[2] / Fmag};
-    auto up = std::array<float, 3>{UP[0] / UPmag, UP[1] / UPmag, UP[2] / UPmag};
-
-    //f * up
-    auto S = std::array<float, 3>{
-        f[1] * up[2] - f[2] * up[1],
-        f[2] * up[0] - f[0] * up[2],
-        f[0] * up[1] - f[1] * up[0]
-    };
-
-    float Smag = std::sqrt(S[0] * S[0] + S[1] * S[1] + S[2] * S[2]);
-    auto s = std::array<float, 3>{S[0] / Smag, S[1] / Smag, S[2] / Smag};
-
-    auto u = std::array<float, 3>{
-        s[1] * f[2] - s[2] * f[1],
-        s[2] * f[0] - s[0] * f[2],
-        s[0] * f[1] - s[1] * f[0]
-    };
+    auto s = F ^ up;
+    auto u = s.normalized() ^ F;
 
     auto mat2 = mygl::matrix4{{
-         S[0],  S[1],  S[2], 0,
+         s[0],  s[1],  s[2], 0,
          u[0],  u[1],  u[2], 0,
-        -f[0], -f[1], -f[2], 0,
+        -F[0], -F[1], -F[2], 0,
             0,     0,     0, 1,
     }};
 
