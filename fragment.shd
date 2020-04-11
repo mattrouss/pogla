@@ -1,0 +1,15 @@
+#version 450
+
+in vec4 vColor;
+in vec3 light_dir;
+in vec3 normal;
+
+layout(location=0) out vec4 output_color;
+
+void main() {
+    //output_color = vColor * clamp(dot(light_dir, normal), 0.0, 1.0);
+    //output_color = vColor;
+    //output_color = vec4(light_dir * 0.5 + vec3(0.5, 0.5, 0.5), 1.0);
+    output_color = vec4(normal * 0.5 + vec3(0.5, 0.5, 0.5), 1.0);
+}
+
