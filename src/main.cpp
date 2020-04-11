@@ -103,7 +103,7 @@ int main(int argc, char **argv)
     initGlew();
     init_gl();
 
-    auto mesh = mygl::load_mesh("../meshes/sphere.obj");
+    auto mesh = mygl::load_mesh("../meshes/monkey.obj");
     verts = mesh->verts;
     normals = mesh->normals;
 
@@ -130,5 +130,7 @@ int main(int argc, char **argv)
     vao = initVBO(prog);
 
     glutMainLoop();
+
+    glDeleteVertexArrays(1, &vao);gl_err();
     return 0;
 }
