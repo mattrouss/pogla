@@ -12,6 +12,8 @@ public:
     matrix4(std::array<float, 16> data_);
     matrix4 operator* (const matrix4& rhs);
     void operator*= (const matrix4& rhs);
+
+    matrix4 transpose() const;
     static matrix4 identity();
 
     friend std::ostream& operator<<(std::ostream& out, const mygl::matrix4& m);

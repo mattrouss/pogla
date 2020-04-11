@@ -60,6 +60,15 @@ namespace mygl
         }
         return out;
     }
+
+    matrix4 matrix4::transpose() const {
+        matrix4 t;
+        for (auto i = 0; i < 4u; i++)
+            for (auto j = 0; j < 4u; j++)
+                t.data[i * 4 + j] = this->data[j * 4 + i];
+
+        return t;
+    }
 }
 
 void frustum(mygl::matrix4 &mat,

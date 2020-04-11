@@ -101,12 +101,12 @@ int main(int argc, char **argv)
     initGlew();
     init_gl();
 
-    auto mesh = mygl::load_mesh("sphere.obj");
+    auto mesh = mygl::load_mesh("../meshes/sphere.obj");
     verts = mesh->verts;
     normals = mesh->normals;
 
-    std::string v_shader = "vertex.shd";
-    std::string f_shader = "fragment.shd";
+    std::string v_shader = "../shaders/vertex.shd";
+    std::string f_shader = "../shaders/fragment.shd";
     auto prog = mygl::program::make_program(v_shader, f_shader);
     if (prog == nullptr)
     {
@@ -122,7 +122,6 @@ int main(int argc, char **argv)
     frustum(projection_matrix, -1, 1, -1, 1, 5, 2000);
     look_at(view_matrix, 10, 10, 10, 0, 0, 0, 0, 1, 0);
     std::cout << projection_matrix << "\n";
-    translate(view_matrix, 10, 10, 10);
     std::cout << view_matrix << "\n";
     //configure uniforms and vbo
     init_uniforms(prog, {1, 1, 1, 1}, projection_matrix, view_matrix);
