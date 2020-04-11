@@ -5,7 +5,7 @@
 
 #include "program.h"
 #include "matrix4.h"
-#include "vec3.h"
+#include "vector.h"
 #include "mesh.h"
 #include "verts.h"
 #include "camera.h"

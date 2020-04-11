@@ -18,7 +18,6 @@ add_executable(bump src/main.cpp
         src/verts.h
         src/camera.cpp
         src/camera.h
-        src/vec3.cpp
-        src/vec3.h)
+        src/vector.h)
 
 target_link_libraries(bump -lGL -lGLEW -lglut -lpthread)

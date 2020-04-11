@@ -40,7 +40,7 @@ namespace mygl
         data = tmp;
     }
 
-    matrix4 matrix4::operator* (const matrix4& rhs)
+    matrix4 matrix4::operator*(const matrix4& rhs)
     {
         auto result = matrix4{data};
         result *= rhs;
@@ -69,6 +69,18 @@ namespace mygl
 
         return t;
     }
+}
+
+
+mygl::Vec4 operator*(const mygl::matrix4& lhs, const mygl::Vec4& rhs) {
+    auto v = mygl::Vec4{};
+    for (auto i = 0; i < 4u; i++) {
+        float sum = 0;
+        for (auto j = 0; j < 4u; j++)
+            sum += lhs.data[i * 4 + j] * rhs[j];
+        v[i] = sum;
+    }
+    return v;
 }
 
 void frustum(mygl::matrix4 &mat,

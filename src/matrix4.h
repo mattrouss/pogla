@@ -3,7 +3,7 @@
 #include <array>
 #include <iostream>
 
-#include "vec3.h"
+#include "vector.h"
 
 namespace mygl
 {
@@ -23,6 +23,8 @@ public:
 public:
     std::array<float, 16> data;
 };
+
+mygl::Vec4 operator*(const mygl::matrix4& lhs, const mygl::Vec4& rhs);
 
 std::ostream& operator<<(std::ostream& out, const mygl::matrix4& m);
 }
