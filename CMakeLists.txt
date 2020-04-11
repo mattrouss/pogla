@@ -12,6 +12,6 @@ add_executable(bump src/main.cpp
     src/matrix4.h
     src/matrix4.cpp
     src/program.h
-    src/program.cpp src/mesh.h src/mesh.cpp src/verts.h)
+    src/program.cpp src/mesh.h src/mesh.cpp src/verts.h src/camera.cpp src/camera.h)
 
 target_link_libraries(bump -lGL -lGLEW -lglut -lpthread)

@@ -7,6 +7,7 @@
 #include "matrix4.h"
 #include "mesh.h"
 #include "verts.h"
+#include "camera.h"
 
 GLuint vao;
 
@@ -117,13 +118,11 @@ int main(int argc, char **argv)
     std::cout << "Hello, World!" << std::endl;
 
     //init camera
-    auto projection_matrix = mygl::matrix4::identity();
-    auto view_matrix = mygl::matrix4::identity();
-    frustum(projection_matrix, -1, 1, -1, 1, 5, 2000);
-    look_at(view_matrix, 10, 10, 10, 0, 0, 0, 0, 1, 0);
+    auto cam = Camera{-1, 1, -1, 1, 5, 2000};
+    cam.look_at(0, 0, 10, 0, 0, 0, 0, 1, 0);
+    auto projection_matrix = cam.get_projection_matrix();
+    auto view_matrix = cam.get_view_matrix();
     std::cout << projection_matrix << "\n";
-    std::cout << view_matrix << "\n";
-    translate(view_matrix, 10, 10, 10);
     std::cout << view_matrix << "\n";
     //configure uniforms and vbo
     init_uniforms(prog, {1, 1, 1, 1}, projection_matrix, view_matrix);
