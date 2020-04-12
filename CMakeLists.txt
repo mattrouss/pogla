@@ -18,6 +18,10 @@ add_executable(bump src/main.cpp
         src/verts.h
         src/camera.cpp
         src/camera.h
-        src/vector.h)
+        src/vector.h
+        src/image.cpp
+        src/image.h
+        src/image_io.cpp
+        src/image_io.h)
 
 target_link_libraries(bump -lGL -lGLEW -lglut -lpthread)
