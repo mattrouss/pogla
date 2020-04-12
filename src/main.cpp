@@ -80,8 +80,8 @@ GLuint initVBO(mygl::program* prog)
     glGenVertexArrays(1, &vao_id);gl_err();
     glBindVertexArray(vao_id);gl_err();
 
-    GLuint buffer_id[2];
-    glGenBuffers(2, buffer_id);gl_err();//works because we only ask for one buffer
+    GLuint buffer_id[3];
+    glGenBuffers(3, buffer_id);gl_err();//works because we only ask for one buffer
 
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer_id[0]);gl_err();
@@ -93,6 +93,11 @@ GLuint initVBO(mygl::program* prog)
     glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), normals.data(), GL_STATIC_DRAW);gl_err();
     glVertexAttribPointer(buffer_id[1], 3, GL_FLOAT, GL_FALSE, 0, 0);gl_err();
     glEnableVertexAttribArray(buffer_id[1]);gl_err();
+
+    glBindBuffer(GL_ARRAY_BUFFER, buffer_id[2]);gl_err();
+    glBufferData(GL_ARRAY_BUFFER, uv_coords.size() * sizeof(float), uv_coords.data(), GL_STATIC_DRAW);gl_err();
+    glVertexAttribPointer(buffer_id[2], 2, GL_FLOAT, GL_FALSE, 0, 0);gl_err();
+    glEnableVertexAttribArray(buffer_id[2]);gl_err();
 
     return vao_id;
 }
@@ -106,6 +111,7 @@ int main(int argc, char **argv)
     auto mesh = mygl::load_mesh("../meshes/monkey.obj");
     verts = mesh->verts;
     normals = mesh->normals;
+    uv_coords = mesh->uv;
 
     std::string v_shader = "../shaders/vertex.shd";
     std::string f_shader = "../shaders/fragment.shd";
