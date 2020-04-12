@@ -104,37 +104,28 @@ void frustum(mygl::matrix4 &mat,
     mat *= mat2;
 }
 
-void look_at(mygl::matrix4 &mat,
-        const float &eyeX, const float &eyeY, const float &eyeZ,
-        const float &centerX, const float &centerY, const float &centerZ,
-        float upX, float upY, float upZ)
+void look_at(mygl::matrix4 &mat, const mygl::Vec3& eye, const mygl::Vec3& target, const mygl::Vec3& up)
 {
-    auto F = mygl::Vec3({centerX - eyeX, centerY - eyeY, centerZ - eyeZ});
-    auto up = mygl::Vec3({upX, upY, upZ});
-    F = F.normalized();
-    up = up.normalized();
-
-    auto s = up ^ F;
-    auto u = F ^ s.normalized();
-
-    std::cout << "f: " << F << " s: " << s << " u: " << u << "\n";
+    auto f = (target - eye).normalized();
+    auto l = (up ^ f).normalized();
+    auto u = f ^ l;
 
     auto mat2 = mygl::matrix4{{
-         s[0],  s[1],  s[2], 0,
+         l[0],  l[1],  l[2], 0,
          u[0],  u[1],  u[2], 0,
-        -F[0], -F[1], -F[2], 0,
+        -f[0], -f[1], -f[2], 0,
             0,     0,     0, 1,
     }};
 
     mat *= mat2;
 }
 
-void translate(mygl::matrix4 &mat, float x, float y, float z)
+void translate(mygl::matrix4 &mat, const mygl::Vec3& v)
 {
     auto translation = mygl::matrix4{{
-        1, 0, 0, x,
-        0, 1, 0, y,
-        0, 0, 1, z,
+        1, 0, 0, v[0],
+        0, 1, 0, v[1],
+        0, 0, 1, v[2],
         0, 0, 0, 1
     }};
 

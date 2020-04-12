@@ -14,9 +14,9 @@ public:
             float znear,
             float zfar);
 
-    void look_at(float x, float y, float z, float cx, float cy, float cz, float upx, float upy, float upz);
+    void look_at(const mygl::Vec3& eye, const mygl::Vec3& target, const mygl::Vec3& up);
 
-    void translate(float x, float y, float z);
+    void translate(const mygl::Vec3& v);
 
     //rotate?
 
@@ -28,9 +28,7 @@ private:
     mygl::matrix4 projection;
     mygl::matrix4 view;
 
-    float posx;
-    float posy;
-    float posz;
+    mygl::Vec3 pos;
 };
 
 

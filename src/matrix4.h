@@ -35,8 +35,6 @@ void frustum(mygl::matrix4 &mat,
         const float &z_near, const float &z_far);
 
 void look_at(mygl::matrix4 &mat,
-        const float &eyeX, const float &eyeY, const float &eyeZ,
-        const float &centerX, const float &centerY, const float &centerZ,
-        float upX, float upY, float upZ);
+        const mygl::Vec3& eye, const mygl::Vec3& target, const mygl::Vec3& up);
 
-void translate(mygl::matrix4 &mat, float x, float y, float z);
+void translate(mygl::matrix4 &mat, const mygl::Vec3& v);
