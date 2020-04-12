@@ -63,8 +63,8 @@ namespace mygl
 
     matrix4 matrix4::transpose() const {
         matrix4 t;
-        for (auto i = 0; i < 4u; i++)
-            for (auto j = 0; j < 4u; j++)
+        for (unsigned i = 0; i < 4u; i++)
+            for (unsigned j = 0; j < 4u; j++)
                 t.data[i * 4 + j] = this->data[j * 4 + i];
 
         return t;
@@ -72,9 +72,9 @@ namespace mygl
 
     mygl::Vec4 operator*(const mygl::matrix4& lhs, const mygl::Vec4& rhs) {
         auto v = mygl::Vec4{};
-        for (auto i = 0; i < 4u; i++) {
+        for (unsigned i = 0; i < 4u; i++) {
             float sum = 0;
-            for (auto j = 0; j < 4u; j++)
+            for (unsigned j = 0; j < 4u; j++)
                 sum += lhs.data[i * 4 + j] * rhs[j];
             v[i] = sum;
         }

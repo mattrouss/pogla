@@ -4,8 +4,8 @@
 #include <array>
 
 #include "program.h"
+#include "image_io.h"
 #include "matrix4.h"
-#include "vector.h"
 #include "mesh.h"
 #include "verts.h"
 #include "camera.h"
@@ -15,7 +15,7 @@ GLuint vao;
 #define gl_err() \
 {\
     GLenum err = glGetError();\
-    if (err != GL_NO_ERROR) std::cerr << "OpenGL error: " << __LINE__ << std::endl;\
+    if (err != GL_NO_ERROR) std::cerr << "OpenGL error l." << __LINE__ << ": " << err << std::endl;\
 }
 
 void display()
@@ -55,6 +55,23 @@ bool init_gl()
     glClearColor(0.0, 0.0, 0.0, 1);gl_err();
 
     return true;
+}
+
+void init_samplers() {
+   GLuint texture_id;
+   glGenTextures(1, &texture_id);gl_err();
+   glBindTexture(GL_TEXTURE_2D, texture_id);gl_err();
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+   auto brick_tex = io::load_image("../textures/brick.tga");
+   if (!brick_tex)
+       return;
+   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, brick_tex->width, brick_tex->height, 0, GL_RGB, GL_UNSIGNED_BYTE, brick_tex->pixels);gl_err();
+   delete brick_tex;
 }
 
 void init_uniforms(mygl::program* prog, std::array<float, 4> color, mygl::matrix4 projection,
@@ -108,7 +125,7 @@ int main(int argc, char **argv)
     initGlew();
     init_gl();
 
-    auto mesh = mygl::load_mesh("../meshes/monkey.obj");
+    auto mesh = mygl::load_mesh("../meshes/sphere.obj");
     verts = mesh->verts;
     normals = mesh->normals;
     uv_coords = mesh->uv;
@@ -126,12 +143,13 @@ int main(int argc, char **argv)
 
     //init camera
     auto cam = Camera{-1, 1, -1, 1, 5, 2000};
-    cam.look_at({{10, 0, 10}}, {{0, 0, 0}}, {{0, 1, 0}});
+    cam.look_at({{0, 0, 10}}, {{0, 0, 0}}, {{0, 1, 0}});
     auto projection_matrix = cam.get_projection_matrix();
     auto view_matrix = cam.get_view_matrix();
     std::cout << projection_matrix << "\n";
     std::cout << view_matrix << "\n";
-    //configure uniforms and vbo
+    //configure samplers, uniforms and vbo
+    init_samplers();
     init_uniforms(prog, {1, 1, 1, 1}, projection_matrix, view_matrix);
     vao = initVBO(prog);
 

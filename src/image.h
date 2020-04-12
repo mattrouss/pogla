@@ -11,7 +11,6 @@
 #define	IMAGE_HH
 
 #include <cstdint>
-#include <tuple>
 
 #define IMAGE_NB_LEVELS 256
 #define IMAGE_MAX_LEVEL 255
@@ -19,8 +18,8 @@
 
 namespace io {
 
-typedef uint8_t* __restrict__ __attribute__((aligned(TL_IMAGE_ALIGNMENT))) GRAY8;
-typedef uint8_t* __restrict__ __attribute__((aligned(TL_IMAGE_ALIGNMENT))) RGB8;
+typedef uint8_t* GRAY8;
+typedef uint8_t* RGB8;
 
 class rgb24_image;
 
