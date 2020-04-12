@@ -68,8 +68,8 @@ void init_uniforms(mygl::program* prog, std::array<float, 4> color, mygl::matrix
 
     mat_proj_id = glGetUniformLocation(prog->prog_id(), "projection_matrix");gl_err();
     mat_obj_id = glGetUniformLocation(prog->prog_id(), "model_view_matrix");gl_err();
-    glUniformMatrix4fv(mat_proj_id, 1, GL_FALSE, projection.data.data());gl_err();
-    glUniformMatrix4fv(mat_obj_id, 1, GL_FALSE, model_view.data.data());gl_err();
+    glUniformMatrix4fv(mat_proj_id, 1, GL_FALSE, projection.transpose().data.data());gl_err();
+    glUniformMatrix4fv(mat_obj_id, 1, GL_FALSE, model_view.transpose().data.data());gl_err();
 }
 
 GLuint initVBO(mygl::program* prog)
@@ -120,7 +120,7 @@ int main(int argc, char **argv)
 
     //init camera
     auto cam = Camera{-1, 1, -1, 1, 5, 2000};
-    cam.look_at(0, 0, 10, 0, 0, 0, 0, 1, 0);
+    cam.look_at(10, 0, 10, 0, 0, 0, 0, 1, 0);
     auto projection_matrix = cam.get_projection_matrix();
     auto view_matrix = cam.get_view_matrix();
     std::cout << projection_matrix << "\n";

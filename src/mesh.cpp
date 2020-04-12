@@ -1,4 +1,6 @@
 #include "mesh.h"
+#include "matrix4.h"
+#include "vector.h"
 #include <fstream>
 #include <memory>
 #include <sstream>
@@ -73,7 +75,7 @@ namespace mygl
                         for (unsigned j = 0; j < 3; j++)
                         {
                             res->normals.push_back(normals[i + j]);
-                            std::cout << "normal: " << normals[i + j] << "\n";
+                            //std::cout << "normal: " << normals[i + j] << "\n";
                         }
                     }
                 }
@@ -95,4 +97,35 @@ namespace mygl
         return res;
     }
 
+    std::ostream& operator<<(std::ostream& out, const mesh& m)
+    {
+        out << "(\n";
+        for (unsigned i = 0; i < m.verts.size(); i += 3)
+        {
+            out << "{" << m.verts[i] << " " << m.verts[i + 1] << " " << m.verts[i + 2] << "}\n";
+        }
+        out << ")";
+
+        return out;
+    }
+
+    std::shared_ptr<mesh> mesh::tranform(matrix4 mat)
+    {
+        auto res = std::make_shared<mesh>();
+        for (unsigned i = 0; i < verts.size(); i += 3)
+        {
+            auto p = Vec4{};
+            p[0] = verts[i];
+            p[1] = verts[i + 1];
+            p[2] = verts[i + 2];
+            p[3] = 1;
+
+            auto p2 = mat * p;
+            res->verts.push_back(p2[0]);
+            res->verts.push_back(p2[1]);
+            res->verts.push_back(p2[2]);
+        }
+
+        return res;
+    }
 }

@@ -69,18 +69,17 @@ namespace mygl
 
         return t;
     }
-}
 
-
-mygl::Vec4 operator*(const mygl::matrix4& lhs, const mygl::Vec4& rhs) {
-    auto v = mygl::Vec4{};
-    for (auto i = 0; i < 4u; i++) {
-        float sum = 0;
-        for (auto j = 0; j < 4u; j++)
-            sum += lhs.data[i * 4 + j] * rhs[j];
-        v[i] = sum;
+    mygl::Vec4 operator*(const mygl::matrix4& lhs, const mygl::Vec4& rhs) {
+        auto v = mygl::Vec4{};
+        for (auto i = 0; i < 4u; i++) {
+            float sum = 0;
+            for (auto j = 0; j < 4u; j++)
+                sum += lhs.data[i * 4 + j] * rhs[j];
+            v[i] = sum;
+        }
+        return v;
     }
-    return v;
 }
 
 void frustum(mygl::matrix4 &mat,
@@ -115,8 +114,10 @@ void look_at(mygl::matrix4 &mat,
     F = F.normalized();
     up = up.normalized();
 
-    auto s = F ^ up;
-    auto u = s.normalized() ^ F;
+    auto s = up ^ F;
+    auto u = F ^ s.normalized();
+
+    std::cout << "f: " << F << " s: " << s << " u: " << u << "\n";
 
     auto mat2 = mygl::matrix4{{
          s[0],  s[1],  s[2], 0,
