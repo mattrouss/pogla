@@ -1,4 +1,5 @@
 #include "camera.h"
+#include "gl_err.h"
 
 Camera::Camera(const float left, const float right, const float bottom, const float top, const float znear,
                const float zfar)
@@ -28,4 +29,15 @@ mygl::matrix4 Camera::get_view_matrix() const
 mygl::matrix4 Camera::get_projection_matrix() const
 {
     return projection;
+}
+
+void Camera::set_prog_proj(mygl::program *prog) const
+{
+    GLint mat_proj_id;
+    GLint mat_obj_id;
+
+    mat_proj_id = glGetUniformLocation(prog->prog_id(), "projection_matrix");gl_err();
+    mat_obj_id = glGetUniformLocation(prog->prog_id(), "model_view_matrix");gl_err();
+    glUniformMatrix4fv(mat_proj_id, 1, GL_FALSE, projection.transpose().data.data());gl_err();
+    glUniformMatrix4fv(mat_obj_id, 1, GL_FALSE, view.transpose().data.data());gl_err();
 }
