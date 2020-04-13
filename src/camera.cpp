@@ -37,7 +37,7 @@ void Camera::set_prog_proj(mygl::program *prog) const
     GLint mat_obj_id;
 
     mat_proj_id = glGetUniformLocation(prog->prog_id(), "projection_matrix");gl_err();
-    mat_obj_id = glGetUniformLocation(prog->prog_id(), "model_view_matrix");gl_err();
+    mat_obj_id = glGetUniformLocation(prog->prog_id(), "view_matrix");gl_err();
     glUniformMatrix4fv(mat_proj_id, 1, GL_FALSE, projection.transpose().data.data());gl_err();
     glUniformMatrix4fv(mat_obj_id, 1, GL_FALSE, view.transpose().data.data());gl_err();
 }

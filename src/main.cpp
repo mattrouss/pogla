@@ -89,7 +89,7 @@ int main(int argc, char **argv)
     initGlew();
     init_gl();
 
-    auto mesh = mygl::load_mesh("../meshes/sphere.obj");
+    auto mesh = mygl::load_mesh("../meshes/monkey.obj");
 
     std::string v_shader = "../shaders/vertex.shd";
     std::string f_shader = "../shaders/fragment.shd";

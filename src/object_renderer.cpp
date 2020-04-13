@@ -54,6 +54,9 @@ ObjectRenderer::~ObjectRenderer()
 
 void ObjectRenderer::render() const
 {
+    GLint transform_id;
+    transform_id = glGetUniformLocation(program->prog_id(), "model_matrix");gl_err()
+    glUniformMatrix4fv(transform_id, 1, GL_FALSE, mesh->get_transform().transpose().data.data());gl_err()
     glBindVertexArray(vao);gl_err()
     glDrawArrays(GL_TRIANGLES, 0, mesh->verts.size() * 3);gl_err()
     glBindVertexArray(0);gl_err()
