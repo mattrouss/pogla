@@ -46,39 +46,36 @@ namespace mygl
             {
                 std::string a[3];
                 split >> a[0] >> a[1] >> a[2];
+                std::array<mygl::Vertex, 3> triangle;
                 for (unsigned k = 0; k < 3; k++)
                 {
                     std::string tmp;
                     std::stringstream spa(a[k]);
+                    mygl::Vertex v;
                     std::getline(spa, tmp, '/');
                     {
                         unsigned i = (std::stoi(tmp) - 1) * 3;
-                        for (unsigned j = 0; j < 3; j++)
-                        {
-                            res->verts.push_back(verts[i + j]);
-                        }
+                        v.pos = {{verts[i], verts[i + 1], verts[i + 2]}};
                     }
                     std::getline(spa, tmp, '/');
                     try
                     {
                         unsigned i = (std::stoi(tmp) - 1) * 2;
-                        for (unsigned j = 0; j < 2; j++)
-                        {
-                            res->uv.push_back(uv[i + j]);
-                        }
+                        v.uv = {{uv[i], uv[i + 1]}};
                     }
                     catch (std::invalid_argument&)
                     {}//ignore invalid arg
                     std::getline(spa, tmp, '/');
                     {
                         unsigned i = (std::stoi(tmp) - 1) * 3;
-                        for (unsigned j = 0; j < 3; j++)
-                        {
-                            res->normals.push_back(normals[i + j]);
-                            //std::cout << "normal: " << normals[i + j] << "\n";
-                        }
+                        v.normal = {{normals[i], normals[i + 1], normals[i + 2]}};
                     }
+
+                    triangle[k] = v;
                 }
+                compute_tangent(triangle);
+                for (unsigned i = 0; i < 3; i++)
+                    res->verts.push_back(triangle[i]);
 
             }
             else if (type == "vt")
@@ -94,6 +91,8 @@ namespace mygl
             }
         }
 
+        for (unsigned i = 0; i < verts.size(); i++)
+            res->verts[i].tangent.normalized();
         return res;
     }
 
@@ -102,7 +101,7 @@ namespace mygl
         out << "(\n";
         for (unsigned i = 0; i < m.verts.size(); i += 3)
         {
-            out << "{" << m.verts[i] << " " << m.verts[i + 1] << " " << m.verts[i + 2] << "}\n";
+            out << "{" << m.verts[i].pos[i] << " " << m.verts[i].pos[1] << " " << m.verts[i].pos[2] << "}\n";
         }
         out << ")";
 
@@ -115,20 +114,18 @@ namespace mygl
         for (unsigned i = 0; i < verts.size(); i += 3)
         {
             auto p = Vec4{};
-            p[0] = verts[i];
-            p[1] = verts[i + 1];
-            p[2] = verts[i + 2];
+            p[0] = verts[i].pos[0];
+            p[1] = verts[i].pos[1];
+            p[2] = verts[i].pos[2];
             p[3] = 1;
 
             auto p2 = mat * p;
-            res->verts.push_back(p2[0]);
-            res->verts.push_back(p2[1]);
-            res->verts.push_back(p2[2]);
+            res->verts.push_back(Vertex({{p2[0], p2[1], p2[3]}}));
         }
 
         return res;
     }
-
+  
     void mesh::reset_transform()
     {
         transform_mat = matrix4::identity();
@@ -147,5 +144,26 @@ namespace mygl
     matrix4 mesh::get_transform() const
     {
         return transform_mat;
+    }
+
+    void compute_tangent(std::array<mygl::Vertex, 3>& triangle) {
+        Vec3 tangent;
+        auto edge1 = triangle[1].pos - triangle[0].pos;
+        auto edge2 = triangle[2].pos - triangle[0].pos;
+
+        auto deltaU1 = triangle[1].uv[0] - triangle[0].uv[0];
+        auto deltaU2 = triangle[2].uv[0] - triangle[0].uv[0];
+        auto deltaV1 = triangle[1].uv[1] - triangle[0].uv[1];
+        auto deltaV2 = triangle[2].uv[1] - triangle[0].uv[1];
+
+        auto d = 1 / (deltaU1 * deltaV2 - deltaU2 * deltaV1);
+
+        tangent[0] = d * (deltaV2 * edge1[0] - deltaV1 * edge2[0]);
+        tangent[1] = d * (deltaV2 * edge1[1] - deltaV1 * edge2[1]);
+        tangent[2] = d * (deltaV2 * edge1[2] - deltaV1 * edge2[2]);
+
+        for (unsigned i = 0; i < 3; i++)
+            triangle[i].tangent += tangent;
+
     }
 }

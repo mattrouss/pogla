@@ -67,6 +67,10 @@ namespace mygl {
             return std::sqrt(sqr_magnitude());
         }
 
+        void normalize() {
+            *this = this->normalized();
+        }
+
         Vector normalized() const {
             Vector copy = *this;
             copy /= magnitude();
@@ -135,6 +139,7 @@ namespace mygl {
         return v /= l;
     }
 
+    using Vec2 = Vector<float, 2>;
     using Vec3 = Vector<float, 3>;
     using Vec4 = Vector<float, 4>;
 

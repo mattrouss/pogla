@@ -9,26 +9,35 @@ ObjectRenderer::ObjectRenderer(mygl::program *prog, std::shared_ptr<mygl::mesh> 
     glGenVertexArrays(1, &vao);gl_err()
     glBindVertexArray(vao);gl_err()
 
-    GLuint buffer_id[2];
-    glGenBuffers(2, buffer_id);gl_err()
+    GLuint vertex_buffer_id;
+    glGenBuffers(1, &vertex_buffer_id);gl_err()
 
-    //verts
-    glBindBuffer(GL_ARRAY_BUFFER, buffer_id[0]);gl_err()
-    glBufferData(GL_ARRAY_BUFFER, mesh->verts.size() * sizeof(float), mesh->verts.data(), GL_STATIC_DRAW);
-    gl_err()
-    glVertexAttribPointer(buffer_id[0], 3, GL_FLOAT, GL_FALSE, 0, 0);gl_err()
-    glEnableVertexAttribArray(buffer_id[0]);gl_err()
+    auto verts = mesh->verts;
+
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_id);gl_err();
+    glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(mygl::Vertex), verts.data(), GL_STATIC_DRAW);gl_err();
+
+    //positions
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(mygl::Vertex), (void *)(offsetof(mygl::Vertex, pos)));gl_err();
+    glEnableVertexAttribArray(0);gl_err();
 
     //normals
-    glBindBuffer(GL_ARRAY_BUFFER, buffer_id[1]);gl_err()
-    glBufferData(GL_ARRAY_BUFFER, mesh->normals.size() * sizeof(float), mesh->normals.data(), GL_STATIC_DRAW);
-    gl_err()
-    glVertexAttribPointer(buffer_id[1], 3, GL_FLOAT, GL_FALSE, 0, 0);gl_err()
-    glEnableVertexAttribArray(buffer_id[1]);gl_err()
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(mygl::Vertex), (void *)(offsetof(mygl::Vertex, normal)));gl_err();
+    glEnableVertexAttribArray(1);gl_err();
 
-    buffer_ids.push_back(buffer_id[0]);
-    buffer_ids.push_back(buffer_id[1]);
+    //uv
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(mygl::Vertex), (void *)(offsetof(mygl::Vertex, uv)));gl_err();
+    glEnableVertexAttribArray(2);gl_err();
 
+    //tangent
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(mygl::Vertex), (void *)(offsetof(mygl::Vertex, tangent)));gl_err();
+    glEnableVertexAttribArray(3);gl_err();
+
+
+
+    buffer_ids.push_back(vertex_buffer_id);
+
+    /*
     if (!mesh->uv.empty())
     {
         GLuint uv_id;
@@ -42,12 +51,16 @@ ObjectRenderer::ObjectRenderer(mygl::program *prog, std::shared_ptr<mygl::mesh> 
 
         buffer_ids.push_back(uv_id);
     }
+     */
 
     glBindVertexArray(0);gl_err()
 }
 
 ObjectRenderer::~ObjectRenderer()
 {
+    glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(2);
     glDeleteBuffers(buffer_ids.size(), (GLuint*)buffer_ids.data());gl_err()
     glDeleteVertexArrays(1, &vao);gl_err()
 }

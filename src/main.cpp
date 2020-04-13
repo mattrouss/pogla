@@ -10,14 +10,9 @@
 #include "verts.h"
 #include "camera.h"
 #include "object_renderer.h"
+#include "gl_err.h"
 
 std::vector<std::shared_ptr<ObjectRenderer>> renderers;
-
-#define gl_err() \
-{\
-    GLenum err = glGetError();\
-    if (err != GL_NO_ERROR) std::cerr << "OpenGL error l." << __LINE__ << ": " << err << std::endl;\
-}
 
 void display()
 {

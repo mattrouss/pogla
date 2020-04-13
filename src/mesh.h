@@ -9,12 +9,19 @@
 
 namespace mygl
 {
+    struct Vertex {
+        Vertex() = default;
+        Vertex(const mygl::Vec3& pos_): pos(pos_) {}
+        Vertex(const mygl::Vec3& pos_, const mygl::Vec3& normal_, const mygl::Vec2& uv_, const mygl::Vec3& tangent_):
+            pos(pos_), normal(normal_), uv(uv_), tangent(tangent_) {}
+
+        mygl::Vec3 pos;
+        mygl::Vec3 normal;
+        mygl::Vec2 uv;
+        mygl::Vec3 tangent;
+    };
     struct mesh
     {
-        std::vector<float> verts;
-        std::vector<float> normals;
-        std::vector<float> uv;
-
         std::shared_ptr<mesh> transform(matrix4 mat);
         void reset_transform();
         void translate(Vec3 v);
@@ -24,10 +31,13 @@ namespace mygl
 
     private:
         matrix4 transform_mat;
+        std::vector<Vertex> verts;
     };
 
     std::shared_ptr<mesh> load_mesh(std::string path);
     std::ostream& operator<<(std::ostream& out, const mesh& m);
+
+    void compute_tangent(std::array<mygl::Vertex, 3>& triangles);
 }
 
 #endif //POGL1_MESH_H
