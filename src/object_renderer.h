@@ -19,6 +19,7 @@ private:
     mygl::program* program;
     std::shared_ptr<mygl::mesh> mesh;
     std::vector<GLint> buffer_ids;
+    std::vector<GLuint> vertex_attribs;
     GLuint vao;
 };
 
