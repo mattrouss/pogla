@@ -3,6 +3,7 @@
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normals;
 layout(location = 2) in vec2 uv_coord;
+layout(location = 3) in vec3 tangent;
 uniform vec4 color;
 uniform mat4 model_view_matrix;// = mat4(
 			      //0, 0, 1, 0,

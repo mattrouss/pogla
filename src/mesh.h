@@ -28,6 +28,8 @@ namespace mygl
 
     std::shared_ptr<mesh> load_mesh(std::string path);
     std::ostream& operator<<(std::ostream& out, const mesh& m);
+
+    void compute_tangent(std::array<mygl::Vertex, 3>& triangles);
 }
 
 #endif //POGL1_MESH_H
