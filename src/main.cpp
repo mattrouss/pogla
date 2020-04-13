@@ -5,12 +5,12 @@
 
 #include "program.h"
 #include "matrix4.h"
-#include "vector.h"
 #include "mesh.h"
 #include "verts.h"
 #include "camera.h"
+#include "object_renderer.h"
 
-GLuint vao;
+std::vector<std::shared_ptr<ObjectRenderer>> renderers;
 
 #define gl_err() \
 {\
@@ -21,9 +21,10 @@ GLuint vao;
 void display()
 {
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);gl_err();
-    glBindVertexArray(vao);gl_err();
-    glDrawArrays(GL_TRIANGLES, 0, verts.size() * 3);gl_err();
-    glBindVertexArray(0);gl_err();
+    for (auto r : renderers)
+    {
+        r->render();
+    }
     glutSwapBuffers();
 }
 
@@ -34,7 +35,7 @@ bool initGlut(int &argc, char **argv) {
     glutInitDisplayMode(GLUT_RGBA|GLUT_DOUBLE|GLUT_DEPTH);
     glutInitWindowSize(1024, 1024);
     glutInitWindowPosition(10, 10);
-    glutCreateWindow("Test OpenGL - POGL");
+    glutCreateWindow("Bump");
     glutDisplayFunc(display);
     return true;//thanks, now I can really test for errors
 }
@@ -72,31 +73,6 @@ void init_uniforms(mygl::program* prog, std::array<float, 4> color, mygl::matrix
     glUniformMatrix4fv(mat_obj_id, 1, GL_FALSE, model_view.transpose().data.data());gl_err();
 }
 
-GLuint initVBO(mygl::program* prog)
-{
-    GLint obj_location = glGetAttribLocation(prog->prog_id(), "position");gl_err();
-
-    GLuint vao_id;
-    glGenVertexArrays(1, &vao_id);gl_err();
-    glBindVertexArray(vao_id);gl_err();
-
-    GLuint buffer_id[2];
-    glGenBuffers(2, buffer_id);gl_err();//works because we only ask for one buffer
-
-
-    glBindBuffer(GL_ARRAY_BUFFER, buffer_id[0]);gl_err();
-    glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(float), verts.data(), GL_STATIC_DRAW);gl_err();
-    glVertexAttribPointer(buffer_id[0], 3, GL_FLOAT, GL_FALSE, 0, 0);gl_err();
-    glEnableVertexAttribArray(buffer_id[0]);gl_err();
-
-    glBindBuffer(GL_ARRAY_BUFFER, buffer_id[1]);gl_err();
-    glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), normals.data(), GL_STATIC_DRAW);gl_err();
-    glVertexAttribPointer(buffer_id[1], 3, GL_FLOAT, GL_FALSE, 0, 0);gl_err();
-    glEnableVertexAttribArray(buffer_id[1]);gl_err();
-
-    return vao_id;
-}
-
 int main(int argc, char **argv)
 {
     initGlut(argc, argv);
@@ -104,8 +80,6 @@ int main(int argc, char **argv)
     init_gl();
 
     auto mesh = mygl::load_mesh("../meshes/monkey.obj");
-    verts = mesh->verts;
-    normals = mesh->normals;
 
     std::string v_shader = "../shaders/vertex.shd";
     std::string f_shader = "../shaders/fragment.shd";
@@ -118,6 +92,9 @@ int main(int argc, char **argv)
     prog->use();
     std::cout << "Hello, World!" << std::endl;
 
+    auto renderer = std::make_shared<ObjectRenderer>(prog, mesh);
+    renderers.push_back(renderer);
+
     //init camera
     auto cam = Camera{-1, 1, -1, 1, 5, 2000};
     cam.look_at(10, 0, 10, 0, 0, 0, 0, 1, 0);
@@ -127,10 +104,7 @@ int main(int argc, char **argv)
     std::cout << view_matrix << "\n";
     //configure uniforms and vbo
     init_uniforms(prog, {1, 1, 1, 1}, projection_matrix, view_matrix);
-    vao = initVBO(prog);
 
     glutMainLoop();
-
-    glDeleteVertexArrays(1, &vao);gl_err();
     return 0;
 }
