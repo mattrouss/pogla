@@ -29,6 +29,11 @@ ObjectRenderer::ObjectRenderer(mygl::program *prog, std::shared_ptr<mygl::mesh> 
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(mygl::Vertex), (void *)(offsetof(mygl::Vertex, uv)));gl_err();
     glEnableVertexAttribArray(2);gl_err();
 
+    //tangent
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(mygl::Vertex), (void *)(offsetof(mygl::Vertex, tangent)));gl_err();
+    glEnableVertexAttribArray(3);gl_err();
+
+
 
     buffer_ids.push_back(vertex_buffer_id);
 
