@@ -4,12 +4,8 @@
 #include "mesh.h"
 #include <vector>
 
-std::vector<float> verts ={
-        0,0,0,
-        0,1,0,
-        1,0,0
-};
-
+std::vector<float> verts;
 std::vector<float> normals;
+std::vector<float> uv_coords;
 
 #endif //POGL1_VERTS_H

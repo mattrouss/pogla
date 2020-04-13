@@ -5,22 +5,19 @@ Camera::Camera(const float left, const float right, const float bottom, const fl
 {
     projection = mygl::matrix4::identity();
     frustum(projection, left, right, bottom, top, znear, zfar);
-    posx = posy = posz = 0;
 }
 
-void Camera::look_at(float x, float y, float z, float cx, float cy, float cz, float upx, float upy, float upz)
+void Camera::look_at(const mygl::Vec3& eye, const mygl::Vec3& target, const mygl::Vec3& up)
 {
     view = mygl::matrix4::identity();
-    ::look_at(view, x, y, z, cx, cy, cz, upx, upy, upz);
-    translate(x, y, z);
+    ::look_at(view, eye, target, up);
+    translate(eye);
 }
 
-void Camera::translate(float x, float y, float z)
+void Camera::translate(const mygl::Vec3& v)
 {
-    ::translate(view, -x, -y, -z);
-    posx = x;
-    posy = y;
-    posz = z;
+    ::translate(view, -1 * v);
+    pos = v;
 }
 
 mygl::matrix4 Camera::get_view_matrix() const
