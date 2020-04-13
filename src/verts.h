@@ -4,8 +4,6 @@
 #include "mesh.h"
 #include <vector>
 
-std::vector<float> verts;
-std::vector<float> normals;
-std::vector<float> uv_coords;
+std::vector<mygl::Vertex> verts;
 
 #endif //POGL1_VERTS_H

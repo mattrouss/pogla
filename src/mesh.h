@@ -9,12 +9,20 @@
 
 namespace mygl
 {
+    struct Vertex {
+        Vertex() = default;
+        Vertex(const mygl::Vec3& pos_): pos(pos_) {}
+        Vertex(const mygl::Vec3& pos_, const mygl::Vec3& normal_, const mygl::Vec2& uv_, const mygl::Vec3& tangent_):
+            pos(pos_), normal(normal_), uv(uv_), tangent(tangent_) {}
+
+        mygl::Vec3 pos;
+        mygl::Vec3 normal;
+        mygl::Vec2 uv;
+        mygl::Vec3 tangent;
+    };
     struct mesh
     {
-        std::vector<float> verts;
-        std::vector<float> normals;
-        std::vector<float> uv;
-
+        std::vector<Vertex> verts;
         std::shared_ptr<mesh> tranform(matrix4 mat);
     };
 

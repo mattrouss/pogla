@@ -50,34 +50,26 @@ namespace mygl
                 {
                     std::string tmp;
                     std::stringstream spa(a[k]);
+                    mygl::Vertex v;
                     std::getline(spa, tmp, '/');
                     {
                         unsigned i = (std::stoi(tmp) - 1) * 3;
-                        for (unsigned j = 0; j < 3; j++)
-                        {
-                            res->verts.push_back(verts[i + j]);
-                        }
+                        v.pos = {{verts[i], verts[i + 1], verts[i + 2]}};
                     }
                     std::getline(spa, tmp, '/');
                     try
                     {
                         unsigned i = (std::stoi(tmp) - 1) * 2;
-                        for (unsigned j = 0; j < 2; j++)
-                        {
-                            res->uv.push_back(uv[i + j]);
-                        }
+                        v.uv = {{uv[i], uv[i + 1]}};
                     }
                     catch (std::invalid_argument&)
                     {}//ignore invalid arg
                     std::getline(spa, tmp, '/');
                     {
                         unsigned i = (std::stoi(tmp) - 1) * 3;
-                        for (unsigned j = 0; j < 3; j++)
-                        {
-                            res->normals.push_back(normals[i + j]);
-                            //std::cout << "normal: " << normals[i + j] << "\n";
-                        }
+                        v.normal = {{normals[i], normals[i + 1], normals[i + 2]}};
                     }
+                    res->verts.push_back(v);
                 }
 
             }
@@ -102,7 +94,7 @@ namespace mygl
         out << "(\n";
         for (unsigned i = 0; i < m.verts.size(); i += 3)
         {
-            out << "{" << m.verts[i] << " " << m.verts[i + 1] << " " << m.verts[i + 2] << "}\n";
+            out << "{" << m.verts[i].pos[i] << " " << m.verts[i].pos[1] << " " << m.verts[i].pos[2] << "}\n";
         }
         out << ")";
 
@@ -115,15 +107,13 @@ namespace mygl
         for (unsigned i = 0; i < verts.size(); i += 3)
         {
             auto p = Vec4{};
-            p[0] = verts[i];
-            p[1] = verts[i + 1];
-            p[2] = verts[i + 2];
+            p[0] = verts[i].pos[0];
+            p[1] = verts[i].pos[1];
+            p[2] = verts[i].pos[2];
             p[3] = 1;
 
             auto p2 = mat * p;
-            res->verts.push_back(p2[0]);
-            res->verts.push_back(p2[1]);
-            res->verts.push_back(p2[2]);
+            res->verts.push_back(Vertex({{p2[0], p2[1], p2[3]}}));
         }
 
         return res;
