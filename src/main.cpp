@@ -76,19 +76,11 @@ void init_samplers() {
    delete brick_tex;
 }
 
-void init_uniforms(mygl::program* prog, std::array<float, 4> color, mygl::matrix4 projection,
-        mygl::matrix4 model_view)
+void init_color_uniform(mygl::program* prog, std::array<float, 4> color)
 {
     GLint color_id;
-    GLint mat_proj_id;
-    GLint mat_obj_id;
     color_id = glGetUniformLocation(prog->prog_id(), "color");gl_err();
     glUniform4f(color_id, color[0], color[1], color[2], color[3]);gl_err();
-
-    mat_proj_id = glGetUniformLocation(prog->prog_id(), "projection_matrix");gl_err();
-    mat_obj_id = glGetUniformLocation(prog->prog_id(), "model_view_matrix");gl_err();
-    glUniformMatrix4fv(mat_proj_id, 1, GL_FALSE, projection.transpose().data.data());gl_err();
-    glUniformMatrix4fv(mat_obj_id, 1, GL_FALSE, model_view.transpose().data.data());gl_err();
 }
 
 int main(int argc, char **argv)
@@ -122,7 +114,8 @@ int main(int argc, char **argv)
     std::cout << view_matrix << "\n";
     //configure samplers, uniforms and vbo
     init_samplers();
-    init_uniforms(prog, {1, 1, 1, 1}, projection_matrix, view_matrix);
+    init_color_uniform(prog, {1, 1, 1, 1});
+    cam.set_prog_proj(prog);
 
     glutMainLoop();
     return 0;

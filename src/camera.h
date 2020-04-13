@@ -3,6 +3,7 @@
 
 
 #include "matrix4.h"
+#include "program.h"
 
 class Camera
 {
@@ -23,6 +24,8 @@ public:
     mygl::matrix4 get_view_matrix() const;
 
     mygl::matrix4 get_projection_matrix() const;
+
+    void set_prog_proj(mygl::program* prog) const;
 
 private:
     mygl::matrix4 projection;
