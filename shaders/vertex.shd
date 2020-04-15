@@ -24,6 +24,7 @@ struct light
     bool used;
 };
 
+uniform int enableBumpMapping;
 uniform light lights[16];
 
 out vec4 vColor;
@@ -34,11 +35,17 @@ out vec2 tex_coord;
 void main() {
     gl_Position = projection_matrix * view_matrix * model_matrix * vec4(position, 1.0);
     vColor = color;
+    if (enableBumpMapping == 1) {
+        vec3 bitangent = normalize(cross(tangent, normal));
+        mat3 TBN = mat3(tangent, bitangent, normal);
+    }
+
     for (int i = 0; i < 16; i++)
     {
         light_dir[i] = normalize(lights[i].position - position);
         light_color[i] = vec4(lights[i].color, 1);
     }
+
     normal = normals;
     tex_coord = uv_coord;
 }
