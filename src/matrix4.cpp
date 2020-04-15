@@ -5,7 +5,10 @@ namespace mygl
 {
     matrix4::matrix4()
     {
-        data.fill(0);
+        data = {1,0,0,0,
+                0,1,0,0,
+                0,0,1,0,
+                0,0,0,1};
     }
 
     matrix4::matrix4(std::array<float, 16> data_)
@@ -68,6 +71,70 @@ namespace mygl
                 t.data[i * 4 + j] = this->data[j * 4 + i];
 
         return t;
+    }
+
+    void matrix4::translate(const mygl::Vec3 &v)
+    {
+        auto translation = mygl::matrix4{{
+                                                 1, 0, 0, v[0],
+                                                 0, 1, 0, v[1],
+                                                 0, 0, 1, v[2],
+                                                 0, 0, 0, 1
+                                         }};
+
+        *this *= translation;
+    }
+
+    matrix4 rot_y(float angle)
+    {
+        float cos_a = cosf(angle);
+        float sin_a = sinf(angle);
+        return mygl::matrix4{{
+            -cos_a, 0, sin_a, 0,
+                 0, 1,     0, 0,
+            -sin_a, 0, cos_a, 0,
+                 0, 0,     0, 1
+        }};
+    }
+
+    matrix4 rot_z(float angle)
+    {
+        float cos_a = cosf(angle);
+        float sin_a = sinf(angle);
+        return mygl::matrix4{{
+            cos_a, -sin_a, 0, 0,
+            sin_a,  cos_a, 0, 0,
+                0,      0, 1, 0,
+                0,      0, 0, 1
+        }};
+    }
+
+    matrix4 rot_x(float angle)
+    {
+        float cos_a = cosf(angle);
+        float sin_a = sinf(angle);
+        return mygl::matrix4{{
+            1,     0,      0, 0,
+            0, cos_a, -sin_a, 0,
+            0, sin_a,  cos_a, 0,
+            0,     0,      0, 1
+        }};
+    }
+
+    void matrix4::rotate(const mygl::Vec3 &v)
+    {
+        //x: pitch
+        //y: yaw
+        //z: roll
+
+        //order: yaw pitch roll
+        auto pitch = rot_x(v[0]);
+        auto yaw = rot_y(v[1]);
+        auto roll = rot_z(v[2]);
+
+        auto rot = yaw * pitch * roll;
+
+        *this *= rot;//.transpose();//not sure about the transpose, needs testing
     }
 
     mygl::Vec4 operator*(const mygl::matrix4& lhs, const mygl::Vec4& rhs) {

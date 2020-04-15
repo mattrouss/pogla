@@ -23,7 +23,16 @@ namespace mygl
     struct mesh
     {
         std::vector<Vertex> verts;
-        std::shared_ptr<mesh> tranform(matrix4 mat);
+
+        std::shared_ptr<mesh> transform(matrix4 mat);
+        void reset_transform();
+        void translate(Vec3 v);
+        void rotate(Vec3 v);
+
+        matrix4 get_transform() const;
+
+    private:
+        matrix4 transform_mat;
     };
 
     std::shared_ptr<mesh> load_mesh(std::string path);

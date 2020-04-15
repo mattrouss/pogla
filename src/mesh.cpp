@@ -108,7 +108,7 @@ namespace mygl
         return out;
     }
 
-    std::shared_ptr<mesh> mesh::tranform(matrix4 mat)
+    std::shared_ptr<mesh> mesh::transform(matrix4 mat)
     {
         auto res = std::make_shared<mesh>();
         for (unsigned i = 0; i < verts.size(); i += 3)
@@ -125,7 +125,26 @@ namespace mygl
 
         return res;
     }
+  
+    void mesh::reset_transform()
+    {
+        transform_mat = matrix4::identity();
+    }
 
+    void mesh::translate(Vec3 v)
+    {
+        transform_mat.translate(v);
+    }
+
+    void mesh::rotate(Vec3 v)
+    {
+        transform_mat.rotate(v);
+    }
+
+    matrix4 mesh::get_transform() const
+    {
+        return transform_mat;
+    }
 
     void compute_tangent(std::array<mygl::Vertex, 3>& triangle) {
         Vec3 tangent;
