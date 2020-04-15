@@ -11,6 +11,7 @@
 #include "camera.h"
 #include "object_renderer.h"
 #include "gl_err.h"
+#include "light.h"
 
 std::vector<std::shared_ptr<ObjectRenderer>> renderers;
 
@@ -111,6 +112,11 @@ int main(int argc, char **argv)
     init_samplers();
     init_color_uniform(prog, {1, 1, 1, 1});
     cam.set_prog_proj(prog);
+
+    auto lights = LightManager{};
+    lights.set(0, {{5,5,5}}, {{1,1,1}});
+    lights.set(1, {{-5,5,5}}, {{1,1,0}});
+    lights.set_lights_uniform(prog);
 
     glutMainLoop();
     return 0;

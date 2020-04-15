@@ -77,6 +77,11 @@ namespace mygl {
             return copy;
         }
 
+        std::array<float, D> data() const
+        {
+            return data;
+        }
+
         friend std::ostream& operator<<(std::ostream &out, const Vector<T, D> &vec) {
             out << "Vec( ";
             for (auto i = 0; i < D; i++)
