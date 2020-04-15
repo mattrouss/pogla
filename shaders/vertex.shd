@@ -17,16 +17,28 @@ uniform mat4 projection_matrix; // = mat4(
 			      //0.00000, 0.00000, -1.00020, -1.00000,
 			      //0.00000, 0.00000, -10.00100, 0.00000);
 
-vec3 light_position = vec3(5.0, 5.0, 5.0);
+struct light
+{
+    vec3 position;
+    vec3 color;
+    bool used;
+};
+
+uniform light lights[16];
 
 out vec4 vColor;
-out vec3 light_dir;
+out vec3 light_dir[16];
+out vec4 light_color[16];
 out vec3 normal;
 out vec2 tex_coord;
 void main() {
     gl_Position = projection_matrix * view_matrix * model_matrix * vec4(position, 1.0);
     vColor = color;
-    light_dir = normalize(light_position - position);
+    for (int i = 0; i < 16; i++)
+    {
+        light_dir[i] = normalize(lights[i].position - position);
+        light_color[i] = vec4(lights[i].color, 1);
+    }
     normal = normals;
     tex_coord = uv_coord;
 }
