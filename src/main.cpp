@@ -12,6 +12,7 @@
 #include "object_renderer.h"
 #include "gl_err.h"
 #include "light.h"
+#include "inputmanager.h"
 
 std::vector<std::shared_ptr<ObjectRenderer>> renderers;
 
@@ -23,6 +24,40 @@ void display()
         r->render();
     }
     glutSwapBuffers();
+}
+
+void keyboardInput(unsigned char key, int, int)
+{
+    auto mod = glutGetModifiers();
+    mygl::Vec3 speed = {{0.0, 0.0, 0.0}};
+    if (mod & GLUT_ACTIVE_CTRL)
+    {
+        speed += {{0.0, -1.0, 0.0}};
+    }
+    switch (key)
+    {
+        case ' ':
+            speed += {{0.0, 1.0, 0.0}};
+            break;
+
+        case 'w':
+        case'z':
+            speed += {{0.0,0.0,-1.0}};
+            break;
+        case 'q':
+        case 'a':
+            speed += {{-1,0,0}};
+            break;
+        case 's':
+            speed += {{0,0,1}};
+            break;
+        case 'd':
+            speed += {{1,0,0}};
+            break;
+    }
+
+    inputManager.send_movement(speed);
+    glutPostRedisplay();
 }
 
 bool initGlut(int &argc, char **argv) {
@@ -102,21 +137,25 @@ int main(int argc, char **argv)
     renderers.push_back(renderer);
 
     //init camera
-    auto cam = Camera{-1, 1, -1, 1, 5, 2000};
-    cam.look_at({{0, 0, 10}}, {{0, 0, 0}}, {{0, 1, 0}});
-    auto projection_matrix = cam.get_projection_matrix();
-    auto view_matrix = cam.get_view_matrix();
-    std::cout << projection_matrix << "\n";
-    std::cout << view_matrix << "\n";
+    auto cam = std::make_shared<Camera>(-1, 1, -1, 1, 5, 2000);
+    cam->look_at({{0, 0, 10}}, {{0, 0, 0}}, {{0, 1, 0}});
+    //auto projection_matrix = cam.get_projection_matrix();
+    //auto view_matrix = cam.get_view_matrix();
+    //std::cout << projection_matrix << "\n";
+    //std::cout << view_matrix << "\n";
     //configure samplers, uniforms and vbo
     init_samplers();
     init_color_uniform(prog, {1, 1, 1, 1});
-    cam.set_prog_proj(prog);
+    cam->set_prog_proj(prog);
+    cam->set_prog(prog);
+    inputManager.register_movement_listener(cam);
 
     auto lights = LightManager{};
     lights.set(0, {{5,5,5}}, {{1,1,1}});
     lights.set(1, {{-5,5,5}}, {{1,1,0}});
     lights.set_lights_uniform(prog);
+
+    glutKeyboardFunc(keyboardInput);
 
     glutMainLoop();
     return 0;

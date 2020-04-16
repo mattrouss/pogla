@@ -27,6 +27,9 @@ add_executable(bump src/main.cpp
         src/image.h
         src/image_io.cpp
         src/image_io.h
-        src/light.cpp src/light.h)
+        src/light.cpp src/light.h
+        src/inputmanager.cpp
+        src/inputmanager.h
+        src/movable.h)
 
 target_link_libraries(bump -lGL -lGLEW -lglut -lpthread)
