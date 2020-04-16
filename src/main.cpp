@@ -66,7 +66,7 @@ void init_samplers(mygl::program* prog, bool enableBumpMapping) {
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-   auto brick_tex = io::load_image("../textures/brick.tga");
+   auto brick_tex = io::load_image("../textures/pebble_texture.tga");
    if (!brick_tex)
        return;
    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -80,7 +80,7 @@ void init_samplers(mygl::program* prog, bool enableBumpMapping) {
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-   auto normal_map = io::load_image("../textures/normal_stones.tga");
+   auto normal_map = io::load_image("../textures/pebble_normal.tga");
    if (!normal_map)
        return;
    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -143,8 +143,8 @@ int main(int argc, char **argv)
     cam.set_prog_proj(prog);
 
     auto lights = LightManager{};
-    lights.set(0, {{5,5,5}}, {{1,1,1}});
-    lights.set(1, {{-5,5,5}}, {{1,1,0}});
+    lights.set(0, {{10,10,10}}, {{1,1,1}});
+    //lights.set(1, {{-5,5,5}}, {{1,1,0}});
     lights.set_lights_uniform(prog);
 
     glutMainLoop();
