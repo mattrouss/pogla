@@ -30,6 +30,6 @@ add_executable(bump src/main.cpp
         src/light.cpp src/light.h
         src/inputmanager.cpp
         src/inputmanager.h
-        src/movable.h)
+        src/movable.h src/clock.cpp src/clock.h)
 
 target_link_libraries(bump -lGL -lGLEW -lglut -lpthread)

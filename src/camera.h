@@ -1,7 +1,7 @@
 #ifndef BUMP_CAMERA_H
 #define BUMP_CAMERA_H
 
-#define cam_speed 0.1
+#define cam_speed 20
 
 #include "matrix4.h"
 #include "program.h"
@@ -21,7 +21,7 @@ public:
             bool translate = true);
 
     void translate(const mygl::Vec3 v) override;
-    void translate(const mygl::Vec3 v, bool update);
+    void set_pos(const mygl::Vec3 v, bool update);
 
     void rotate(const mygl::Vec3 rotation) override;
 

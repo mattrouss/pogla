@@ -9,11 +9,17 @@
 class InputManager
 {
 public:
-    void register_movement_listener(std::shared_ptr<Movable> listener);
-    void send_movement(mygl::Vec3 translation);
+    InputManager()
+    {
+        state.fill(false);
+    }
+    void register_movement_listener(const std::shared_ptr<Movable>& listener);
+    void send_input();
+    void set_key(char c, bool state);
 
 private:
     std::vector<std::shared_ptr<Movable>> movement_listeners;
+    std::array<bool, 256> state;
 };
 
 extern InputManager inputManager;
