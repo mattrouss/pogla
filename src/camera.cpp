@@ -70,3 +70,8 @@ void Camera::set_prog(mygl::program* p)
 {
     prog = p;
 }
+
+void Camera::set_pos(const mygl::Vec3 p)
+{
+    set_pos(p, false);
+}

@@ -21,6 +21,7 @@ public:
             bool translate = true);
 
     void translate(const mygl::Vec3 v) override;
+    void set_pos(const mygl::Vec3 p) override;
     void set_pos(const mygl::Vec3 v, bool update);
 
     void rotate(const mygl::Vec3 rotation) override;
