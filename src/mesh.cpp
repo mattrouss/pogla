@@ -151,16 +151,12 @@ namespace mygl
         auto edge1 = triangle[1].pos - triangle[0].pos;
         auto edge2 = triangle[2].pos - triangle[0].pos;
 
-        auto deltaU1 = triangle[1].uv[0] - triangle[0].uv[0];
-        auto deltaU2 = triangle[2].uv[0] - triangle[0].uv[0];
-        auto deltaV1 = triangle[1].uv[1] - triangle[0].uv[1];
-        auto deltaV2 = triangle[2].uv[1] - triangle[0].uv[1];
+        auto deltaUV1 = triangle[1].uv - triangle[0].uv;
+        auto deltaUV2 = triangle[2].uv - triangle[0].uv;
 
-        auto d = 1 / (deltaU1 * deltaV2 - deltaU2 * deltaV1);
+        auto d = 1 / (deltaUV1[0] * deltaUV2[1] - deltaUV2[0] * deltaUV1[1]);
 
-        tangent[0] = d * (deltaV2 * edge1[0] - deltaV1 * edge2[0]);
-        tangent[1] = d * (deltaV2 * edge1[1] - deltaV1 * edge2[1]);
-        tangent[2] = d * (deltaV2 * edge1[2] - deltaV1 * edge2[2]);
+        tangent = d * (deltaUV2[1] * edge1 - deltaUV1[1] * edge2);
 
         for (unsigned i = 0; i < 3; i++)
             triangle[i].tangent += tangent;
