@@ -13,8 +13,10 @@
 #include "light.h"
 #include "inputmanager.h"
 #include "clock.h"
+#include "trajectory.h"
 
 std::vector<std::shared_ptr<ObjectRenderer>> renderers;
+std::function<void()> light_trajectory_callback;
 
 void display()
 {
@@ -41,6 +43,7 @@ void keyUp(unsigned char key, int, int)
 void refresh_timer(int)
 {
     glutPostRedisplay();
+    light_trajectory_callback();
     glutTimerFunc(1000/50, refresh_timer, 0);
 }
 
@@ -135,9 +138,28 @@ int main(int argc, char **argv)
 
     //configure lights
     auto lights = LightManager{};
-    lights.set(0, {{5,5,5}}, {{1,1,1}});
-    lights.set(1, {{-5,5,5}}, {{1,1,0}});
+    lights.set(0, {{5,5,5}}, {{1,1,0.8}});
+    //lights.set(1, {{-5,5,5}}, {{1,1,0}});
     lights.set_lights_uniform(prog);
+
+    //set light trajectory
+    auto light_movement = Trajectory{{[](float t) -> mygl::Vec3 {
+        float x = sinf(t);
+        float z = cosf(t);
+        float y = cosf(t / 10.0f);
+
+        auto res = mygl::Vec3{{x, y, z}} * 3.0f;
+        return res;
+    }, TFunc::ABS_POS|TFunc::ABS_TIME|TFunc::SET_POS}};
+    light_movement.register_object(lights.get(0));
+
+    //temporary until a better solution is found
+    light_trajectory_callback = light_movement.get_callback_with_update(
+            [&]()
+            {
+                lights.set_lights_uniform(prog);
+            }
+            );
 
     //start display timer and start main loop
     glutTimerFunc(1000/50, refresh_timer, 0);
