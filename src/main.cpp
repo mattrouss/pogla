@@ -7,11 +7,12 @@
 #include "image_io.h"
 #include "matrix4.h"
 #include "mesh.h"
-#include "verts.h"
 #include "camera.h"
 #include "object_renderer.h"
 #include "gl_err.h"
 #include "light.h"
+#include "inputmanager.h"
+#include "clock.h"
 
 std::vector<std::shared_ptr<ObjectRenderer>> renderers;
 
@@ -23,6 +24,24 @@ void display()
         r->render();
     }
     glutSwapBuffers();
+    inputManager.send_input();
+    mainClock.tick();
+}
+
+void keyDown(unsigned char key, int, int)
+{
+    inputManager.set_key(key, true);
+}
+
+void keyUp(unsigned char key, int, int)
+{
+    inputManager.set_key(key, false);
+}
+
+void refresh_timer(int)
+{
+    glutPostRedisplay();
+    glutTimerFunc(1000/50, refresh_timer, 0);
 }
 
 bool initGlut(int &argc, char **argv) {
@@ -34,6 +53,9 @@ bool initGlut(int &argc, char **argv) {
     glutInitWindowPosition(10, 10);
     glutCreateWindow("Bump");
     glutDisplayFunc(display);
+    glutKeyboardFunc(keyDown);
+    glutKeyboardUpFunc(keyUp);
+    glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
     return true;//thanks, now I can really test for errors
 }
 
@@ -51,7 +73,6 @@ bool init_gl()
     glCullFace(GL_FRONT);gl_err();
     glFrontFace(GL_CCW);gl_err();
     glClearColor(0.0, 0.0, 0.0, 1);gl_err();
-
     return true;
 }
 
@@ -102,22 +123,24 @@ int main(int argc, char **argv)
     renderers.push_back(renderer);
 
     //init camera
-    auto cam = Camera{-1, 1, -1, 1, 5, 2000};
-    cam.look_at({{0, 0, 10}}, {{0, 0, 0}}, {{0, 1, 0}});
-    auto projection_matrix = cam.get_projection_matrix();
-    auto view_matrix = cam.get_view_matrix();
-    std::cout << projection_matrix << "\n";
-    std::cout << view_matrix << "\n";
+    auto cam = std::make_shared<Camera>(-1, 1, -1, 1, 5, 2000);
+    cam->look_at({{0, 0, 10}}, {{0, 0, 0}}, {{0, 1, 0}});
+
     //configure samplers, uniforms and vbo
     init_samplers();
     init_color_uniform(prog, {1, 1, 1, 1});
-    cam.set_prog_proj(prog);
+    cam->set_prog_proj(prog);
+    cam->set_prog(prog);
+    inputManager.register_movement_listener(cam);
 
+    //configure lights
     auto lights = LightManager{};
     lights.set(0, {{5,5,5}}, {{1,1,1}});
     lights.set(1, {{-5,5,5}}, {{1,1,0}});
     lights.set_lights_uniform(prog);
 
+    //start display timer and start main loop
+    glutTimerFunc(1000/50, refresh_timer, 0);
     glutMainLoop();
     return 0;
 }
