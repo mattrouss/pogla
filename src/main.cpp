@@ -76,21 +76,48 @@ bool init_gl()
     return true;
 }
 
-void init_samplers() {
-   GLuint texture_id;
-   glGenTextures(1, &texture_id);gl_err();
-   glBindTexture(GL_TEXTURE_2D, texture_id);gl_err();
+void init_samplers(mygl::program* prog, bool enableBumpMapping) {
+   GLuint texture_ids[2];
+   glGenTextures(2, texture_ids);gl_err();
+
+   glActiveTexture(GL_TEXTURE0 + texture_ids[0]);
+   glBindTexture(GL_TEXTURE_2D, texture_ids[0]);gl_err();
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-   auto brick_tex = io::load_image("../textures/brick.tga");
+   auto brick_tex = io::load_image("../textures/pebble_texture.tga");
    if (!brick_tex)
        return;
    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, brick_tex->width, brick_tex->height, 0, GL_RGB, GL_UNSIGNED_BYTE, brick_tex->pixels);gl_err();
    delete brick_tex;
+
+   glActiveTexture(GL_TEXTURE0 + texture_ids[1]);
+   glBindTexture(GL_TEXTURE_2D, texture_ids[1]);gl_err();
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+   auto normal_map = io::load_image("../textures/pebble_normal.tga");
+   if (!normal_map)
+       return;
+   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, normal_map->width, normal_map->height, 0, GL_RGB, GL_UNSIGNED_BYTE, normal_map->pixels);gl_err();
+   delete normal_map;
+
+    GLint enable_bump_id;
+    enable_bump_id = glGetUniformLocation(prog->prog_id(), "enableBumpMapping");gl_err();
+    glUniform1i(enable_bump_id, (int)enableBumpMapping);gl_err();
+
+    GLint tex_locs[2];
+    tex_locs[0] = glGetUniformLocation(prog->prog_id(), "tex_sampler");gl_err();
+    glUniform1i(tex_locs[0], texture_ids[0]);gl_err();
+
+    tex_locs[1] = glGetUniformLocation(prog->prog_id(), "bump_map");gl_err();
+    glUniform1i(tex_locs[1], texture_ids[1]);gl_err();
 }
 
 void init_color_uniform(mygl::program* prog, std::array<float, 4> color)
@@ -106,7 +133,7 @@ int main(int argc, char **argv)
     initGlew();
     init_gl();
 
-    auto mesh = mygl::load_mesh("../meshes/monkey.obj");
+    auto mesh = mygl::load_mesh("../meshes/cube.obj");
 
     std::string v_shader = "../shaders/vertex.shd";
     std::string f_shader = "../shaders/fragment.shd";
@@ -123,20 +150,22 @@ int main(int argc, char **argv)
     renderers.push_back(renderer);
 
     //init camera
+    bool enableBumpMapping = true;
     auto cam = std::make_shared<Camera>(-1, 1, -1, 1, 5, 2000);
     cam->look_at({{0, 0, 10}}, {{0, 0, 0}}, {{0, 1, 0}});
-
+  
     //configure samplers, uniforms and vbo
-    init_samplers();
     init_color_uniform(prog, {1, 1, 1, 1});
+    init_samplers(prog, enableBumpMapping);
+
     cam->set_prog_proj(prog);
     cam->set_prog(prog);
     inputManager.register_movement_listener(cam);
 
     //configure lights
     auto lights = LightManager{};
-    lights.set(0, {{5,5,5}}, {{1,1,1}});
-    lights.set(1, {{-5,5,5}}, {{1,1,0}});
+    lights.set(0, {{10,10,10}}, {{1,1,1}});
+    //lights.set(1, {{-5,5,5}}, {{1,1,0}});
     lights.set_lights_uniform(prog);
 
     //start display timer and start main loop

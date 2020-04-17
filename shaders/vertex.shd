@@ -24,6 +24,7 @@ struct light
     bool used;
 };
 
+uniform int enableBumpMapping;
 uniform light lights[16];
 
 out vec4 vColor;
@@ -31,15 +32,28 @@ out vec3 light_dir[16];
 out vec4 light_color[16];
 out vec3 normal;
 out vec2 tex_coord;
+out mat3 TBN;
+
 void main() {
     gl_Position = projection_matrix * view_matrix * model_matrix * vec4(position, 1.0);
     vColor = color;
+    normal = normals;
+
     for (int i = 0; i < 16; i++)
     {
         light_dir[i] = normalize(lights[i].position - position);
         light_color[i] = vec4(lights[i].color, 1);
     }
-    normal = normals;
+
+    if (enableBumpMapping == 1) {
+        vec3 bitangent = normalize(cross(tangent, normal));
+        // Compute matrix to convert vectors from tangent to world space
+        TBN =
+            mat3(normalize(vec3(model_matrix * vec4(tangent, 0.0))),
+                normalize(vec3(model_matrix * vec4(bitangent, 0.0))),
+                normalize(vec3(model_matrix * vec4(normal, 0.0))));
+    }
+
     tex_coord = uv_coord;
 }
 
