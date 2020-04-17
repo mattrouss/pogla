@@ -38,7 +38,7 @@ void keyUp(unsigned char key, int, int)
     inputManager.set_key(key, false);
 }
 
-void refresh_timer(int t)
+void refresh_timer(int)
 {
     glutPostRedisplay();
     glutTimerFunc(1000/50, refresh_timer, 0);
