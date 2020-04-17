@@ -134,16 +134,30 @@ namespace mygl
     void mesh::translate(Vec3 v)
     {
         transform_mat.translate(v);
+        //std::cout << transform_mat << "\n";
     }
 
     void mesh::rotate(Vec3 v)
     {
         transform_mat.rotate(v);
+        //std::cout << transform_mat << "\n";
     }
 
     matrix4 mesh::get_transform() const
     {
         return transform_mat;
+    }
+
+    void mesh::set_pos(Vec3 p)
+    {
+        transform_mat.set_pos(p);
+        //std::cout << transform_mat << "\n";
+    }
+
+    void mesh::set_rot(Vec3 r)
+    {
+        transform_mat.set_rot(r);
+        //std::cout << transform_mat << "\n";
     }
 
     void compute_tangent(std::array<mygl::Vertex, 3>& triangle) {
