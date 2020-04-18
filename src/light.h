@@ -43,23 +43,27 @@ struct Light : public Movable
 struct UniformLight : public Light
 {
     UniformLight() = default;
-    UniformLight(mygl::Vec3 pos, mygl::Vec3 color, bool used = false);
+    UniformLight(mygl::Vec3 pos, mygl::Vec3 color, float intenity);
+
+    float intensity;
+
+    float get_intensity() const;
 };
 
 struct DirectionalLight : public Light
 {
     DirectionalLight() = default;
-    DirectionalLight(mygl::Vec3 pos, mygl::Vec3 color, mygl::Vec3 target, bool used = false);
+    DirectionalLight(mygl::Vec3 pos, mygl::Vec3 color, mygl::Vec3 target);
 
     mygl::Vec3 target;
 
-    mygl::Vec3 get_dir();
+    mygl::Vec3 get_dir() const;
 };
 
 struct AmbientLight : public Light
 {
     AmbientLight() = default;
-    AmbientLight(mygl::Vec3 pos, mygl::Vec3 color, bool used = false);
+    AmbientLight(mygl::Vec3 pos, mygl::Vec3 color);
 };
 
 class LightManager
@@ -67,7 +71,7 @@ class LightManager
 public:
     LightManager();
 
-    void set_uniform(size_t i, mygl::Vec3 pos, mygl::Vec3 color);
+    void set_uniform(size_t i, mygl::Vec3 pos, mygl::Vec3 color, float intensity);
     void set_directional(size_t i, mygl::Vec3 pos, mygl::Vec3 target, mygl::Vec3 color);
     void set_ambient(size_t i, mygl::Vec3 pos, mygl::Vec3 color);
     void reset(size_t i);

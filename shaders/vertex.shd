@@ -22,6 +22,7 @@ struct light
     vec3 position;
     vec3 color;
     vec3 dir;
+    float intensity;
     int type;
     bool used;
 };
@@ -54,6 +55,12 @@ void main() {
             light_dir[i] = normalize(lights[i].position - position);
 
         light_color[i] = vec4(lights[i].color, 1);
+        if (lights[i].type == uniform_light) {
+            float dist = distance(lights[i].position, gl_Position.xyz);
+            float attenuation = lights[i].intensity / (dist * dist);
+            light_color[i] *= attenuation;
+
+        }
     }
 
     if (enableBumpMapping == 1) {
