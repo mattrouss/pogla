@@ -90,7 +90,7 @@ namespace mygl
         float cos_a = cosf(angle);
         float sin_a = sinf(angle);
         return mygl::matrix4{{
-            -cos_a, 0, sin_a, 0,
+            cos_a, 0, sin_a, 0,
                  0, 1,     0, 0,
             -sin_a, 0, cos_a, 0,
                  0, 0,     0, 1
@@ -135,6 +135,26 @@ namespace mygl
         auto rot = yaw * pitch * roll;
 
         *this *= rot;//.transpose();//not sure about the transpose, needs testing
+    }
+
+    void matrix4::set_rot(const mygl::Vec3 &v)
+    {
+        this->data = {
+                1,0,0,data[3],
+                0,1,0,data[7],
+                0,0,1,data[11],
+                0,0,0,1
+                };
+        this->rotate(v);
+    }
+
+    void matrix4::set_pos(const mygl::Vec3 &v)
+    {
+        this->data[3] = 0;
+        this->data[7] = 0;
+        this->data[11] = 0;
+
+        this->translate(v);
     }
 
     mygl::Vec4 operator*(const mygl::matrix4& lhs, const mygl::Vec4& rhs) {

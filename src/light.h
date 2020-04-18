@@ -24,6 +24,7 @@ struct Light : public Movable
     void translate(mygl::Vec3 v) override;
     void set_pos(mygl::Vec3 p) override;
     void rotate(mygl::Vec3) override {}
+    void set_rot(mygl::Vec3) override {}
 };
 
 class LightManager

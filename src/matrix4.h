@@ -21,7 +21,9 @@ public:
     friend std::ostream& operator<<(std::ostream& out, const mygl::matrix4& m);
 
     void translate(const mygl::Vec3& v);
+    void set_pos(const mygl::Vec3& v);
     void rotate(const mygl::Vec3& v);
+    void set_rot(const mygl::Vec3& v);
 
 public:
     std::array<float, 16> data;

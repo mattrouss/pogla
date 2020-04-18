@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "matrix4.h"
+#include "movable.h"
 
 namespace mygl
 {
@@ -20,14 +21,16 @@ namespace mygl
         mygl::Vec2 uv;
         mygl::Vec3 tangent;
     };
-    struct mesh
+    struct mesh : public Movable
     {
         std::vector<Vertex> verts;
 
         std::shared_ptr<mesh> transform(matrix4 mat);
         void reset_transform();
-        void translate(Vec3 v);
-        void rotate(Vec3 v);
+        void translate(Vec3 v) override;
+        void set_pos(Vec3 p) override;
+        void rotate(Vec3 v) override;
+        void set_rot(Vec3 r) override;
 
         matrix4 get_transform() const;
 
