@@ -1,10 +1,13 @@
+#include <iostream>
 #include "trajectory.h"
 
 Trajectory::Trajectory(TrajectoryFunction func)
     : trajectory_function{func}
 {
     clock.tick();
-    last_pos = trajectory_function(0.0f);
+    auto tmp = trajectory_function(0.0f);
+    last_pos = tmp.first;
+    last_rot = tmp.second;
 }
 
 void Trajectory::run()
@@ -17,29 +20,56 @@ void Trajectory::run()
     }
     for (auto obj : objects)
     {
-        auto v = trajectory_function(t);
+        auto pair = trajectory_function(t);
+        auto translation = pair.first;
+        auto rotation = pair.second;
 
         if (trajectory_function.translate())
         {
             if (trajectory_function.delta_pos())
-                obj->translate(v);//we need to translate, function returns translation
+            {
+                if (trajectory_function.use_position())
+                    obj->translate(translation);//we need to translate, function returns translation
+                if (trajectory_function.use_rotation())
+                    obj->rotate(rotation);
+            }
             else
             {
-                auto delta = v - last_pos;
-                last_pos = v;
-                obj->translate(delta);//we want to translate, we have absolute position, convert to delta
+                if (trajectory_function.use_position())
+                {
+                    auto delta_pos = translation - last_pos;
+                    last_pos = translation;
+                    obj->translate(delta_pos);//we want to translate, we have absolute position, convert to delta
+                }
+                if (trajectory_function.use_rotation())
+                {
+                    auto delta_rot = rotation - last_rot;
+                    last_rot = rotation;
+                    obj->rotate(delta_rot);
+                }
             }
         }
         else
         {
             if (trajectory_function.delta_pos())
             {
-                last_pos += v;
-                obj->set_pos(last_pos);//we have a delta, we want abolute pos, add v to last pos
+                if (trajectory_function.use_position())
+                {
+                    last_pos += translation;
+                    obj->set_pos(last_pos);//we have a delta, we want abolute pos, add v to last pos
+                }
+                if (trajectory_function.use_rotation())
+                {
+                    last_rot += rotation;
+                    obj->set_rot(last_rot);
+                }
             }
             else
             {
-                obj->set_pos(v);//we have abolute pos, we want to set position
+                if (trajectory_function.use_position())
+                    obj->set_pos(translation);//we have abolute pos, we want to set position
+                if (trajectory_function.use_rotation())
+                    obj->set_rot(rotation);
             }
         }
     }

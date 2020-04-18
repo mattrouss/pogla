@@ -27,6 +27,7 @@ private:
     TrajectoryFunction trajectory_function;
     std::vector<std::shared_ptr<Movable>> objects;
     mygl::Vec3 last_pos;
+    mygl::Vec3 last_rot;
     Clock clock;
 };
 

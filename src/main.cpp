@@ -172,15 +172,24 @@ int main(int argc, char **argv)
     lights.set_lights_uniform(prog);
 
     //set light trajectory
-    auto light_movement = Trajectory{{[](float t) -> mygl::Vec3 {
+    auto light_movement = Trajectory{{[](float t) -> std::pair<mygl::Vec3, mygl::Vec3> {
         float x = sinf(t);
         float z = cosf(t);
         float y = cosf(t / 10.0f);
 
         auto res = mygl::Vec3{{x, y, z}} * 3.0f;
-        return res;
-    }, TFunc::ABS_POS|TFunc::ABS_TIME|TFunc::SET_POS}};
+        return {res, {{0,0,0}}};
+    }, TFunc::ABS_POS|TFunc::ABS_TIME|TFunc::SET_POS|TFunc::USE_POSITION}};
     light_movement.register_object(lights.get(0));
+
+    /*auto light_movement = Trajectory{{[] (float t) -> std::pair<mygl::Vec3, mygl::Vec3> {
+        float rot = t;
+        float y = sinf(t);
+
+        auto res = mygl::Vec3{{0.0f, y, 0.0f}} * 2.0f;
+        return {res, {{0, t, 0}}};
+    }, TFunc::ABS_POS|TFunc::ABS_TIME|TFunc::SET_POS|TFunc::USE_POSITION|TFunc::USE_ROTATION}};
+    light_movement.register_object(mesh);*/
 
     //temporary until a better solution is found
     light_trajectory_callback = light_movement.get_callback_with_update(
@@ -189,6 +198,7 @@ int main(int argc, char **argv)
                 lights.set_lights_uniform(prog);
             }
             );
+    //light_trajectory_callback = light_movement.get_callback();
 
     //start display timer and start main loop
     glutTimerFunc(1000/50, refresh_timer, 0);

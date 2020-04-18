@@ -75,3 +75,9 @@ void Camera::set_pos(const mygl::Vec3 p)
 {
     set_pos(p, false);
 }
+
+void Camera::set_rot(mygl::Vec3 r)
+{
+    r = -1 * r; //on the camera we need to invert the view matrix
+    projection.set_rot(r);
+}

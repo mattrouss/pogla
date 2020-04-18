@@ -20,11 +20,12 @@ public:
     void look_at(const mygl::Vec3& eye, const mygl::Vec3& target, const mygl::Vec3& up,
             bool translate = true);
 
-    void translate(const mygl::Vec3 v) override;
-    void set_pos(const mygl::Vec3 p) override;
-    void set_pos(const mygl::Vec3 v, bool update);
+    void translate(mygl::Vec3 v) override;
+    void set_pos(mygl::Vec3 p) override;
+    void set_pos(mygl::Vec3 v, bool update);
 
-    void rotate(const mygl::Vec3 rotation) override;
+    void set_rot(mygl::Vec3 r) override;
+    void rotate(mygl::Vec3 rotation) override;
 
     //void rotate(float horizontal, float vertical);
 

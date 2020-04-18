@@ -12,16 +12,21 @@ namespace TFunc
         TRANSLATE = 4,//function result is used to translate objects
         SET_POS = 8,//function result is used to set position of objects directly (default and takes priority)
         DELTA_POS = 16,//function result is a translation
-        ABS_POS = 32//function result is the position of the object (default)
+        ABS_POS = 32,//function result is the position of the object (default)
+        USE_POSITION = 64,//function result will affect object position
+        USE_ROTATION = 128//function result will affect object rotation
     };
 }
 
+//TRANSLATE, SET_POS, DELTA_POS, ABS_POS also apply to rotations
+
 struct TrajectoryFunction
 {
-    std::function<mygl::Vec3(float t)> func;
-    uint8_t flags = 0;
+    using ReturnType = std::pair<mygl::Vec3, mygl::Vec3>;
+    std::function<ReturnType (float t)> func;
+    unsigned flags = 0;
 
-    inline mygl::Vec3 operator()(float t)
+    inline ReturnType operator()(float t)
     {
         return func(t);
     }
@@ -55,6 +60,16 @@ struct TrajectoryFunction
     bool abs_pos()
     {
         return flags & TFunc::ABS_POS;
+    }
+
+    bool use_position()
+    {
+        return flags & TFunc::USE_POSITION;
+    }
+
+    bool use_rotation()
+    {
+        return flags & TFunc::USE_ROTATION;
     }
 };
 
