@@ -75,7 +75,7 @@ void LightManager::set_lights_uniform(mygl::program *prog)
     uniformId = glGetUniformLocation(prog->prog_id(), "ambient_light");
     glUniform1ui(uniformId, LightType::AMBIENT);
 
-    for (size_t i = 0; i < 10; i++)
+    for (size_t i = 0; i < 16; i++)
     {
         //that's gonna be fun
         std::string prefix = "lights[" + std::to_string(i) + "].";
