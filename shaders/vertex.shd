@@ -21,10 +21,17 @@ struct light
 {
     vec3 position;
     vec3 color;
+    vec3 dir;
+    int type;
     bool used;
 };
 
 uniform int enableBumpMapping;
+
+uniform uint uniform_light;
+uniform uint directional_light;
+uniform uint ambient_light;
+
 uniform light lights[16];
 
 out vec4 vColor;
@@ -41,7 +48,11 @@ void main() {
 
     for (int i = 0; i < 16; i++)
     {
-        light_dir[i] = normalize(lights[i].position - position);
+        if (lights[i].type == directional_light)
+            light_dir[i] = lights[i].dir;
+        else
+            light_dir[i] = normalize(lights[i].position - position);
+
         light_color[i] = vec4(lights[i].color, 1);
     }
 

@@ -7,13 +7,22 @@
 #include "program.h"
 #include "movable.h"
 
+namespace LightType {
+    enum: unsigned int {
+        UNIFORM,
+        DIRECTIONAL,
+        AMBIENT
+    };
+}
+
 struct Light : public Movable
 {
     Light() = default;
-    Light(mygl::Vec3 pos, mygl::Vec3 color, bool used = false);
+    Light(mygl::Vec3 pos, mygl::Vec3 color, unsigned type, bool used = false);
 
     mygl::Vec3 pos;
     mygl::Vec3 color;
+    const unsigned type = LightType::UNIFORM;
     bool used = false;
     //add strength attribute
 
@@ -24,6 +33,32 @@ struct Light : public Movable
     void translate(mygl::Vec3 v) override;
     void set_pos(mygl::Vec3 p) override;
     void rotate(mygl::Vec3) override {}
+
+    unsigned get_type() {
+        return type;
+    }
+};
+
+struct UniformLight : public Light
+{
+    UniformLight() = default;
+    UniformLight(mygl::Vec3 pos, mygl::Vec3 color, bool used = false);
+};
+
+struct DirectionalLight : public Light
+{
+    DirectionalLight() = default;
+    DirectionalLight(mygl::Vec3 pos, mygl::Vec3 color, mygl::Vec3 target, bool used = false);
+
+    mygl::Vec3 target;
+
+    mygl::Vec3 get_dir();
+};
+
+struct AmbientLight : public Light
+{
+    AmbientLight() = default;
+    AmbientLight(mygl::Vec3 pos, mygl::Vec3 color, bool used = false);
 };
 
 class LightManager
@@ -31,7 +66,9 @@ class LightManager
 public:
     LightManager();
 
-    void set(size_t i, mygl::Vec3 pos, mygl::Vec3 color);
+    void set_uniform(size_t i, mygl::Vec3 pos, mygl::Vec3 color);
+    void set_directional(size_t i, mygl::Vec3 pos, mygl::Vec3 target, mygl::Vec3 color);
+    void set_ambient(size_t i, mygl::Vec3 pos, mygl::Vec3 color);
     void reset(size_t i);
     std::shared_ptr<Light> get(size_t i);
 
