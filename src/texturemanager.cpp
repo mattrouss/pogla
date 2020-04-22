@@ -35,8 +35,20 @@ unsigned TextureManager::load(std::string path)
 
     delete texture;
 
-    glBindTexture(GL_TEXTURE_2D, 0);//unbind current texture (return to neutral state)
+    glBindTexture(GL_TEXTURE_2D, 0);gl_err()//unbind current texture (return to neutral state)
 
     texture_ids.push_back(texture_id);
     return texture_ids.size() - 1;//return index of the texture
+}
+
+GLuint TextureManager::get(unsigned i) const
+{
+    if (i >= texture_ids.size())
+        return 0;
+    return texture_ids[i];
+}
+
+void TextureManager::reset_use()
+{
+    glBindTexture(GL_TEXTURE_2D, 0);gl_err()
 }

@@ -4,7 +4,6 @@
 #include <array>
 
 #include "program.h"
-#include "image_io.h"
 #include "matrix4.h"
 #include "mesh.h"
 #include "camera.h"
@@ -14,6 +13,7 @@
 #include "inputmanager.h"
 #include "clock.h"
 #include "trajectory.h"
+#include "material.h"
 
 std::vector<std::shared_ptr<ObjectRenderer>> renderers;
 std::function<void()> light_trajectory_callback;
@@ -79,50 +79,6 @@ bool init_gl()
     return true;
 }
 
-void init_samplers(mygl::program* prog, bool enableBumpMapping) {
-   GLuint texture_ids[2];
-   glGenTextures(2, texture_ids);gl_err();
-
-   glActiveTexture(GL_TEXTURE0 + texture_ids[0]);
-   glBindTexture(GL_TEXTURE_2D, texture_ids[0]);gl_err();
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-   auto brick_tex = io::load_image("../textures/pebble_texture.tga");
-   if (!brick_tex)
-       return;
-   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, brick_tex->width, brick_tex->height, 0, GL_RGB, GL_UNSIGNED_BYTE, brick_tex->pixels);gl_err();
-   delete brick_tex;
-
-   glActiveTexture(GL_TEXTURE0 + texture_ids[1]);
-   glBindTexture(GL_TEXTURE_2D, texture_ids[1]);gl_err();
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-   auto normal_map = io::load_image("../textures/pebble_normal.tga");
-   if (!normal_map)
-       return;
-   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, normal_map->width, normal_map->height, 0, GL_RGB, GL_UNSIGNED_BYTE, normal_map->pixels);gl_err();
-   delete normal_map;
-
-    GLint enable_bump_id;
-    enable_bump_id = glGetUniformLocation(prog->prog_id(), "enableBumpMapping");gl_err();
-    glUniform1i(enable_bump_id, (int)enableBumpMapping);gl_err();
-
-    GLint tex_locs[2];
-    tex_locs[0] = glGetUniformLocation(prog->prog_id(), "tex_sampler");gl_err();
-    glUniform1i(tex_locs[0], texture_ids[0]);gl_err();
-
-    tex_locs[1] = glGetUniformLocation(prog->prog_id(), "bump_map");gl_err();
-    glUniform1i(tex_locs[1], texture_ids[1]);gl_err();
-}
-
 void init_color_uniform(mygl::program* prog, std::array<float, 4> color)
 {
     GLint color_id;
@@ -149,7 +105,11 @@ int main(int argc, char **argv)
     prog->use();
     std::cout << "Hello, World!" << std::endl;
 
-    auto renderer = std::make_shared<ObjectRenderer>(prog, mesh);
+    auto texture_manager = std::make_shared<TextureManager>();
+    auto mat = std::make_shared<Material>(texture_manager, prog, "../textures/pebble_texture.tga",
+                                          "../textures/pebble_normal.tga");
+
+    auto renderer = std::make_shared<ObjectRenderer>(prog, mesh, mat);
     renderers.push_back(renderer);
 
     //init camera
@@ -159,7 +119,6 @@ int main(int argc, char **argv)
   
     //configure samplers, uniforms and vbo
     init_color_uniform(prog, {1, 1, 1, 1});
-    init_samplers(prog, enableBumpMapping);
 
     cam->set_prog_proj(prog);
     cam->set_prog(prog);
