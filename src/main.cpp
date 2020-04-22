@@ -167,20 +167,20 @@ int main(int argc, char **argv)
 
     //configure lights
     auto lights = LightManager{};
-    lights.set_uniform(0, {{0,0,2}},{{1, 1, 0.8}},50);
+    lights.set_uniform(0, {{0,0,2}},{{1, 1, 0.8}},15);
     lights.set_ambient(1, {{0,0,0}},0.2 * mygl::Vec3({1,1,1}));
     lights.set_lights_uniform(prog);
 
     //set light trajectory
     auto light_movement = Trajectory{{[](float t) -> std::pair<mygl::Vec3, mygl::Vec3> {
         float x = sinf(t);
-        float z = cosf(t);
+        float z = cosf(t*3.0f);
         float y = cosf(t / 10.0f);
 
-        auto res = mygl::Vec3{{x, y, z}} * 3.0f;
-        return {res, {{0,0,0}}};
+        auto res = mygl::Vec3{{0, 0, z}} * 2.0f;
+        return {mygl::Vec3{{0,0,5}} + res, {{0,0,0}}};
     }, TFunc::ABS_POS|TFunc::ABS_TIME|TFunc::SET_POS|TFunc::USE_POSITION}};
-    //light_movement.register_object(lights.get(0));
+    light_movement.register_object(lights.get(0));
 
     /*auto light_movement = Trajectory{{[] (float t) -> std::pair<mygl::Vec3, mygl::Vec3> {
         float rot = t;

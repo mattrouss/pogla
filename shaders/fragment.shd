@@ -1,8 +1,7 @@
 #version 450
 
 in vec4 vColor;
-in vec3 light_dir[16];
-in vec4 light_color[16];//color is (0,0,0) is light is disabled
+in vec4 vPos;
 in vec3 normal;
 in vec2 tex_coord;
 in mat3 TBN;
@@ -46,9 +45,17 @@ void main() {
     {
         vec4 light;
         if (lights[i].type == ambient_light)
-            light = light_color[i];
+            light = vec4(lights[i].color, 1.0);
+        else if (lights[i].type == directional_light)
+            light = vec4(lights[i].color, 1.0) * clamp(dot(surface_normal, lights[i].dir), 0, 1);
         else
-            light = light_color[i] * clamp(dot(surface_normal, light_dir[i]), 0, 1);
+        {
+            vec4 light_beam = vec4(lights[i].position, 1.0);
+            float dist = length(light_beam);
+            vec3 dir = normalize(light_beam).xyz;
+            float intensity = lights[i].intensity / (dist * dist);
+            light = vec4(lights[i].color, 1.0) * clamp(dot(surface_normal, dir), 0, 1) * intensity;
+        }
 
         output_color += texture2D(tex_sampler, tex_coord) * light;
     }
