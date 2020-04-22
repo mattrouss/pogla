@@ -153,7 +153,7 @@ int main(int argc, char **argv)
     renderers.push_back(renderer);
 
     //init camera
-    bool enableBumpMapping = true;
+    bool enableBumpMapping = false;
     auto cam = std::make_shared<Camera>(-1, 1, -1, 1, 5, 2000);
     cam->look_at({{0, 0, 10}}, {{0, 0, 0}}, {{0, 1, 0}});
   
@@ -167,8 +167,8 @@ int main(int argc, char **argv)
 
     //configure lights
     auto lights = LightManager{};
-    lights.set(0, {{5,5,5}}, {{1,1,0.8}});
-    lights.set(1, {{-5,5,5}}, {{1,1,0}});
+    lights.set_directional(0, {{5,5,5}}, {{0, 0, 0}}, {{1,1,0.8}});
+    lights.set_ambient(1, {{0,0,0}}, 0.2 * mygl::Vec3({1,1,1}));
     lights.set_lights_uniform(prog);
 
     //set light trajectory
