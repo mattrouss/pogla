@@ -32,11 +32,11 @@ uniform uint uniform_light;
 uniform uint directional_light;
 uniform uint ambient_light;
 
-uniform light lights[16];
+uniform light lights[8];
 
 out vec4 vColor;
-out vec3 light_dir[16];
-out vec4 light_color[16];
+out vec3 light_dir[8];
+out vec4 light_color[8];
 out vec3 normal;
 out vec2 tex_coord;
 out mat3 TBN;
@@ -46,7 +46,7 @@ void main() {
     vColor = color;
     normal = normals;
 
-    for (int i = 0; i < 16; i++)
+    for (int i = 0; i < 8; i++)
     {
         if (lights[i].type == directional_light)
             light_dir[i] = lights[i].dir;

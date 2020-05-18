@@ -140,6 +140,7 @@ int main(int argc, char **argv)
         return {res, {{0,0,0}}};
     }, TFunc::ABS_POS|TFunc::ABS_TIME|TFunc::SET_POS|TFunc::USE_POSITION}};
     light_movement.register_object(lights.get(0));
+    //light_movement.register_object(cam);
 
     /*auto light_movement = Trajectory{{[] (float t) -> std::pair<mygl::Vec3, mygl::Vec3> {
         float rot = t;
