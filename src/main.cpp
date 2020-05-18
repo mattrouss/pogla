@@ -115,13 +115,13 @@ int main(int argc, char **argv)
     //init camera
     bool enableBumpMapping = false;
     auto cam = std::make_shared<Camera>(-1, 1, -1, 1, 5, 2000);
+    cam->set_prog(prog);
     cam->look_at({{0, 0, 10}}, {{0, 0, 0}}, {{0, 1, 0}});
   
     //configure samplers, uniforms and vbo
     init_color_uniform(prog, {1, 1, 1, 1});
 
     cam->set_prog_proj(prog);
-    cam->set_prog(prog);
     inputManager.register_movement_listener(cam);
 
     //configure lights
@@ -140,7 +140,7 @@ int main(int argc, char **argv)
         return {res, {{0,0,0}}};
     }, TFunc::ABS_POS|TFunc::ABS_TIME|TFunc::SET_POS|TFunc::USE_POSITION}};
     light_movement.register_object(lights.get(0));
-    //light_movement.register_object(cam);
+    light_movement.register_object(cam);
 
     /*auto light_movement = Trajectory{{[] (float t) -> std::pair<mygl::Vec3, mygl::Vec3> {
         float rot = t;
@@ -156,6 +156,7 @@ int main(int argc, char **argv)
             [&]()
             {
                 lights.set_lights_uniform(prog);
+                //cam->set_prog_proj(prog);
             }
             );
     //light_trajectory_callback = light_movement.get_callback();

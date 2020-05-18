@@ -38,6 +38,7 @@ void Camera::set_pos(const mygl::Vec3 v, bool update)
     pos = v;
     if (update)//a bit dirty but does the trick for now
         look_at(pos, {{0,0,0}}, {{0,1,0}}, true);
+    set_prog_proj(prog);
 }
 
 mygl::matrix4 Camera::get_view_matrix() const
@@ -80,4 +81,5 @@ void Camera::set_rot(mygl::Vec3 r)
 {
     r = -1 * r; //on the camera we need to invert the view matrix
     projection.set_rot(r);
+    set_prog_proj(prog);
 }
