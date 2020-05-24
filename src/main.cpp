@@ -113,7 +113,6 @@ int main(int argc, char **argv)
     renderers.push_back(renderer);
 
     //init camera
-    bool enableBumpMapping = false;
     auto cam = std::make_shared<Camera>(-1, 1, -1, 1, 5, 2000);
     cam->look_at({{0, 0, 10}}, {{0, 0, 0}}, {{0, 1, 0}});
   
