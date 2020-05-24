@@ -17,26 +17,10 @@ uniform mat4 projection_matrix; // = mat4(
 			      //0.00000, 0.00000, -1.00020, -1.00000,
 			      //0.00000, 0.00000, -10.00100, 0.00000);
 
-struct light
-{
-    vec3 position;
-    vec3 color;
-    vec3 dir;
-    int type;
-    bool used;
-};
-
 uniform int enableBumpMapping;
 
-uniform uint uniform_light;
-uniform uint directional_light;
-uniform uint ambient_light;
-
-uniform light lights[16];
-
 out vec4 vColor;
-out vec3 light_dir[16];
-out vec4 light_color[16];
+out vec4 vPos;
 out vec3 normal;
 out vec2 tex_coord;
 out mat3 TBN;
@@ -45,16 +29,6 @@ void main() {
     gl_Position = projection_matrix * view_matrix * model_matrix * vec4(position, 1.0);
     vColor = color;
     normal = normals;
-
-    for (int i = 0; i < 16; i++)
-    {
-        if (lights[i].type == directional_light)
-            light_dir[i] = lights[i].dir;
-        else
-            light_dir[i] = normalize(lights[i].position - position);
-
-        light_color[i] = vec4(lights[i].color, 1);
-    }
 
     if (enableBumpMapping == 1) {
         vec3 bitangent = normalize(cross(tangent, normal));
@@ -66,5 +40,6 @@ void main() {
     }
 
     tex_coord = uv_coord;
+    vPos = vec4(position, 1.0);
 }
 
