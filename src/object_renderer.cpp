@@ -1,7 +1,10 @@
 #include "object_renderer.h"
+
+#include <utility>
 #include "gl_err.h"
 
-ObjectRenderer::ObjectRenderer(mygl::program *prog, std::shared_ptr<mygl::mesh> mesh)
+ObjectRenderer::ObjectRenderer(mygl::program *prog, std::shared_ptr<mygl::mesh> mesh,
+        std::shared_ptr<Material> mat)
 {
     this->program = prog;
     this->mesh = mesh;
@@ -37,6 +40,8 @@ ObjectRenderer::ObjectRenderer(mygl::program *prog, std::shared_ptr<mygl::mesh> 
     buffer_ids.push_back(vertex_buffer_id);
 
     glBindVertexArray(0);gl_err()
+
+    this->mat = std::move(mat);
 }
 
 ObjectRenderer::~ObjectRenderer()
@@ -49,10 +54,12 @@ ObjectRenderer::~ObjectRenderer()
 
 void ObjectRenderer::render() const
 {
+    mat->use();
     GLint transform_id;
     transform_id = glGetUniformLocation(program->prog_id(), "model_matrix");gl_err()
     glUniformMatrix4fv(transform_id, 1, GL_FALSE, mesh->get_transform().transpose().data.data());gl_err()
     glBindVertexArray(vao);gl_err()
     glDrawArrays(GL_TRIANGLES, 0, mesh->verts.size() * 3);gl_err()
     glBindVertexArray(0);gl_err()
+    mat->stop_use();
 }

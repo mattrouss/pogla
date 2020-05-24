@@ -1,6 +1,8 @@
 #ifndef BUMP_GL_ERR_H
 #define BUMP_GL_ERR_H
 
+#include <iostream>
+
 #define gl_err() \
 {\
     GLenum err = glGetError();\

@@ -132,6 +132,8 @@ namespace mygl
             err = glGetError();
             if (err != GL_NO_ERROR) std::cerr << "OpenGL error: " << __LINE__ << std::endl;
 
+            std::cout << "Link:\n" << result->log << "\n";
+
             glDeleteProgram(program);
             err = glGetError();
             if (err != GL_NO_ERROR) std::cerr << "OpenGL error: " << __LINE__ << std::endl;

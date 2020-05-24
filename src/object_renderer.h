@@ -6,11 +6,12 @@
 #include <vector>
 #include "program.h"
 #include "mesh.h"
+#include "material.h"
 
 class ObjectRenderer
 {
 public:
-    ObjectRenderer(mygl::program* prog, std::shared_ptr<mygl::mesh> mesh);
+    ObjectRenderer(mygl::program* prog, std::shared_ptr<mygl::mesh> mesh, std::shared_ptr<Material> mat);
     ~ObjectRenderer();
 
     void render() const;
@@ -21,6 +22,7 @@ private:
     std::vector<GLint> buffer_ids;
     std::vector<GLuint> vertex_attribs;
     GLuint vao;
+    std::shared_ptr<Material> mat;
 };
 
 
