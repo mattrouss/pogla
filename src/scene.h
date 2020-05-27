@@ -19,39 +19,29 @@
 class Scene {
 public:
     Scene() {}
-    Scene(const std::string& filepath, mygl::program* program)
-    : prog_(program)
-    {
-        YAML::Node root = YAML::LoadFile(filepath);
-        if (!root["scene"]) {
-            throw std::invalid_argument(filepath + ": No scene was found.");
-        }
-        auto sc = root["scene"];
 
-        auto cam = sc["camera"];
-        cam_ = init_camera(cam);
-
-        texture_mngr_ = std::make_shared<TextureManager>();
-        auto mtls = sc["materials"];
-        init_mtls(mtls);
-
-        auto objs = sc["objects"];
-        init_objects(objs);
-    }
+    void load_scene(const std::string& file_path, mygl::program* program);
 
     std::shared_ptr<Camera> init_camera(const YAML::Node& cam_node) const;
     void init_mtls(const YAML::Node& mtls);
     void init_objects(const YAML::Node& objs);
+    void init_lights(const YAML::Node& lights);
+
+    void render() const;
+
+    std::shared_ptr<Light> get_light(size_t i) const;
+    void set_lights_uniform() const;
+
 
 private:
     mygl::program* prog_;
 
     std::shared_ptr<TextureManager> texture_mngr_;
-    std::vector<std::shared_ptr<ObjectRenderer>> renderers_;
+    std::shared_ptr<LightManager> light_mngr_;
 
     std::shared_ptr<Camera> cam_;
     std::vector<std::shared_ptr<Material>> mtls_;
-    std::vector<Light> lights_;
+    std::vector<std::shared_ptr<ObjectRenderer>> renderers_;
 };
 
 #endif //BUMP_SCENE_H

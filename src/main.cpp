@@ -5,26 +5,21 @@
 
 #include "program.h"
 #include "matrix4.h"
-#include "mesh.h"
-#include "camera.h"
-#include "object_renderer.h"
 #include "gl_err.h"
-#include "light.h"
 #include "inputmanager.h"
 #include "clock.h"
 #include "trajectory.h"
-#include "material.h"
+#include "scene.h"
 
-std::vector<std::shared_ptr<ObjectRenderer>> renderers;
+Scene scene;
 std::function<void()> light_trajectory_callback;
 
 void display()
 {
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);gl_err();
-    for (auto r : renderers)
-    {
-        r->render();
-    }
+
+    scene.render();
+
     glutSwapBuffers();
     inputManager.send_input();
     mainClock.tick();
@@ -92,8 +87,6 @@ int main(int argc, char **argv)
     initGlew();
     init_gl();
 
-    auto mesh = mygl::load_mesh("../meshes/cube.obj");
-
     std::string v_shader = "../shaders/vertex.shd";
     std::string f_shader = "../shaders/fragment.shd";
     auto prog = mygl::program::make_program(v_shader, f_shader);
@@ -105,29 +98,10 @@ int main(int argc, char **argv)
     prog->use();
     std::cout << "Hello, World!" << std::endl;
 
-    auto texture_manager = std::make_shared<TextureManager>();
-    auto mat = std::make_shared<Material>(texture_manager, prog, "../textures/pebble_texture.tga",
-                                          "../textures/pebble_normal.tga");
+    scene.load_scene("../scenes/scene0.yaml", prog);
 
-    auto renderer = std::make_shared<ObjectRenderer>(prog, mesh, mat);
-    renderers.push_back(renderer);
-
-    //init camera
-    auto cam = std::make_shared<Camera>(-1, 1, -1, 1, 5, 2000);
-    cam->look_at({{0, 0, 10}}, {{0, 0, 0}}, {{0, 1, 0}});
-  
     //configure samplers, uniforms and vbo
     init_color_uniform(prog, {1, 1, 1, 1});
-
-    cam->set_prog_proj(prog);
-    cam->set_prog(prog);
-    inputManager.register_movement_listener(cam);
-
-    //configure lights
-    auto lights = LightManager{};
-    lights.set_uniform(0, {{0,0,2}},{{1, 1, 0.8}},15);
-    lights.set_ambient(1, {{0,0,0}},0.2 * mygl::Vec3({1,1,1}));
-    lights.set_lights_uniform(prog);
 
     //set light trajectory
     auto light_movement = Trajectory{{[](float t) -> std::pair<mygl::Vec3, mygl::Vec3> {
@@ -138,8 +112,7 @@ int main(int argc, char **argv)
         auto res = mygl::Vec3{{0, 0, z}} * 2.0f;
         return {mygl::Vec3{{0,0,5}} + res, {{0,0,0}}};
     }, TFunc::ABS_POS|TFunc::ABS_TIME|TFunc::SET_POS|TFunc::USE_POSITION}};
-    light_movement.register_object(lights.get(0));
-    //light_movement.register_object(cam);
+    light_movement.register_object(scene.get_light(0));
 
     /*auto light_movement = Trajectory{{[] (float t) -> std::pair<mygl::Vec3, mygl::Vec3> {
         float rot = t;
@@ -154,7 +127,7 @@ int main(int argc, char **argv)
     light_trajectory_callback = light_movement.get_callback_with_update(
             [&]()
             {
-                lights.set_lights_uniform(prog);
+                scene.set_lights_uniform();
             }
             );
     //light_trajectory_callback = light_movement.get_callback();
