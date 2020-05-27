@@ -7,6 +7,7 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra -g")
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 find_package(GLEW REQUIRED)
+find_package(YAML-CPP REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS})
 
 add_executable(bump src/main.cpp
@@ -30,6 +31,6 @@ add_executable(bump src/main.cpp
         src/light.cpp src/light.h
         src/inputmanager.cpp
         src/inputmanager.h
-        src/movable.h src/clock.cpp src/clock.h src/trajectory.cpp src/trajectory.h src/trajectory_function.h src/texturemanager.cpp src/texturemanager.h src/material.cpp src/material.h)
+        src/movable.h src/clock.cpp src/clock.h src/trajectory.cpp src/trajectory.h src/trajectory_function.h src/texturemanager.cpp src/texturemanager.h src/material.cpp src/material.h src/scene.cpp src/scene.h)
 
-target_link_libraries(bump -lGL -lGLEW -lglut -lpthread)
+target_link_libraries(bump -lGL -lGLEW -lglut -lpthread -lyaml-cpp)
