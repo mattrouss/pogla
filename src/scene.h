@@ -14,9 +14,11 @@
 #include "vector.h"
 #include "material.h"
 #include "inputmanager.h"
+#include "object_renderer.h"
 
 class Scene {
 public:
+    Scene() {}
     Scene(const std::string& filepath, mygl::program* program)
     : prog_(program)
     {
@@ -25,32 +27,30 @@ public:
             throw std::invalid_argument(filepath + ": No scene was found.");
         }
         auto sc = root["scene"];
-        for(YAML::const_iterator it = sc.begin();it != sc.end();++it) {
-            std::string key = it->first.as<std::string>();       // <- key
-            std::cout << key << std::endl;
-        }
 
         auto cam = sc["camera"];
-        std::cout << sc["camera"]["znear"] << std::endl;
         cam_ = init_camera(cam);
 
         texture_mngr_ = std::make_shared<TextureManager>();
         auto mtls = sc["materials"];
         init_mtls(mtls);
 
-
+        auto objs = sc["objects"];
+        init_objects(objs);
     }
 
     std::shared_ptr<Camera> init_camera(const YAML::Node& cam_node) const;
     void init_mtls(const YAML::Node& mtls);
+    void init_objects(const YAML::Node& objs);
 
 private:
     mygl::program* prog_;
 
-    std::shared_ptr<Camera> cam_;
     std::shared_ptr<TextureManager> texture_mngr_;
+    std::vector<std::shared_ptr<ObjectRenderer>> renderers_;
+
+    std::shared_ptr<Camera> cam_;
     std::vector<std::shared_ptr<Material>> mtls_;
-    std::vector<mygl::mesh> objects_;
     std::vector<Light> lights_;
 };
 

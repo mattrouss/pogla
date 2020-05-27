@@ -29,10 +29,23 @@ void Scene::init_mtls(const YAML::Node& mtls) {
     for (auto const& mtl: mtls) {
         std::cout << mtl << std::endl;
         mtls_.push_back(std::make_shared<Material>(
-                        texture_mngr_,
-                        prog_,
-                        mtl["texture_path"].as<std::string>(),
-                        mtl["normal_map_path"].as<std::string>()
-                        ));
+                texture_mngr_,
+                prog_,
+                mtl["texture_path"].as<std::string>(),
+                mtl["normal_map_path"].as<std::string>()
+                ));
     }
+}
+
+void Scene::init_objects(const YAML::Node &objs) {
+    for (auto const& obj: objs) {
+        auto mesh = mygl::load_mesh(obj["mesh_path"].as<std::string>());
+        mesh->translate(obj["position"].as<mygl::Vec3>());
+        renderers_.push_back(std::make_shared<ObjectRenderer>(
+                prog_,
+                mesh,
+                mtls_[obj["material"].as<unsigned>()]
+                ));
+    }
+
 }
