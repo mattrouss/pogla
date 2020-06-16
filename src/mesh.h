@@ -31,6 +31,7 @@ namespace mygl
         void set_pos(Vec3 p) override;
         void rotate(Vec3 v) override;
         void set_rot(Vec3 r) override;
+        Vec3 get_pos() override;
 
         matrix4 get_transform() const;
 

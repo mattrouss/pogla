@@ -157,6 +157,11 @@ namespace mygl
         this->translate(v);
     }
 
+    mygl::Vec3 matrix4::get_pos()
+    {
+        return mygl::Vec3{{this->data[3], this->data[7], this->data[11]}};
+    }
+
     mygl::Vec4 operator*(const mygl::matrix4& lhs, const mygl::Vec4& rhs) {
         auto v = mygl::Vec4{};
         for (unsigned i = 0; i < 4u; i++) {
