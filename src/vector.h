@@ -11,6 +11,8 @@
 #include <cmath>
 #include <algorithm>
 
+#include "yaml-cpp/yaml.h"
+
 namespace mygl {
     template <typename T, size_t D>
     class Vector
@@ -159,4 +161,20 @@ namespace mygl {
     }
 
 
+}
+
+namespace YAML {
+    template<>
+    struct convert<mygl::Vec3> {
+        static bool decode(const Node& node, mygl::Vec3& rhs) {
+            if (!node.IsSequence() || node.size() != 3) {
+                return false;
+            }
+
+            rhs[0] = node[0].as<double>();
+            rhs[1] = node[1].as<double>();
+            rhs[2] = node[2].as<double>();
+            return true;
+        }
+    };
 }
