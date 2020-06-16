@@ -1,0 +1,31 @@
+scene:
+  camera:
+    znear: 5
+    zfar: 2000
+    eye: [0, 0, 10]
+    target: [0, 0, 0]
+    up: [0, 1, 0]
+  lights:
+    - type: "uniform"
+      position: [0, 0, 2]
+      color: [1, 1, 0.8]
+      intensity: 15
+    - type: "ambient"
+      position: [0, 0, 1]
+      color: [0.2, 0.2, 0.2]
+  objects:
+    - mesh_path: "../meshes/cube.obj"
+      material: 0
+      position: [0, 0, 0]
+    - mesh_path: "../meshes/cube.obj"
+      material: 0
+      position: [0, 0, 2]
+    - mesh_path: "../meshes/cube.obj"
+      material: 0
+      position: [0, 2, 0]
+    - mesh_path: "../meshes/cube.obj"
+      material: 0
+      position: [-2, 0, 0]
+  materials:
+    - texture_path: "../textures/pebble_texture.tga"
+      normal_map_path: "../textures/pebble_normal.tga"

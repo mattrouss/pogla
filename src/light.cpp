@@ -22,30 +22,33 @@ void Light::translate(mygl::Vec3 v)
 {
     pos += v;
 }
-UniformLight::UniformLight(mygl::Vec3 pos, mygl::Vec3 color, bool used)
-    : Light(pos, color, LightType::UNIFORM, used)
+UniformLight::UniformLight(mygl::Vec3 pos, mygl::Vec3 color, float intensity)
+    : Light(pos, color, LightType::UNIFORM, true), intensity{intensity}
 {
 }
 
+float UniformLight::get_intensity() const {
+    return intensity;
+}
 
-DirectionalLight::DirectionalLight(mygl::Vec3 pos, mygl::Vec3 color, mygl::Vec3 target, bool used)
-    : Light(pos, color, LightType::DIRECTIONAL, used), target(target)
+DirectionalLight::DirectionalLight(mygl::Vec3 pos, mygl::Vec3 color, mygl::Vec3 target)
+    : Light(pos, color, LightType::DIRECTIONAL, true), target(target)
 {
 }
 
-mygl::Vec3 DirectionalLight::get_dir() {
+mygl::Vec3 DirectionalLight::get_dir() const {
     return (pos - target).normalized();
 }
 
 
-AmbientLight::AmbientLight(mygl::Vec3 pos, mygl::Vec3 color, bool used)
-        : Light(pos, color, LightType::AMBIENT, used)
+AmbientLight::AmbientLight(mygl::Vec3 pos, mygl::Vec3 color)
+        : Light(pos, color, LightType::AMBIENT, true)
 {
 }
 
-void LightManager::set_uniform(size_t i, mygl::Vec3 pos, mygl::Vec3 color)
+void LightManager::set_uniform(size_t i, mygl::Vec3 pos, mygl::Vec3 color, float intensity)
 {
-    lights[i] = std::make_shared<UniformLight>(pos, color);
+    lights[i] = std::make_shared<UniformLight>(pos, color, intensity);
 }
 
 
@@ -78,6 +81,8 @@ void LightManager::set_lights_uniform(mygl::program *prog)
     for (size_t i = 0; i < 16; i++)
     {
         //that's gonna be fun
+        if (!lights[i]->used) continue;
+
         std::string prefix = "lights[" + std::to_string(i) + "].";
         uniformId = glGetUniformLocation(prog->prog_id(), (prefix + "position").c_str());gl_err()
         glUniform3f(uniformId,
@@ -96,6 +101,11 @@ void LightManager::set_lights_uniform(mygl::program *prog)
                         dir[0],
                         dir[1],
                         dir[2]);
+        } else if (lights[i]->get_type() == LightType::UNIFORM) {
+            uniformId = glGetUniformLocation(prog->prog_id(), (prefix + "intensity").c_str());gl_err()
+            float intensity = dynamic_cast<UniformLight&>(*lights[i]).get_intensity();
+            glUniform1f(uniformId, intensity);
+
         }
         uniformId = glGetUniformLocation(prog->prog_id(), (prefix + "type").c_str());gl_err()
         glUniform1i(uniformId, lights[i]->get_type());

@@ -7,6 +7,7 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra -g")
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 find_package(GLEW REQUIRED)
+find_package(YAML-CPP REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS})
 
 add_executable(bump src/main.cpp
@@ -43,6 +44,10 @@ add_executable(bump src/main.cpp
         src/waypoint_trajectory.cpp
         src/waypoint_trajectory.h
         src/cameratracking.cpp
-        src/cameratracking.h src/basicmovable.cpp src/basicmovable.h)
+        src/cameratracking.h
+        src/basicmovable.cpp
+        src/basicmovable.h
+        src/scene.cpp
+        src/scene.h)
 
-target_link_libraries(bump -lGL -lGLEW -lglut -lpthread)
+target_link_libraries(bump -lGL -lGLEW -lglut -lpthread -lyaml-cpp)
