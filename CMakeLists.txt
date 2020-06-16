@@ -30,6 +30,19 @@ add_executable(bump src/main.cpp
         src/light.cpp src/light.h
         src/inputmanager.cpp
         src/inputmanager.h
-        src/movable.h src/clock.cpp src/clock.h src/trajectory.cpp src/trajectory.h src/trajectory_function.h src/texturemanager.cpp src/texturemanager.h src/material.cpp src/material.h src/waypoint_trajectory.cpp src/waypoint_trajectory.h)
+        src/movable.h
+        src/clock.cpp
+        src/clock.h
+        src/trajectory.cpp
+        src/trajectory.h
+        src/trajectory_function.h
+        src/texturemanager.cpp
+        src/texturemanager.h
+        src/material.cpp
+        src/material.h
+        src/waypoint_trajectory.cpp
+        src/waypoint_trajectory.h
+        src/cameratracking.cpp
+        src/cameratracking.h src/basicmovable.cpp src/basicmovable.h)
 
 target_link_libraries(bump -lGL -lGLEW -lglut -lpthread)

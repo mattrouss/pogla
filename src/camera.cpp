@@ -83,3 +83,13 @@ void Camera::set_rot(mygl::Vec3 r)
     projection.set_rot(r);
     set_prog_proj(prog);
 }
+
+void Camera::update()
+{
+    set_prog_proj(prog);
+}
+
+mygl::Vec3 Camera::get_pos()
+{
+    return pos;
+}

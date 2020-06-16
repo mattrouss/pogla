@@ -160,6 +160,11 @@ namespace mygl
         //std::cout << transform_mat << "\n";
     }
 
+    Vec3 mesh::get_pos()
+    {
+        return mygl::Vec3();
+    }
+
     void compute_tangent(std::array<mygl::Vertex, 3>& triangle) {
         Vec3 tangent;
         auto edge1 = triangle[1].pos - triangle[0].pos;

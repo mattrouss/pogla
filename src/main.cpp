@@ -14,9 +14,12 @@
 #include "clock.h"
 #include "trajectory.h"
 #include "material.h"
+#include "cameratracking.h"
+#include "basicmovable.h"
 
 std::vector<std::shared_ptr<ObjectRenderer>> renderers;
 std::function<void()> light_trajectory_callback;
+std::function<void()> cam_trajectory_callback;
 
 void display()
 {
@@ -44,6 +47,7 @@ void refresh_timer(int)
 {
     glutPostRedisplay();
     light_trajectory_callback();
+    cam_trajectory_callback();
     glutTimerFunc(1000/50, refresh_timer, 0);
 }
 
@@ -139,8 +143,28 @@ int main(int argc, char **argv)
         auto res = mygl::Vec3{{x, y, z}} * 3.0f;
         return {res, {{0,0,0}}};
     }, TFunc::ABS_POS|TFunc::ABS_TIME|TFunc::SET_POS|TFunc::USE_POSITION}};
-    light_movement.register_object(lights.get(0));
-    light_movement.register_object(cam);
+    //light_movement.register_object(lights.get(0));
+    //light_movement.register_object(cam);
+
+    auto cam_movement = TrajectoryFunction{[](float t) -> std::pair<mygl::Vec3, mygl::Vec3> {
+        float x = sinf(t/10.f);
+        float y = 5;
+        float z = cosf(t/10.f);
+
+        auto res = mygl::Vec3{{x, y, z}} * 5.f;
+        return {res, {{0,0,0}}};
+    }, TFunc::ABS_POS|TFunc::ABS_TIME|TFunc::SET_POS|TFunc::USE_POSITION};
+
+    auto light_func = TrajectoryFunction{[](float t) -> std::pair<mygl::Vec3, mygl::Vec3> {
+        float x = sinf(t);
+        float z = cosf(t);
+        float y = cosf(t / 10.0f);
+
+        auto res = mygl::Vec3{{x, y, z}} * 3.0f;
+        return {res, {{0,0,0}}};
+    }, TFunc::ABS_POS|TFunc::ABS_TIME|TFunc::SET_POS|TFunc::USE_POSITION};
+    auto cam_target = std::make_shared<BasicMovable>();
+    auto tracking = CameraTracking(cam_movement, light_func, cam, cam_target);
 
     /*auto light_movement = Trajectory{{[] (float t) -> std::pair<mygl::Vec3, mygl::Vec3> {
         float rot = t;
@@ -160,6 +184,9 @@ int main(int argc, char **argv)
             }
             );
     //light_trajectory_callback = light_movement.get_callback();
+
+    cam_trajectory_callback = tracking.get_callback();
+
 
     //start display timer and start main loop
     glutTimerFunc(1000/50, refresh_timer, 0);

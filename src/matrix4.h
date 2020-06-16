@@ -22,6 +22,7 @@ public:
 
     void translate(const mygl::Vec3& v);
     void set_pos(const mygl::Vec3& v);
+    mygl::Vec3 get_pos();
     void rotate(const mygl::Vec3& v);
     void set_rot(const mygl::Vec3& v);
 

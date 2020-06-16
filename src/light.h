@@ -34,6 +34,11 @@ struct Light : public Movable
     void set_pos(mygl::Vec3 p) override;
     void rotate(mygl::Vec3) override {}
     void set_rot(mygl::Vec3) override {}
+    mygl::Vec3 get_pos() override
+    {
+        return pos;
+    }
+
 
     unsigned get_type() {
         return type;

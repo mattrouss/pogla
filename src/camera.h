@@ -23,9 +23,12 @@ public:
     void translate(mygl::Vec3 v) override;
     void set_pos(mygl::Vec3 p) override;
     void set_pos(mygl::Vec3 v, bool update);
+    mygl::Vec3 get_pos() override;
 
     void set_rot(mygl::Vec3 r) override;
     void rotate(mygl::Vec3 rotation) override;
+
+    void update();
 
     //void rotate(float horizontal, float vertical);
 
