@@ -9,6 +9,10 @@ class BasicMovable : public Movable
 {
 public:
     BasicMovable() = default;
+    BasicMovable(mygl::Vec3 pos)
+    {
+        this->pos = pos;
+    }
 
     void set_pos(mygl::Vec3 p) override;
 

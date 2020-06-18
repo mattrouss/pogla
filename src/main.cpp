@@ -25,7 +25,7 @@ void display()
     scene.render();
 
     glutSwapBuffers();
-    inputManager.send_input();
+    //inputManager.send_input();
     mainClock.tick();
 }
 
@@ -42,8 +42,9 @@ void keyUp(unsigned char key, int, int)
 void refresh_timer(int)
 {
     glutPostRedisplay();
-    light_trajectory_callback();
-    cam_trajectory_callback();
+    //light_trajectory_callback();
+    //cam_trajectory_callback();
+    scene.run();
     glutTimerFunc(1000/50, refresh_timer, 0);
 }
 
@@ -107,15 +108,15 @@ int main(int argc, char **argv)
 
     //init camera
     bool enableBumpMapping = false;
-    auto cam = std::make_shared<Camera>(-1, 1, -1, 1, 5, 2000);
-    cam->set_prog(prog);
-    cam->look_at({{0, 0, 10}}, {{0, 0, 0}}, {{0, 1, 0}});
+    //auto cam = std::make_shared<Camera>(-1, 1, -1, 1, 5, 2000);
+    //cam->set_prog(prog);
+    //cam->look_at({{0, 0, 10}}, {{0, 0, 0}}, {{0, 1, 0}});
   
     //configure samplers, uniforms and vbo
-    init_color_uniform(prog, {1, 1, 1, 1});
+    /*init_color_uniform(prog, {1, 1, 1, 1});
 
-    cam->set_prog_proj(prog);
-    inputManager.register_movement_listener(cam);
+    //cam->set_prog_proj(prog);
+    //inputManager.register_movement_listener(cam);
 
     //configure lights
     auto lights = LightManager{};
@@ -154,7 +155,7 @@ int main(int argc, char **argv)
         return {res, {{0,0,0}}};
     }, TFunc::ABS_POS|TFunc::ABS_TIME|TFunc::SET_POS|TFunc::USE_POSITION};
     auto cam_target = std::make_shared<BasicMovable>();
-    auto tracking = CameraTracking(cam_movement, light_func, cam, cam_target);
+    //auto tracking = CameraTracking(cam_movement, light_func, cam, cam_target);
 
     /*auto light_movement = Trajectory{{[] (float t) -> std::pair<mygl::Vec3, mygl::Vec3> {
         float rot = t;
@@ -166,17 +167,17 @@ int main(int argc, char **argv)
     light_movement.register_object(mesh);*/
 
     //temporary until a better solution is found
-    light_trajectory_callback = light_movement.get_callback_with_update(
+    /*light_trajectory_callback = light_movement.get_callback_with_update(
             [&]()
             {
                 //lights.set_lights_uniform(prog);
                 //cam->set_prog_proj(prog);
                 scene.set_lights_uniform();
             }
-            );
+            );*/
     //light_trajectory_callback = light_movement.get_callback();
 
-    cam_trajectory_callback = tracking.get_callback();
+    //cam_trajectory_callback = tracking.get_callback();
 
 
     //start display timer and start main loop

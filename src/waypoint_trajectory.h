@@ -13,11 +13,18 @@ class WaypointTrajectory
 public:
     struct Waypoint
     {
-        mygl::Vec3 pos;
+        Waypoint() = default;
+        Waypoint(std::array<float, 4> data)
+        {
+            time = data[0];
+            pos = mygl::Vec3{{data[1], data[2], data[3]}};
+        }
+
         float time;
+        mygl::Vec3 pos;
     };
 
-    WaypointTrajectory(std::vector<Waypoint> waypoints, bool loop = false);
+    WaypointTrajectory(std::vector<Waypoint> waypoints, bool loop = true);
 
 
     std::pair<mygl::Vec3, mygl::Vec3> operator()(float t);

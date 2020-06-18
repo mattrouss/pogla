@@ -10,7 +10,11 @@ class CameraTracking
 public:
 
     CameraTracking(TrajectoryFunction cam_func, TrajectoryFunction obj_func,
-            std::shared_ptr<Camera> cam, std::shared_ptr<Movable> obj);
+            std::shared_ptr<Camera> cam);
+    CameraTracking(TrajectoryFunction cam_func, std::shared_ptr<Camera> cam,
+            mygl::Vec3 focus);
+    CameraTracking(mygl::Vec3 pos, TrajectoryFunction obj_func,
+            std::shared_ptr<Camera> cam);
 
     void run();//run for 1 frame
 

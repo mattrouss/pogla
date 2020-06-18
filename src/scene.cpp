@@ -3,6 +3,8 @@
 //
 
 #include "scene.h"
+#include "waypoint_trajectory.h"
+#include "cameratracking.h"
 
 void Scene::load_scene(const std::string &file_path, mygl::program *program) {
     YAML::Node root = YAML::LoadFile(file_path);
@@ -11,6 +13,12 @@ void Scene::load_scene(const std::string &file_path, mygl::program *program) {
     }
     prog_ = program;
     auto sc = root["scene"];
+
+    if (sc["trajectories"])
+    {
+        auto trajectories = sc["trajectories"];
+        init_trajectories(trajectories);
+    }
 
     // Setup camera
     auto cam = sc["camera"];
@@ -30,22 +38,65 @@ void Scene::load_scene(const std::string &file_path, mygl::program *program) {
     init_lights(lights);
 }
 
-std::shared_ptr<Camera> Scene::init_camera(const YAML::Node &cam_node) const {
+std::shared_ptr<Camera> Scene::init_camera(const YAML::Node &cam_node) {
     auto z_near = cam_node["znear"] ? cam_node["znear"].as<float>() : 5;
     auto z_far = cam_node["zfar"] ? cam_node["zfar"].as<float>() : 2000;
 
     auto eye = cam_node["eye"] ? cam_node["eye"].as<mygl::Vec3>()
             : mygl::Vec3{{0, 0, 10}};
-    auto target = cam_node["target"] ? cam_node["target"].as<mygl::Vec3>()
-            : mygl::Vec3{{0, 0, 0}};
+
+    bool trajectory = false;
+    std::string trajectory_name = "None";
+    if (cam_node["trajectory"])
+    {
+        trajectory = true;
+        trajectory_name = cam_node["trajectory"].as<std::string>();
+    }
+
     auto up = cam_node["up"] ? cam_node["up"].as<mygl::Vec3>()
             : mygl::Vec3{{0, 1, 0}};
 
     auto cam = std::make_shared<Camera>(-1, 1, -1, 1, z_near, z_far);
+    cam->set_prog(prog_);
+
+    mygl::Vec3 target = mygl::Vec3{{0.001,0,0}};//not origin to prevent problems with initial
+    //lookat call
+    if (cam_node["target"])
+    {
+        if (cam_node["target"].IsScalar())
+        {
+            //set target to trajectory
+            auto target_trajectory = cam_node["target"].as<std::string>();
+            if (trajectory)
+            {
+                //trajectory with moving camera and target
+                tracking_ = std::make_shared<CameraTracking>(trajectories_.at(trajectory_name),
+                                                                 trajectories_.at(target_trajectory),
+                                                                 cam);
+            }
+            else
+            {
+                //trajectory with only moving target
+                tracking_ = std::make_shared<CameraTracking>(eye, trajectories_.at(target_trajectory),
+                        cam);
+            }
+        }
+        else
+        {
+            target = cam_node["target"].as<mygl::Vec3>();
+            if (trajectory)
+            {
+                //trajectory with moving camera and static target
+                tracking_ = std::make_shared<CameraTracking>(trajectories_.at(trajectory_name),
+                        cam, target);
+            }
+            //else: no trajectory, camera is static
+        }
+    }
+
     cam->look_at(eye, target, up);
 
     cam->set_prog_proj(prog_);
-    cam->set_prog(prog_);
     inputManager.register_movement_listener(cam);
 
     return cam;
@@ -95,9 +146,58 @@ void Scene::init_lights(const YAML::Node &lights) {
     light_mngr_->set_lights_uniform(prog_);
 }
 
+void Scene::init_trajectories(const YAML::Node& trajectories)
+{
+    for (auto const& trajectory: trajectories)
+    {
+        std::string type = "None";
+        if (trajectory["type"])
+            type = trajectory["type"].as<std::string>();
+        else
+            continue;//abort loading for current trajectory
+
+        std::string name = trajectory["name"] ? trajectory["name"].as<std::string>() : "unnamed";
+        if (name == "unnamed")
+            std::cerr << "Warning: found unnamed trajectory.\n";
+        if (type == "waypoints" and trajectory["data"] and trajectory["data"].IsSequence())
+        {
+            auto data = std::vector<WaypointTrajectory::Waypoint>{};
+            for (auto const& wp : trajectory["data"])
+            {
+                data.push_back(WaypointTrajectory::Waypoint{wp.as<std::array<float, 4>>()});
+            }
+            auto result = TrajectoryFunction{WaypointTrajectory{data},
+                    TFunc::ABS_POS|TFunc::ABS_TIME|TFunc::SET_POS|TFunc::USE_POSITION};
+            trajectories_.emplace(name, result);
+        }
+        else if (type == "orbit")
+        {
+            auto origin = trajectory.as<mygl::Vec3>();
+            auto radius = trajectory.as<float>();
+            auto period = trajectory.as<float>();
+            auto result = TrajectoryFunction{
+                    [origin, radius, period](float t) -> std::pair<mygl::Vec3, mygl::Vec3> {
+                        float x = sinf(t/period);
+                        float y = 0;
+                        float z = cosf(t/period);
+
+                        auto res = (mygl::Vec3{{x, y, z}} + origin) * radius;
+                        return {res, {{0,0,0}}};
+                    }, TFunc::ABS_POS|TFunc::ABS_TIME|TFunc::SET_POS|TFunc::USE_POSITION};
+            trajectories_.emplace(name, result);
+        }
+    }
+}
+
 void Scene::render() const {
     for (auto r : renderers_)
         r->render();
+}
+
+void Scene::run()
+{
+    if (tracking_ != nullptr)
+        tracking_->run();
 }
 
 std::shared_ptr<Light> Scene::get_light(size_t i) const {

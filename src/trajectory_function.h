@@ -23,6 +23,7 @@ namespace TFunc
 struct TrajectoryFunction
 {
     using ReturnType = std::pair<mygl::Vec3, mygl::Vec3>;
+    using FType = std::function<ReturnType>;
     std::function<ReturnType (float t)> func;
     unsigned flags = 0;
 
