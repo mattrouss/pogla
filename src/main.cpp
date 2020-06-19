@@ -25,7 +25,7 @@ void display()
     scene.render();
 
     glutSwapBuffers();
-    //inputManager.send_input();
+    inputManager.send_input();
     mainClock.tick();
 }
 
@@ -89,6 +89,16 @@ void init_color_uniform(mygl::program* prog, std::array<float, 4> color)
 
 int main(int argc, char **argv)
 {
+    std::string scene_path;
+    if (argc != 2)
+    {
+        std::cout << "usage: ./bump scane_file\n";
+        return 1;
+    }
+    else
+    {
+        scene_path = std::string{argv[1]};
+    }
     initGlut(argc, argv);
     initGlew();
     init_gl();
@@ -104,7 +114,7 @@ int main(int argc, char **argv)
     prog->use();
     std::cout << "Hello, World!" << std::endl;
 
-    scene.load_scene("../scenes/scene0.yaml", prog);
+    scene.load_scene(scene_path, prog);
 
     //init camera
     bool enableBumpMapping = false;
