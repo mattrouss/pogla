@@ -72,6 +72,7 @@ void Trajectory::run()
                     obj->set_rot(rotation);
             }
         }
+        //std::cout << "Pos: " << obj->get_pos() << "\n";
     }
 }
 

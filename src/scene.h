@@ -48,7 +48,8 @@ private:
     std::shared_ptr<Camera> cam_;
     std::vector<std::shared_ptr<Material>> mtls_;
     std::vector<std::shared_ptr<ObjectRenderer>> renderers_;
-    std::map<std::string, TrajectoryFunction> trajectories_;
+    std::map<std::string, TrajectoryFunction> trajectory_functions_;
+    std::vector<Trajectory> trajectories_;//trajectory instances for objects and lights
     std::shared_ptr<CameraTracking> tracking_;
 };
 

@@ -70,15 +70,15 @@ std::shared_ptr<Camera> Scene::init_camera(const YAML::Node &cam_node) {
             if (trajectory)
             {
                 //trajectory with moving camera and target
-                tracking_ = std::make_shared<CameraTracking>(trajectories_.at(trajectory_name),
-                                                                 trajectories_.at(target_trajectory),
-                                                                 cam);
+                tracking_ = std::make_shared<CameraTracking>(trajectory_functions_.at(trajectory_name),
+                                                             trajectory_functions_.at(target_trajectory),
+                                                             cam);
             }
             else
             {
                 //trajectory with only moving target
-                tracking_ = std::make_shared<CameraTracking>(eye, trajectories_.at(target_trajectory),
-                        cam);
+                tracking_ = std::make_shared<CameraTracking>(eye, trajectory_functions_.at(target_trajectory),
+                                                             cam);
             }
         }
         else
@@ -87,8 +87,8 @@ std::shared_ptr<Camera> Scene::init_camera(const YAML::Node &cam_node) {
             if (trajectory)
             {
                 //trajectory with moving camera and static target
-                tracking_ = std::make_shared<CameraTracking>(trajectories_.at(trajectory_name),
-                        cam, target);
+                tracking_ = std::make_shared<CameraTracking>(trajectory_functions_.at(trajectory_name),
+                                                             cam, target);
             }
             //else: no trajectory, camera is static
         }
@@ -117,6 +117,15 @@ void Scene::init_objects(const YAML::Node &objs) {
     for (auto const& obj: objs) {
         auto mesh = mygl::load_mesh(obj["mesh_path"].as<std::string>());
         mesh->translate(obj["position"].as<mygl::Vec3>());
+        if (obj["rotation"])
+            mesh->set_rot(obj["rotation"].as<mygl::Vec3>());
+
+        if (obj["trajectory"])
+        {
+            trajectories_.emplace_back(trajectory_functions_[obj["trajectory"].as<std::string>()]);
+            trajectories_.back().register_object(mesh);
+        }
+
         renderers_.push_back(std::make_shared<ObjectRenderer>(
                 prog_,
                 mesh,
@@ -139,6 +148,12 @@ void Scene::init_lights(const YAML::Node &lights) {
                     light["position"].as<mygl::Vec3>(),
                     light["color"].as<mygl::Vec3>(),
                     light["intensity"].as<float>());
+
+            if (light["trajectory"])
+            {
+                trajectories_.emplace_back(trajectory_functions_[light["trajectory"].as<std::string>()]);
+                trajectories_.back().register_object(light_mngr_->get(idx));
+            }
 
         }
         idx++;
@@ -168,23 +183,23 @@ void Scene::init_trajectories(const YAML::Node& trajectories)
             }
             auto result = TrajectoryFunction{WaypointTrajectory{data},
                     TFunc::ABS_POS|TFunc::ABS_TIME|TFunc::SET_POS|TFunc::USE_POSITION};
-            trajectories_.emplace(name, result);
+            trajectory_functions_.emplace(name, result);
         }
         else if (type == "orbit")
         {
-            auto origin = trajectory.as<mygl::Vec3>();
-            auto radius = trajectory.as<float>();
-            auto period = trajectory.as<float>();
+            auto origin = trajectory["origin"].as<mygl::Vec3>();
+            auto radius = trajectory["radius"].as<float>();
+            auto period = trajectory["period"].as<float>();
             auto result = TrajectoryFunction{
                     [origin, radius, period](float t) -> std::pair<mygl::Vec3, mygl::Vec3> {
-                        float x = sinf(t/period);
+                        float x = sinf(t/period*M_PI);
                         float y = 0;
-                        float z = cosf(t/period);
+                        float z = cosf(t/period*M_PI);
 
                         auto res = (mygl::Vec3{{x, y, z}} + origin) * radius;
                         return {res, {{0,0,0}}};
                     }, TFunc::ABS_POS|TFunc::ABS_TIME|TFunc::SET_POS|TFunc::USE_POSITION};
-            trajectories_.emplace(name, result);
+            trajectory_functions_.emplace(name, result);
         }
     }
 }
@@ -198,6 +213,14 @@ void Scene::run()
 {
     if (tracking_ != nullptr)
         tracking_->run();
+
+    for (auto& t : trajectories_)
+    {
+        t.run();
+    }
+
+    if (not trajectories_.empty())
+        light_mngr_->set_lights_uniform(prog_);
 }
 
 std::shared_ptr<Light> Scene::get_light(size_t i) const {
