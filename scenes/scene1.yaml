@@ -1,0 +1,44 @@
+scene:
+  camera:
+    znear: 5
+    zfar: 2000
+    eye: [0, 10, 10]
+    target: [0, 5, 0]
+    up: [0, 1, 0]
+    #trajectory: "test4"
+  lights:
+    - type: "uniform"
+      position: [2, 2, 2]
+      color: [1, 1, 0.8]
+      intensity: 15
+    - type: "ambient"
+      position: [0, 0, 1]
+      color: [0.2, 0.2, 0.2]
+  objects:
+    - mesh_path: "../meshes/barrel.obj"
+      material: 0
+      position: [0, 0, 0]
+    - mesh_path: "../meshes/rings.obj"
+      material: 1
+      position: [0, 0, 0]
+    - mesh_path: "../meshes/floor.obj"
+      material: 2
+      position: [0, 0, 0]
+    - mesh_path: "../meshes/walls.obj"
+      material: 3
+      position: [0, 0, 0]
+  materials:
+    - texture_path: "../textures/wood_texture.tga"
+      normal_map_path: "../textures/wood_normal.tga"
+    - texture_path: "../textures/rust_texture.tga"
+      normal_map_path: "../textures/rust_normal.tga"
+    - texture_path: "../textures/plank_texture.tga"
+      normal_map_path: "../textures/plank_normal.tga"
+    - texture_path: "../textures/brick_texture.tga"
+      normal_map_path: "../textures/brick_normal.tga"
+  trajectories:
+    - type: "orbit"
+      name: "test4"
+      origin: [0,7,0]
+      radius: 7
+      period: 10

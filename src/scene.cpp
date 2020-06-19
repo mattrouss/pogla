@@ -118,7 +118,7 @@ void Scene::init_objects(const YAML::Node &objs) {
         auto mesh = mygl::load_mesh(obj["mesh_path"].as<std::string>());
         mesh->translate(obj["position"].as<mygl::Vec3>());
         if (obj["rotation"])
-            mesh->set_rot(obj["rotation"].as<mygl::Vec3>() * 180.0 / M_PI);
+            mesh->set_rot(obj["rotation"].as<mygl::Vec3>() / 180.0 * M_PI);
 
         if (obj["trajectory"])
         {

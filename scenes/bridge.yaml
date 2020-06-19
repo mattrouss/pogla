@@ -1,0 +1,39 @@
+scene:
+  camera:
+    znear: 5
+    zfar: 2000
+    eye: [0, 10, 10]
+    target: [0, 5, 0]
+    up: [0, 1, 0]
+    #trajectory: "test4"
+  lights:
+    - type: "uniform"
+      position: [2, 2, 2]
+      color: [1, 1, 0.8]
+      intensity: 15
+    - type: "ambient"
+      position: [0, 0, 1]
+      color: [0.2, 0.2, 0.2]
+  objects:
+    - mesh_path: "../meshes/light_bricks.obj"
+      material: 0
+      position: [0, 0, 0]
+    - mesh_path: "../meshes/dark_bricks.obj"
+      material: 1
+      position: [0, 0, 0]
+    - mesh_path: "../meshes/red_bricks.obj"
+      material: 2
+      position: [0, 0, 0]
+    - mesh_path: "../meshes/bridge.obj"
+      material: 3
+      position: [0, 0, 0]
+  materials:
+    - texture_path: "../textures/rock_texture.tga"
+      normal_map_path: "../textures/rock_normal.tga"
+    - texture_path: "../textures/dark_rock_texture.tga"
+      normal_map_path: "../textures/dark_rock_normal.tga"
+    - texture_path: "../textures/red_rock_texture.tga"
+      normal_map_path: "../textures/red_rock_normal.tga"
+    - texture_path: "../textures/red_wood_texture.tga"
+      normal_map_path: "../textures/red_wood_normal.tga"
+
