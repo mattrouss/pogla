@@ -196,7 +196,7 @@ void Scene::init_trajectories(const YAML::Node& trajectories)
                         float y = 0;
                         float z = cosf(t/period*M_PI);
 
-                        auto res = (mygl::Vec3{{x, y, z}} + origin) * radius;
+                        auto res = (mygl::Vec3{{x, y, z}} * radius) + origin;
                         return {res, {{0,0,0}}};
                     }, TFunc::ABS_POS|TFunc::ABS_TIME|TFunc::SET_POS|TFunc::USE_POSITION};
             trajectory_functions_.emplace(name, result);

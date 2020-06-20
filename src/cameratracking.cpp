@@ -35,6 +35,9 @@ CameraTracking::CameraTracking(mygl::Vec3 pos, TrajectoryFunction obj_func,
     this->cam = cam;
     this->obj = std::make_shared<BasicMovable>();
 
+    obj_trajectory = std::make_shared<Trajectory>(obj_func);
+    obj_trajectory->register_object(obj);
+
     cam_trajectory = nullptr;
 }
 

@@ -1,0 +1,50 @@
+scene:
+  camera:
+    znear: 5
+    zfar: 2000
+    eye: [0, 0, 10]
+    target: [0, 0, 0]
+    #target: "test2"
+    #trajectory: "test1"
+    up: [0, 1, 0]
+  lights:
+    - type: "uniform"
+      position: [0, 0, 2]
+      color: [1, 1, 0.8]
+      intensity: 15
+      trajectory: "test4"
+    - type: "ambient"
+      position: [0, 0, 1]
+      color: [0.2, 0.2, 0.2]
+  objects:
+    - mesh_path: "../meshes/cube.obj"
+      material: 0
+      position: [0, 0, 0]
+    - mesh_path: "../meshes/cube.obj"
+      material: 0
+      position: [0, 0, 2]
+    - mesh_path: "../meshes/cube.obj"
+      material: 0
+      position: [0, 2, 0]
+    - mesh_path: "../meshes/cube.obj"
+      material: 0
+      position: [-2, 0, 0]
+  materials:
+    - texture_path: "../textures/pebble_texture.tga"
+      normal_map_path: "../textures/flat_nor.tga"
+  trajectories:
+    #points in trajectory are with format: [time, x, y, z]
+    - type: "waypoints"
+      name: "test1"
+      data: [[0,-10,0,20],[5,-20,4,0],[10,-10,0,20]]
+    - type: "waypoints"
+      name: "test2"
+      data: [[0,0,0,0],[5,20,0,0],[10,0,0,0]]
+    - type: "waypoints"
+      name: "test3"
+      data: [[0,10,0,20],[5,0,4,0],[10,10,0,20]]
+    - type: "orbit"
+      name: "test4"
+      origin: [0,0,0]
+      radius: 5
+      period: 5

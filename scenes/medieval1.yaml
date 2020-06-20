@@ -3,19 +3,24 @@ scene:
     znear: 5
     zfar: 2000
     eye: [0, 0, 10]
-    target: [0, 0, 0]
+    target: [0, 3, 0]
     #target: "test2"
     #trajectory: "test1"
     up: [0, 1, 0]
   lights:
-    - type: "uniform"
-      position: [0, 0, 2]
-      color: [1, 1, 0.8]
-      intensity: 15
-      trajectory: "test4"
+    #- type: "uniform"
+    #  position: [0, 0, 2]
+    #  color: [1, 1, 0.8]
+    #  intensity: 15
+    #  trajectory: "test4"
     - type: "ambient"
       position: [0, 0, 1]
       color: [0.2, 0.2, 0.2]
+    - type: "uniform"
+      position: [3, 5, 10]
+      color: [1, 1, 1]
+      intensity: 100
+
   objects:
     #house
     - mesh_path: "../meshes/walls_1.obj"

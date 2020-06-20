@@ -1,0 +1,58 @@
+scene:
+  camera:
+    znear: 5
+    zfar: 2000
+    eye: [0, 0, 10]
+    target: [0, 0, 0]
+    up: [0, 1, 0]
+  lights:
+    - type: "uniform"
+      position: [0, 0, 2]
+      color: [1, 1, 0.8]
+      intensity: 15
+      trajectory: "test4"
+    - type: "ambient"
+      position: [0, 0, 1]
+      color: [0.2, 0.2, 0.2]
+
+  objects:
+    #ground
+    - mesh_path: "../meshes/ground_1.obj"
+      material: 1
+      position: [0,-1,0]
+    #well
+    - mesh_path: "../meshes/well_base.obj"
+      material: 2
+      position: [0, -1, 0]
+    - mesh_path: "../meshes/well_beams.obj"
+      material: 3
+      position: [0, -1, 0]
+    - mesh_path: "../meshes/well_roof.obj"
+      material: 0
+      position: [0, -1, 0]
+  materials:
+    #0
+    - texture_path: "../textures/roof_1.tga"
+      normal_map_path: "../textures/roof_1_nor.tga"
+    #1
+    - texture_path: "../textures/ground_2.tga"
+      normal_map_path: "../textures/ground_2_nor.tga"
+    #2
+    - texture_path: "../textures/sandstone.tga"
+      normal_map_path: "../textures/sandstone_nor.tga"
+    #3
+    - texture_path: "../textures/wood_1.tga"
+      normal_map_path: "../textures/wood_1_nor.tga"
+  trajectories:
+    #points in trajectory are with format: [time, x, y, z]
+    - type: "orbit"
+      name: "test4"
+      origin: [0,0,0]
+      radius: 5
+      period: 5
+
+
+
+
+
+

@@ -10,7 +10,8 @@ scene:
     - type: "uniform"
       position: [2, 2, 2]
       color: [1, 1, 0.8]
-      intensity: 15
+      intensity: 25
+      trajectory: "test4"
     - type: "ambient"
       position: [0, 0, 1]
       color: [0.2, 0.2, 0.2]
@@ -21,3 +22,9 @@ scene:
   materials:
     - texture_path: "../textures/gold.tga"
       normal_map_path: "../textures/coin.tga"
+  trajectories:
+    - type: "orbit"
+      name: "test4"
+      origin: [0,4,0]
+      radius: 5
+      period: 5

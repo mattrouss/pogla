@@ -47,4 +47,4 @@ scene:
       name: "test4"
       origin: [0,0,0]
       radius: 5
-      period: 10
+      period: 5

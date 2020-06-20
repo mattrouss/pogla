@@ -1,0 +1,120 @@
+scene:
+  camera:
+    znear: 5
+    zfar: 2000
+    eye: [0, 0, 10]
+    target: [2, 5, 2]
+    #target: "test2"
+    trajectory: "orbit_cam"
+    up: [0, 1, 0]
+  lights:
+    - type: "uniform"
+      position: [0, 0, 2]
+      color: [1, 1, 0.8]
+      intensity: 15
+      trajectory: "test4"
+    - type: "ambient"
+      position: [0, 0, 1]
+      color: [0.2, 0.2, 0.2]
+  objects:
+    #house
+    - mesh_path: "../meshes/walls_1.obj"
+      material: 0
+      position: [4.8, 0, -8]
+      rotation: [0, -17, 0]
+    - mesh_path: "../meshes/base_1.obj"
+      material: 1
+      position: [4.8, 0, -8]
+      rotation: [0, -17, 0]
+    - mesh_path: "../meshes/roof_1.obj"
+      material: 2
+      position: [4.8, 0, -8]
+      rotation: [0, -17, 0]
+    #ground
+    - mesh_path: "../meshes/ground_1.obj"
+      material: 3
+      position: [0,0,0]
+    #rock_1
+    - mesh_path: "../meshes/rock_2.obj"
+      material: 4
+      position: [12, 0, 3.6]
+    - mesh_path: "../meshes/rock_2.obj"
+      material: 4
+      position: [-8, 0, 0]
+    #rock_2
+    - mesh_path: "../meshes/rock_1.obj"
+      material: 4
+      position: [11, 0, -3.2]
+    - mesh_path: "../meshes/rock_1.obj"
+      material: 4
+      position: [0, 0, 8.4]
+    #well
+    - mesh_path: "../meshes/well_base.obj"
+      material: 5
+      position: [3.1, 0, 5.1]
+    - mesh_path: "../meshes/well_beams.obj"
+      material: 6
+      position: [3.1, 0, 5.1]
+    - mesh_path: "../meshes/well_roof.obj"
+      material: 2
+      position: [3.1, 0, 5.1]
+    #lamps
+    #lamp_1
+    - mesh_path: "../meshes/lamp_base.obj"
+      material: 6
+      position: [-7, 0, -5.9]
+    - mesh_path: "../meshes/lamp_top.obj"
+      material: 6
+      position: [-7, 0, -5.9]
+    #lamp_2
+    - mesh_path: "../meshes/lamp_base.obj"
+      material: 6
+      position: [9.2, 0, 1.2]
+      rotation: [0, -84, 0]
+    - mesh_path: "../meshes/lamp_top.obj"
+      material: 6
+      position: [9.2, 0, 1.2]
+      rotation: [0, -84, 0]
+    #lamp_3
+    - mesh_path: "../meshes/lamp_base.obj"
+      material: 6
+      position: [-3.4, 0, 10.5]
+      rotation: [0, -194, 0]
+    - mesh_path: "../meshes/lamp_top.obj"
+      material: 6
+      position: [-3.4, 0, 10.5]
+      rotation: [0, -194, 0]
+  materials:
+    #0
+    - texture_path: "../textures/plank_1.tga"
+      normal_map_path: "../textures/plank_1_nor.tga"
+    #1
+    - texture_path: "../textures/stone_1.tga"
+      normal_map_path: "../textures/stone_1_nor.tga"
+    #2
+    - texture_path: "../textures/roof_1.tga"
+      normal_map_path: "../textures/roof_1_nor.tga"
+    #3
+    - texture_path: "../textures/ground_2.tga"
+      normal_map_path: "../textures/ground_2_nor.tga"
+    #4
+    - texture_path: "../textures/rock_1.tga"
+      normal_map_path: "../textures/rock_1_nor.tga"
+    #5
+    - texture_path: "../textures/stone_2.tga"
+      normal_map_path: "../textures/stone_2_nor.tga"
+    #6
+    - texture_path: "../textures/wood_1.tga"
+      normal_map_path: "../textures/wood_1_nor.tga"
+  trajectories:
+    #points in trajectory are with format: [time, x, y, z]
+    - type: "orbit"
+      name: "test4"
+      origin: [0,0,0]
+      radius: 5
+      period: 10
+    - type: "orbit"
+      name: "orbit_cam"
+      origin: [2,20,2]
+      radius: 60
+      period: 90
