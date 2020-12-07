@@ -10,11 +10,12 @@ set(mygl_src_files
 
     inputmanager.cpp inputmanager.h
 
+    # OpenGL errors
     gl_err.h
 )
 
 add_library(mygl ${mygl_src_files})
-target_link_libraries(mygl PUBLIC utils assets)
+target_link_libraries(mygl PUBLIC assets utils)
 
 target_include_directories(assets PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

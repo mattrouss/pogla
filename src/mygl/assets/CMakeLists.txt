@@ -11,4 +11,4 @@ set(assets_src_files
 )
 
 add_library(assets ${assets_src_files})
-target_link_libraries(assets mygl utils)
+target_link_libraries(assets PRIVATE mygl)
