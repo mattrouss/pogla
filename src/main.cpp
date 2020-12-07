@@ -11,7 +11,7 @@
 #include "mygl/gl_err.h"
 #include "mygl/inputmanager.h"
 #include "mygl/program.h"
-#include "trajectory.h"
+#include "trajectory/trajectory.h"
 #include "utils/clock.h"
 #include "utils/matrix4.h"
 

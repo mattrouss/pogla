@@ -2,7 +2,7 @@
 #define BUMP_CAMERATRACKING_H
 
 #include <memory>
-#include "trajectory.h"
+#include "trajectory/trajectory.h"
 #include "camera.h"
 
 class CameraTracking

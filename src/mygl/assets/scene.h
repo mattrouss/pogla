@@ -20,7 +20,10 @@
 #include "mygl/lightmanager.h"
 #include "mygl/inputmanager.h"
 #include "mygl/object_renderer.h"
-#include "trajectory_function.h"
+
+#include "trajectory/trajectory_function.h"
+#include "trajectory/waypoint_trajectory.h"
+
 
 class Scene {
 public:

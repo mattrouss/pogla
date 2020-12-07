@@ -1,4 +1,5 @@
 add_subdirectory(assets)
+add_subdirectory(trajectory)
 
 set(mygl_src_files
     program.cpp program.h
@@ -19,7 +20,8 @@ set(mygl_src_files
 )
 
 add_library(mygl ${mygl_src_files})
-target_link_libraries(mygl PUBLIC assets utils)
+target_link_libraries(mygl PUBLIC assets trajectory utils)
 
 target_include_directories(assets PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(trajectory PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

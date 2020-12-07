@@ -3,7 +3,6 @@
 //
 
 #include "scene.h"
-#include "waypoint_trajectory.h"
 #include "cameratracking.h"
 
 void Scene::load_scene(const std::string &file_path, mygl::program *program) {
