@@ -1,4 +1,4 @@
-#include "light.h"
+#include "lightmanager.h"
 #include "gl_err.h"
 
 LightManager::LightManager()
@@ -7,44 +7,6 @@ LightManager::LightManager()
             mygl::Vec3{{0,0,0}}, false));
 }
 
-Light::Light(mygl::Vec3 pos, mygl::Vec3 color, unsigned type, bool used)
-    : pos{pos}, color{color}, type{type}, used{used}
-{
-}
-
-
-void Light::set_pos(mygl::Vec3 p)
-{
-    pos = p;
-}
-
-void Light::translate(mygl::Vec3 v)
-{
-    pos += v;
-}
-UniformLight::UniformLight(mygl::Vec3 pos, mygl::Vec3 color, float intensity)
-    : Light(pos, color, LightType::UNIFORM, true), intensity{intensity}
-{
-}
-
-float UniformLight::get_intensity() const {
-    return intensity;
-}
-
-DirectionalLight::DirectionalLight(mygl::Vec3 pos, mygl::Vec3 color, mygl::Vec3 target)
-    : Light(pos, color, LightType::DIRECTIONAL, true), target(target)
-{
-}
-
-mygl::Vec3 DirectionalLight::get_dir() const {
-    return (pos - target).normalized();
-}
-
-
-AmbientLight::AmbientLight(mygl::Vec3 pos, mygl::Vec3 color)
-        : Light(pos, color, LightType::AMBIENT, true)
-{
-}
 
 void LightManager::set_uniform(size_t i, mygl::Vec3 pos, mygl::Vec3 color, float intensity)
 {
@@ -63,10 +25,12 @@ void LightManager::set_ambient(size_t i, mygl::Vec3 pos, mygl::Vec3 color)
     lights[i] = std::make_shared<AmbientLight>(pos, color);
 }
 
+
 std::shared_ptr<Light> LightManager::get(size_t i)
 {
     return lights[i];
 }
+
 
 void LightManager::set_lights_uniform(mygl::program *prog)
 {

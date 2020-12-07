@@ -14,12 +14,13 @@
 
 #include "mesh.h"
 #include "camera.h"
-#include "light.h"
 #include "material.h"
-#include "inputmanager.h"
-#include "object_renderer.h"
-#include "trajectory_function.h"
 #include "cameratracking.h"
+
+#include "mygl/lightmanager.h"
+#include "mygl/inputmanager.h"
+#include "mygl/object_renderer.h"
+#include "trajectory_function.h"
 
 class Scene {
 public:

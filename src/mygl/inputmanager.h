@@ -2,6 +2,7 @@
 #define BUMP_INPUTMANAGER_H
 
 #include "utils/vector.h"
+#include "assets/light.h"
 #include "movable.h"
 #include <functional>
 #include <memory>

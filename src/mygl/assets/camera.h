@@ -4,7 +4,7 @@
 #define cam_speed 20
 
 #include "utils/matrix4.h"
-#include "program.h"
+#include "mygl/program.h"
 #include "movable.h"
 
 class Camera : public Movable

@@ -6,7 +6,7 @@
 #include <memory>
 #include "utils/vector.h"
 #include "movable.h"
-#include "clock.h"
+#include "utils/clock.h"
 #include "trajectory_function.h"
 
 class Trajectory

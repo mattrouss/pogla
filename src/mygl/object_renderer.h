@@ -5,8 +5,8 @@
 #include <GL/glew.h>
 #include <vector>
 #include "program.h"
-#include "mesh.h"
-#include "material.h"
+#include "assets/mesh.h"
+#include "assets/material.h"
 
 class ObjectRenderer
 {

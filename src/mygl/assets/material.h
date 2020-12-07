@@ -2,8 +2,8 @@
 #define BUMP_MATERIAL_H
 
 #include <memory>
-#include "texturemanager.h"
-#include "program.h"
+#include "mygl/texturemanager.h"
+#include "mygl/program.h"
 
 class Material
 {

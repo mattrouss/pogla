@@ -1,6 +1,6 @@
 #include "camera.h"
-#include "gl_err.h"
-#include "clock.h"
+#include "mygl/gl_err.h"
+#include "utils/clock.h"
 
 Camera::Camera(const float left, const float right, const float bottom, const float top, const float znear,
                const float zfar)

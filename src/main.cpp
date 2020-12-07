@@ -3,16 +3,16 @@
 #include <GL/freeglut.h>
 #include <array>
 
-#include "program.h"
-#include "utils/matrix4.h"
-#include "gl_err.h"
-#include "inputmanager.h"
-#include "clock.h"
-#include "trajectory.h"
-#include "material.h"
-#include "cameratracking.h"
+#include "assets/material.h"
+#include "assets/scene.h"
+#include "assets/cameratracking.h"
 #include "basicmovable.h"
-#include "scene.h"
+#include "mygl/gl_err.h"
+#include "mygl/inputmanager.h"
+#include "mygl/program.h"
+#include "trajectory.h"
+#include "utils/clock.h"
+#include "utils/matrix4.h"
 
 Scene scene;
 std::function<void()> light_trajectory_callback;

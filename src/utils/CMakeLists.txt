@@ -1,5 +1,8 @@
 set(utils_src_files
 
+    # Clock
+    clock.cpp clock.h
+
     # Image IO
     image.cpp image.h
     image_io.cpp image_io.h

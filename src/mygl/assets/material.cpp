@@ -1,5 +1,5 @@
 #include "material.h"
-#include "gl_err.h"
+#include "mygl/gl_err.h"
 
 #include <utility>
 
