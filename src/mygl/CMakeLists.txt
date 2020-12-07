@@ -10,6 +10,10 @@ set(mygl_src_files
 
     inputmanager.cpp inputmanager.h
 
+    # Movable
+    movable.h
+    basicmovable.cpp basicmovable.h
+
     # OpenGL errors
     gl_err.h
 )

@@ -5,7 +5,7 @@
 
 #include "utils/matrix4.h"
 #include "mygl/program.h"
-#include "movable.h"
+#include "mygl/movable.h"
 
 class Camera : public Movable
 {

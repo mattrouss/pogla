@@ -3,14 +3,11 @@ add_subdirectory(utils)
 
 add_executable(${BUMP_EXECUTABLE_NAME}
         main.cpp
-        movable.h
         trajectory.cpp
         trajectory.h
         trajectory_function.h
         waypoint_trajectory.cpp
         waypoint_trajectory.h
-        basicmovable.cpp
-        basicmovable.h
 )
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})

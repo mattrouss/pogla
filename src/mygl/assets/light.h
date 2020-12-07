@@ -3,9 +3,9 @@
 
 #include <memory>
 
+#include "mygl/movable.h"
 #include "utils/vector.h"
 #include "utils/matrix4.h"
-#include "movable.h"
 
 namespace LightType {
     enum: unsigned int {

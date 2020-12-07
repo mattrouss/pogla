@@ -6,7 +6,8 @@
 #include "assets/material.h"
 #include "assets/scene.h"
 #include "assets/cameratracking.h"
-#include "basicmovable.h"
+
+#include "mygl/basicmovable.h"
 #include "mygl/gl_err.h"
 #include "mygl/inputmanager.h"
 #include "mygl/program.h"
