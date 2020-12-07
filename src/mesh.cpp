@@ -1,6 +1,4 @@
 #include "mesh.h"
-#include "matrix4.h"
-#include "vector.h"
 #include <fstream>
 #include <memory>
 #include <sstream>

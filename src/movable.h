@@ -1,7 +1,7 @@
 #ifndef BUMP_MOVABLE_H
 #define BUMP_MOVABLE_H
 
-#include "vector.h"
+#include "utils/vector.h"
 
 class Movable
 {

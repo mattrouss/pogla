@@ -3,7 +3,7 @@
 
 
 #include <utility>
-#include "vector.h"
+#include "utils/vector.h"
 
 /*
  * This trajectory function only works in absolute time.

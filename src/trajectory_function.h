@@ -1,7 +1,7 @@
 #ifndef BUMP_TRAJECTORY_FUNCTION_H
 #define BUMP_TRAJECTORY_FUNCTION_H
 
-#include "vector.h"
+#include "utils/vector.h"
 
 namespace TFunc
 {

@@ -1,6 +1,6 @@
 #include "texturemanager.h"
 #include "gl_err.h"
-#include "image_io.h"
+#include "utils/image_io.h"
 
 TextureManager::~TextureManager()
 {

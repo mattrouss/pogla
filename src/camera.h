@@ -3,7 +3,7 @@
 
 #define cam_speed 20
 
-#include "matrix4.h"
+#include "utils/matrix4.h"
 #include "program.h"
 #include "movable.h"
 

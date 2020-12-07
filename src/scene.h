@@ -10,10 +10,11 @@
 #include <map>
 #include <memory>
 
+#include "utils/vector.h"
+
 #include "mesh.h"
 #include "camera.h"
 #include "light.h"
-#include "vector.h"
 #include "material.h"
 #include "inputmanager.h"
 #include "object_renderer.h"

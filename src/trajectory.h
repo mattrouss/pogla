@@ -4,7 +4,7 @@
 
 #include <functional>
 #include <memory>
-#include "vector.h"
+#include "utils/vector.h"
 #include "movable.h"
 #include "clock.h"
 #include "trajectory_function.h"

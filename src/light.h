@@ -2,8 +2,8 @@
 #define BUMP_LIGHT_H
 
 #include <memory>
-#include "vector.h"
-#include "matrix4.h"
+#include "utils/vector.h"
+#include "utils/matrix4.h"
 #include "program.h"
 #include "movable.h"
 

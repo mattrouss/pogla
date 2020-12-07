@@ -3,7 +3,7 @@
 
 
 #include "movable.h"
-#include "vector.h"
+#include "utils/vector.h"
 
 class BasicMovable : public Movable
 {

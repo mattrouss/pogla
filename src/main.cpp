@@ -4,7 +4,7 @@
 #include <array>
 
 #include "program.h"
-#include "matrix4.h"
+#include "utils/matrix4.h"
 #include "gl_err.h"
 #include "inputmanager.h"
 #include "clock.h"
