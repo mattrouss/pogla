@@ -2,6 +2,8 @@
 #include "GL/glew.h"
 #include <GL/freeglut.h>
 #include <array>
+#include <mygl/program/programbuilder.h>
+#include <mygl/shadertypes.h>
 
 #include "assets/material.h"
 #include "assets/scene.h"
@@ -10,7 +12,7 @@
 #include "mygl/basicmovable.h"
 #include "mygl/gl_err.h"
 #include "mygl/inputmanager.h"
-#include "mygl/program.h"
+#include "mygl/program/Program.h"
 #include "trajectory/trajectory.h"
 #include "utils/clock.h"
 #include "utils/matrix4.h"
@@ -81,7 +83,7 @@ bool init_gl()
     return true;
 }
 
-void init_color_uniform(mygl::program* prog, std::array<float, 4> color)
+void init_color_uniform(mygl::Program* prog, std::array<float, 4> color)
 {
     GLint color_id;
     color_id = glGetUniformLocation(prog->prog_id(), "color");gl_err();
@@ -106,12 +108,18 @@ int main(int argc, char **argv)
 
     std::string v_shader = "../shaders/vertex.shd";
     std::string f_shader = "../shaders/fragment.shd";
-    auto prog = mygl::program::make_program(v_shader, f_shader);
-    if (prog == nullptr)
+    //auto prog = mygl::Program::make_program(v_shader, f_shader);
+    auto prog_builder = mygl::ProgramBuilder{};
+    prog_builder.add_shader(
+            mygl::shaders::DisplayShadersBase{v_shader, f_shader}
+            );
+    auto prog_result = prog_builder.build();
+    if (prog_result == std::nullopt)
     {
         std::cout << "Shader compilation failed.\n";
         return 1;
     }
+    auto prog = prog_result->get();
     prog->use();
     std::cout << "Hello, World!" << std::endl;
 

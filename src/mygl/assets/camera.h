@@ -4,7 +4,7 @@
 #define cam_speed 20
 
 #include "utils/matrix4.h"
-#include "mygl/program.h"
+#include "mygl/program/Program.h"
 #include "mygl/movable.h"
 
 class Camera : public Movable
@@ -36,8 +36,8 @@ public:
 
     mygl::matrix4 get_projection_matrix() const;
 
-    void set_prog_proj(mygl::program* p) const;
-    void set_prog(mygl::program* p);
+    void set_prog_proj(mygl::Program* p) const;
+    void set_prog(mygl::Program* p);
 
 private:
     mygl::matrix4 projection;
@@ -47,7 +47,7 @@ private:
     mygl::Vec3 left;
     mygl::Vec3 forward;
 
-    mygl::program* prog = nullptr;
+    mygl::Program* prog = nullptr;
 };
 
 
