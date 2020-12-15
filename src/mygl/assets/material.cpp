@@ -3,21 +3,21 @@
 
 #include <utility>
 
-Material::Material(std::shared_ptr<TextureManager> manager, mygl::program* prog,
+Material::Material(std::shared_ptr<TextureManager> manager, mygl::Program* prog,
         unsigned texture)
     : texture_manager{std::move(manager)}, texture_id{texture}, bump_id{0}, use_bump{false}
 {
     program = prog;
 }
 
-Material::Material(std::shared_ptr<TextureManager> manager, mygl::program* prog,
+Material::Material(std::shared_ptr<TextureManager> manager, mygl::Program* prog,
         unsigned texture, unsigned bump)
     : texture_manager{std::move(manager)}, texture_id{texture}, bump_id{bump}, use_bump{true}
 {
     program = prog;
 }
 
-Material::Material(std::shared_ptr<TextureManager> manager, mygl::program* prog,
+Material::Material(std::shared_ptr<TextureManager> manager, mygl::Program* prog,
         std::string texture)
     : texture_manager{std::move(manager)}
 {
@@ -27,7 +27,7 @@ Material::Material(std::shared_ptr<TextureManager> manager, mygl::program* prog,
     program = prog;
 }
 
-Material::Material(std::shared_ptr<TextureManager> manager, mygl::program* prog,
+Material::Material(std::shared_ptr<TextureManager> manager, mygl::Program* prog,
         std::string texture, std::string bump)
     : texture_manager{std::move(manager)}
 {

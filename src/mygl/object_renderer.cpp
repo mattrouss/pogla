@@ -3,8 +3,8 @@
 #include <utility>
 #include "gl_err.h"
 
-ObjectRenderer::ObjectRenderer(mygl::program *prog, std::shared_ptr<mygl::mesh> mesh,
-        std::shared_ptr<Material> mat)
+ObjectRenderer::ObjectRenderer(mygl::Program *prog, std::shared_ptr<mygl::mesh> mesh,
+                               std::shared_ptr<Material> mat)
 {
     this->program = prog;
     this->mesh = mesh;

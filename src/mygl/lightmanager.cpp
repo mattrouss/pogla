@@ -32,7 +32,7 @@ std::shared_ptr<Light> LightManager::get(size_t i)
 }
 
 
-void LightManager::set_lights_uniform(mygl::program *prog)
+void LightManager::set_lights_uniform(mygl::Program *prog)
 {
     GLint uniformId;
     uniformId = glGetUniformLocation(prog->prog_id(), "uniform_light");

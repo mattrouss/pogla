@@ -6,7 +6,7 @@
 #include "assets/light.h"
 #include "utils/vector.h"
 #include "utils/matrix4.h"
-#include "mygl/program.h"
+#include "mygl/program/Program.h"
 #include "movable.h"
 
 class LightManager
@@ -20,7 +20,7 @@ public:
     void reset(size_t i);
     std::shared_ptr<Light> get(size_t i);
 
-    void set_lights_uniform(mygl::program* prog);
+    void set_lights_uniform(mygl::Program* prog);
 
 private:
     std::array<std::shared_ptr<Light>, 16> lights;

@@ -29,7 +29,7 @@ class Scene {
 public:
     Scene() {}
 
-    void load_scene(const std::string& file_path, mygl::program* program);
+    void load_scene(const std::string& file_path, mygl::Program* program);
 
     std::shared_ptr<Camera> init_camera(const YAML::Node& cam_node);
     void init_mtls(const YAML::Node& mtls);
@@ -45,7 +45,7 @@ public:
 
 
 private:
-    mygl::program* prog_;
+    mygl::Program* prog_;
 
     std::shared_ptr<TextureManager> texture_mngr_;
     std::shared_ptr<LightManager> light_mngr_;
