@@ -21,13 +21,22 @@ void Camera::look_at(const mygl::Vec3& eye, const mygl::Vec3& target, const mygl
 }
 
 void Camera::translate(const mygl::Vec3 v)
-{//translate in local base
+{
     mygl::Vec3 left_h = {{left[0], 0, left[2]}};
     mygl::Vec3 forward_h = {{forward[0], 0, forward[2]}};
 
     auto translation = v[0] * left_h + v[1] * mygl::Vec3{{0.0,1.0,0.0}} + v[2] * forward_h;
 
     set_pos(pos + (translation * cam_speed * mainClock.deltatime()), true);
+
+    set_prog_proj(prog);
+}
+
+void Camera::translate_local(const mygl::Vec3 v)
+{
+    auto up = (forward ^ left).normalized();
+    auto translation = v[0] * left + v[1] * up  + v[2] * forward;
+    set_pos(pos + (translation * mainClock.deltatime()), true);
 
     set_prog_proj(prog);
 }

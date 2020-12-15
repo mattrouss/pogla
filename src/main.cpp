@@ -26,8 +26,19 @@ void display()
     scene.render();
 
     glutSwapBuffers();
-    inputManager.send_input();
+    inputManager.send_keyboard_input();
+    inputManager.send_mouse_input();
     mainClock.tick();
+}
+
+void mouseClick(int button, int state, int, int)
+{
+    inputManager.set_mouse_type(button, state);
+}
+
+void mouseMove(int x, int y)
+{
+    inputManager.set_mouse_coords(x, y);
 }
 
 void keyDown(unsigned char key, int, int)
@@ -58,6 +69,9 @@ bool initGlut(int &argc, char **argv) {
     glutInitWindowPosition(10, 10);
     glutCreateWindow("Bump");
     glutDisplayFunc(display);
+    glutMouseFunc(mouseClick);
+    glutMotionFunc(mouseMove);
+    glutPassiveMotionFunc(mouseMove);
     glutKeyboardFunc(keyDown);
     glutKeyboardUpFunc(keyUp);
     glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
@@ -127,7 +141,7 @@ int main(int argc, char **argv)
     /*init_color_uniform(prog, {1, 1, 1, 1});
 
     //cam->set_prog_proj(prog);
-    //inputManager.register_movement_listener(cam);
+    //inputManager.register_keyboard_listener(cam);
 
     //configure lights
     auto lights = LightManager{};

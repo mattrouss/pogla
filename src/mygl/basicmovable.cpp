@@ -14,6 +14,13 @@ void BasicMovable::translate(mygl::Vec3 v)
     pos += v;
 }
 
+void BasicMovable::translate_local(mygl::Vec3 v)
+{
+    auto translation = v[0] * left + v[1] * (forward ^ left).normalized() + v[2] * forward;
+
+    pos += translation;
+}
+
 void BasicMovable::set_rot(mygl::Vec3 r)
 {
 }

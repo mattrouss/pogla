@@ -29,6 +29,7 @@ namespace mygl
         std::shared_ptr<mesh> transform(matrix4 mat);
         void reset_transform();
         void translate(Vec3 v) override;
+        void translate_local(Vec3 v) override;
         void set_pos(Vec3 p) override;
         void rotate(Vec3 v) override;
         void set_rot(Vec3 r) override;

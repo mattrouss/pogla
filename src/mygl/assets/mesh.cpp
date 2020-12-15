@@ -135,6 +135,10 @@ namespace mygl
         //std::cout << transform_mat << "\n";
     }
 
+    void mesh::translate_local(Vec3)
+    {
+    }
+
     void mesh::rotate(Vec3 v)
     {
         transform_mat.rotate(v);

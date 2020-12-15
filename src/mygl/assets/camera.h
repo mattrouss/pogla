@@ -21,6 +21,7 @@ public:
             bool translate = true);
 
     void translate(mygl::Vec3 v) override;
+    void translate_local(mygl::Vec3 v) override;
     void set_pos(mygl::Vec3 p) override;
     void set_pos(mygl::Vec3 v, bool update);
     mygl::Vec3 get_pos() override;

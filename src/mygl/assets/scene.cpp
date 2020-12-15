@@ -96,7 +96,8 @@ std::shared_ptr<Camera> Scene::init_camera(const YAML::Node &cam_node) {
     cam->look_at(eye, target, up);
 
     cam->set_prog_proj(prog_);
-    inputManager.register_movement_listener(cam);
+    inputManager.register_keyboard_listener(cam);
+    inputManager.register_mouse_listener(cam);
 
     return cam;
 }
