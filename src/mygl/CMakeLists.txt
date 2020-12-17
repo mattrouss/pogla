@@ -17,6 +17,9 @@ set(mygl_src_files
     movable.h
     basicmovable.cpp basicmovable.h
 
+    # Particle System
+    particle_system.cpp particle_system.h
+
     # OpenGL errors
     gl_err.h
 )
