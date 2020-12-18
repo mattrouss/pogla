@@ -25,6 +25,7 @@ std::function<void()> cam_trajectory_callback;
 
 void display()
 {
+    glClearColor(0.95f, 0.93f, 0.9f, 1.0f) ;
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);gl_err();
 
     particle_system.render();
