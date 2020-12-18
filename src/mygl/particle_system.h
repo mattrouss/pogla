@@ -17,7 +17,7 @@ class ParticleSystem
 public:
     ParticleSystem(size_t N);
 
-    void init_system(std::shared_ptr<mygl::mesh> mesh);
+    void init_system(mygl::Program* prog, std::shared_ptr<mygl::mesh> mesh);
 
     void render() const;
     void init_particles();

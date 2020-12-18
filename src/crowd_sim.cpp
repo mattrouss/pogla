@@ -19,7 +19,7 @@
 #include "utils/clock.h"
 #include "utils/matrix4.h"
 
-ParticleSystem particle_system((size_t)50u);
+ParticleSystem particle_system(1000u);
 std::function<void()> light_trajectory_callback;
 std::function<void()> cam_trajectory_callback;
 
@@ -132,13 +132,12 @@ int main(int argc, char **argv)
     lights.set_ambient(1, {{0,0,0}}, 0.2 * mygl::Vec3({1,1,1}));
     lights.set_lights_uniform(prog);
 
-    init_color_uniform(prog, {{1, 0, 0, 1}});
+    init_color_uniform(prog, {{1, 0.8, 0.9, 1}});
 
     // Load particle mesh
     auto mesh = mygl::load_mesh("../meshes/monkey.obj");
-    
 
-    particle_system.init_system(mesh);
+    particle_system.init_system(prog, mesh);
 
     //start display timer and start main loop
     glutTimerFunc(1000/50, refresh_timer, 0);

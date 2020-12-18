@@ -4,9 +4,11 @@ ParticleSystem::ParticleSystem(size_t N)
     : N_(N)
 {}
 
-void ParticleSystem::init_system(std::shared_ptr<mygl::mesh> mesh)
+void ParticleSystem::init_system(mygl::Program* prog, std::shared_ptr<mygl::mesh> mesh)
 {
+    prog_ = prog;
     particle_mesh_ = mesh;
+
     init_particles();
 
     auto vertex_attribs = std::vector<GLuint>{0, 1, 2, 3, 4};
