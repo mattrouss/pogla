@@ -4,9 +4,10 @@ ParticleSystem::ParticleSystem(size_t N)
     : N_(N)
 {}
 
-void ParticleSystem::init_system(mygl::Program* prog, std::shared_ptr<mygl::mesh> mesh)
+void ParticleSystem::init_system(mygl::Program* display_prog, mygl::Program* compute_prog, std::shared_ptr<mygl::mesh> mesh)
 {
-    prog_ = prog;
+    display_prog_ = display_prog;
+    compute_prog_ = compute_prog;
     particle_mesh_ = mesh;
 
     init_particles();
@@ -24,12 +25,14 @@ void ParticleSystem::init_system(mygl::Program* prog, std::shared_ptr<mygl::mesh
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_id);gl_err();
     glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(mygl::Vertex), verts.data(), GL_STATIC_DRAW);gl_err();
 
-    // Create instance data vbo
+
+    // Create instance data ssbo
     GLuint instance_vertex_buffer_id;
     glGenBuffers(1, &instance_vertex_buffer_id);
 
-    glBindBuffer(GL_ARRAY_BUFFER, instance_vertex_buffer_id);gl_err();
-    glBufferData(GL_ARRAY_BUFFER, positions_.size() * sizeof(mygl::Vec3), positions_.data(), GL_STATIC_DRAW);gl_err();
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, instance_vertex_buffer_id);gl_err();
+    glBufferData(GL_SHADER_STORAGE_BUFFER, positions_.size() * sizeof(mygl::Vec3), positions_.data(), GL_STATIC_DRAW);gl_err();
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, instance_vertex_buffer_id);
 
 
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_id);
@@ -78,7 +81,16 @@ void ParticleSystem::init_particles()
 
 void ParticleSystem::render() const
 {
-    auto transform_id = glGetUniformLocation(prog_->prog_id(), "model_matrix");gl_err()
+    // Run compute program
+    compute_prog_->use();
+    glBindVertexArray(vao_);gl_err()
+    glDispatchCompute(N_, 1, 1);gl_err();
+    glMemoryBarrier(GL_ALL_BARRIER_BITS);
+    glBindVertexArray(0);gl_err()
+
+    // Run display program
+    display_prog_->use();
+    auto transform_id = glGetUniformLocation(display_prog_->prog_id(), "model_matrix");gl_err()
     glUniformMatrix4fv(transform_id, 1, GL_FALSE, particle_mesh_->get_transform().transpose().data.data());gl_err()
     glBindVertexArray(vao_);gl_err()
     glDrawArraysInstanced(GL_TRIANGLES, 0, particle_mesh_->verts.size() * 3, N_);gl_err()

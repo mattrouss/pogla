@@ -106,18 +106,25 @@ int main(int argc, char **argv)
 
     std::string v_shader = "../shaders/particle_vertex.shd";
     std::string f_shader = "../shaders/particle_fragment.shd";
+    std::string c_shader = "../shaders/particle_compute.shd";
 
     auto prog_builder = mygl::ProgramBuilder{};
     prog_builder.add_shader(
             mygl::shaders::DisplayShadersBase{v_shader, f_shader}
             );
+    auto compute_prog_builder = mygl::ProgramBuilder{};
+    compute_prog_builder.add_shader(
+            mygl::shaders::ComputeShader{c_shader}
+            );
     auto prog_result = prog_builder.build();
-    if (prog_result == std::nullopt)
+    auto compute_result = compute_prog_builder.build();
+    if (prog_result == std::nullopt || compute_result == std::nullopt)
     {
         std::cout << "Shader compilation failed.\n";
         return 1;
     }
     auto prog = prog_result->get();
+    auto compute_prog = compute_result->get();
     prog->use();
 
     //init camera
@@ -138,7 +145,7 @@ int main(int argc, char **argv)
     // Load particle mesh
     auto mesh = mygl::load_mesh("../meshes/monkey.obj");
 
-    particle_system.init_system(prog, mesh);
+    particle_system.init_system(prog, compute_prog,  mesh);
 
     //start display timer and start main loop
     glutTimerFunc(1000/50, refresh_timer, 0);

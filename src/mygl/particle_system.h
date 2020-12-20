@@ -17,13 +17,14 @@ class ParticleSystem
 public:
     ParticleSystem(size_t N);
 
-    void init_system(mygl::Program* prog, std::shared_ptr<mygl::mesh> mesh);
+    void init_system(mygl::Program* display_prog, mygl::Program* compute_prog, std::shared_ptr<mygl::mesh> mesh);
 
     void render() const;
     void init_particles();
 
 private:
-    mygl::Program* prog_;
+    mygl::Program* display_prog_;
+    mygl::Program* compute_prog_;
     GLuint vao_;
 
     size_t N_;
