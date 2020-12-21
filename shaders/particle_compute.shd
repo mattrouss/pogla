@@ -4,6 +4,9 @@ const uint PARTICLE_NB = 50;
 
 layout (local_size_x = PARTICLE_NB) in;
 
+uniform float time;
+const float period = 2.0;
+
 struct Particle
 {
     float pos_x, pos_y, pos_z;
@@ -17,9 +20,9 @@ layout (std430, binding=1) buffer particle_pos_buffer
 
 void update_particle(int i)
 {
-    particles[i].pos_x = i;
-    particles[i].pos_y = 0;
-    particles[i].pos_z = 0;
+    float x = particles[i].pos_x;
+    float z = particles[i].pos_z;
+    particles[i].pos_y = sin(x + z + time / 1000);
 }
 
 void main()

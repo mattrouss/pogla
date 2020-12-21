@@ -88,6 +88,12 @@ namespace mygl
     {
         // Run compute program
         compute_prog_->use();
+
+        auto time = glutGet(GLUT_ELAPSED_TIME);
+        GLint time_id;
+        time_id = glGetUniformLocation(compute_prog_->prog_id(), "time");gl_err();
+        glUniform1f(time_id, time);gl_err();
+
         glBindVertexArray(vao_);gl_err()
         glDispatchCompute(N_, 1, 1);gl_err();
         glMemoryBarrier(GL_ALL_BARRIER_BITS);
