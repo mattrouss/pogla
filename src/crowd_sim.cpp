@@ -104,9 +104,9 @@ int main(int argc, char **argv)
     initGlew();
     init_gl();
 
-    std::string v_shader = "../shaders/particle_vertex.shd";
-    std::string f_shader = "../shaders/particle_fragment.shd";
-    std::string c_shader = "../shaders/particle_compute.shd";
+    std::string v_shader = "../shaders/particle_vertex.shader";
+    std::string f_shader = "../shaders/particle_fragment.shader";
+    std::string c_shader = "../shaders/particle_compute.shader";
 
     auto prog_builder = mygl::ProgramBuilder{};
     prog_builder.add_shader(

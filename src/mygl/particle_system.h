@@ -20,6 +20,7 @@ namespace mygl
         Particle(const mygl::Vec3& pos): pos_(pos) {}
 
         mygl::Vec3 pos_;
+
     };
 
     class ParticleSystem
