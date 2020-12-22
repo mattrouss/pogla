@@ -17,7 +17,7 @@ layout (std430, binding=1) buffer particle_pos_buffer
     Particle particles[];
 };
 
-void swap_horizontal(int i_a, int i_b)
+void swap_horizontal(uint i_a, uint i_b)
 {
     if (particles[i_a].pos_x > particles[i_b].pos_x)
     {
@@ -33,7 +33,7 @@ void swap_horizontal(int i_a, int i_b)
     }
 }
 
-void swap_vertical(int i_a, int i_b)
+void swap_vertical(uint i_a, uint i_b)
 {
     if (particles[i_a].pos_y > particles[i_b].pos_y)
     {

@@ -106,7 +106,7 @@ int main(int argc, char **argv)
 
     std::string v_shader = "../shaders/particle_vertex.shader";
     std::string f_shader = "../shaders/particle_fragment.shader";
-    std::string c_shader = "../shaders/particle_compute.shader";
+    std::string c_shader = "../shaders/spatial_sort.shader";
 
     auto prog_builder = mygl::ProgramBuilder{};
     prog_builder.add_shader(
