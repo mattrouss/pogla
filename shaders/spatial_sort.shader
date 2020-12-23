@@ -51,7 +51,7 @@ void swap_vertical(uint i_a, uint i_b)
 
 void main()
 {
-    uint i_a = gl_GlobalInvocationID.x;
+    uint i_a = gl_GlobalInvocationID.x + gl_GlobalInvocationID.y * gl_WorkGroupSize.x * gl_NumWorkGroups.x;
     uint i_b = i_a + 1;
     if (gl_LocalInvocationID.x % 2 == 0
         && gl_LocalInvocationID.x < gl_WorkGroupSize.x - 1)

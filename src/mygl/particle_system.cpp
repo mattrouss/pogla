@@ -135,7 +135,7 @@ namespace mygl
 
             glBindVertexArray(vao_);
             gl_err()
-            glDispatchCompute(N_x_ / 5, N_y_ / 5, 1);
+            glDispatchCompute(N_x_, N_y_, 1);
             gl_err();
             glMemoryBarrier(GL_ALL_BARRIER_BITS);
             glBindVertexArray(0);
@@ -154,7 +154,7 @@ namespace mygl
         iteration_parity = (iteration_parity + 1) % 2;
 
         glBindVertexArray(vao_);gl_err()
-        glDispatchCompute(N_x_ / 5, N_y_ / 5, 1);gl_err();
+        glDispatchCompute(N_x_, N_y_, 1);gl_err();
         glMemoryBarrier(GL_ALL_BARRIER_BITS);
         glBindVertexArray(0);gl_err();
 
