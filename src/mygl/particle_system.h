@@ -18,8 +18,10 @@ namespace mygl
     public:
         Particle() = default;
         Particle(const mygl::Vec3& pos): pos_(pos) {}
+        Particle(const mygl::Vec3& pos, const mygl::Vec3& velocity): pos_(pos), velocity_(velocity) {}
 
         mygl::Vec3 pos_;
+        mygl::Vec3 velocity_;
 
     };
 
@@ -34,7 +36,7 @@ namespace mygl
                 mygl::Program* sort_prog,
                 std::shared_ptr<mygl::mesh> mesh);
 
-        void render();
+        void render(float deltatime);
         void init_particles();
 
     private:
@@ -48,8 +50,8 @@ namespace mygl
         size_t N_y_;
         std::shared_ptr<mygl::mesh> particle_mesh_;
 
-        std::vector<mygl::Vec3> positions_a_;
-        std::vector<mygl::Vec3> positions_b_;
+        std::vector<mygl::Particle> particles_a_;
+        std::vector<mygl::Particle> particles_b_;
         unsigned iteration_parity = 0;
 
     };

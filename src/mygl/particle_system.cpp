@@ -64,11 +64,11 @@ namespace mygl
         glGenBuffers(1, &instance_vertex_buffer_id_b);
 
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, instance_vertex_buffer_id_a);gl_err();
-        glBufferData(GL_SHADER_STORAGE_BUFFER, positions_a_.size() * sizeof(mygl::Vec3), positions_a_.data(), GL_STATIC_DRAW);gl_err();
+        glBufferData(GL_SHADER_STORAGE_BUFFER, particles_a_.size() * sizeof(mygl::Particle), particles_a_.data(), GL_STATIC_DRAW);gl_err();
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, instance_vertex_buffer_id_a);
 
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, instance_vertex_buffer_id_b);gl_err();
-        glBufferData(GL_SHADER_STORAGE_BUFFER, positions_b_.size() * sizeof(mygl::Vec3), positions_b_.data(), GL_STATIC_DRAW);gl_err();
+        glBufferData(GL_SHADER_STORAGE_BUFFER, particles_b_.size() * sizeof(mygl::Particle), particles_b_.data(), GL_STATIC_DRAW);gl_err();
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, instance_vertex_buffer_id_b);
 
 
@@ -90,12 +90,12 @@ namespace mygl
         glEnableVertexAttribArray(vertex_attribs[3]);gl_err();
 
         glBindBuffer(GL_ARRAY_BUFFER, instance_vertex_buffer_id_a);
-        glVertexAttribPointer(vertex_attribs[4], 3, GL_FLOAT, GL_FALSE, sizeof(mygl::Vec3), (void *)0);
+        glVertexAttribPointer(vertex_attribs[4], 3, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)0);
         glEnableVertexAttribArray(vertex_attribs[4]);gl_err();
         glVertexAttribDivisor(vertex_attribs[4], 1); // Instanced attribute
 
         glBindBuffer(GL_ARRAY_BUFFER, instance_vertex_buffer_id_b);
-        glVertexAttribPointer(vertex_attribs[5], 3, GL_FLOAT, GL_FALSE, sizeof(mygl::Vec3), (void *)0);
+        glVertexAttribPointer(vertex_attribs[5], 3, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)0);
         glEnableVertexAttribArray(vertex_attribs[5]);gl_err();
         glVertexAttribDivisor(vertex_attribs[5], 1); // Instanced attribute
 
@@ -105,8 +105,8 @@ namespace mygl
 
     void ParticleSystem::init_particles()
     {
-        positions_a_.resize(N_);
-        positions_b_.resize(N_);
+        particles_a_.resize(N_);
+        particles_b_.resize(N_);
 
         auto grid_center = mygl::Vec3{{0.0, 0.0, 0.0}};
         float offset = 5.0f;
@@ -117,17 +117,20 @@ namespace mygl
         {
             for (auto j = 0u; j < grid_width; ++j)
             {
-                positions_a_[j + grid_width * i] = grid_center
+                auto pos = grid_center
                    - mygl::Vec3{{grid_length / 2.0f, 0, grid_length / 2.0f}}
                    + mygl::Vec3{{i * offset, 0.0, j * offset}};
-                positions_b_[j + grid_width * i] = grid_center
-                   - mygl::Vec3{{grid_length / 2.0f, 0, grid_length / 2.0f}}
-                   + mygl::Vec3{{i * offset, 0.0, j * offset}};
+                auto vel = Vec3{{0.0f, 0.0f, 1.0f}};
+
+                auto p = Particle(pos, vel);
+
+                particles_a_[j + grid_width * i] = p;
+                particles_b_[j + grid_width * i] = p;
             }
         }
     }
 
-    void ParticleSystem::render()
+    void ParticleSystem::render(float deltatime)
     {
         if (sort_prog_ != nullptr)
         {
@@ -148,6 +151,9 @@ namespace mygl
         GLint time_id;
         time_id = glGetUniformLocation(compute_prog_->prog_id(), "time");gl_err();
         glUniform1f(time_id, time);gl_err();
+        GLint deltatime_id = glGetUniformLocation(compute_prog_->prog_id(), "deltatime");gl_err();
+        glUniform1f(deltatime_id, deltatime);gl_err();
+
         GLint parity_id;
         parity_id = glGetUniformLocation(compute_prog_->prog_id(), "parity");gl_err();
         glUniform1ui(parity_id, iteration_parity);gl_err();

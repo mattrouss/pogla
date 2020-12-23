@@ -5,12 +5,14 @@ const uint PARTICLE_NB = 5;
 layout (local_size_x = PARTICLE_NB, local_size_y = PARTICLE_NB) in;
 
 uniform float time;
+uniform float deltatime;
 uniform uint parity;
 const float period = 2.0;
 
 struct Particle
 {
     float pos_x, pos_y, pos_z;
+    float vel_x, vel_y, vel_z;
 };
 
 layout (std430, binding=1) buffer particle_pos_buffer_a
@@ -35,29 +37,37 @@ Particle get_particle(int i, int j)
     }
 }
 
-void write_particle(int i, int j, vec3 pos)
+void write_particle(int i, int j, Particle p)
 {
     if (parity == 0)
     {
-        particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].pos_x = pos.x;
-        particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].pos_y = pos.y;
-        particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].pos_z = pos.z;
+        particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].pos_x = p.pos_x;
+        particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].pos_y = p.pos_y;
+        particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].pos_z = p.pos_z;
+        particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].vel_x = p.vel_x;
+        particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].vel_y = p.vel_y;
+        particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].vel_z = p.vel_z;
     }
     else
     {
-        particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].pos_x = pos.x;
-        particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].pos_y = pos.y;
-        particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].pos_z = pos.z;
+        particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].pos_x = p.pos_x;
+        particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].pos_y = p.pos_y;
+        particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].pos_z = p.pos_z;
+        particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].vel_x = p.vel_x;
+        particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].vel_y = p.vel_y;
+        particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].vel_z = p.vel_z;
     }
 }
 
 void update_particle(int i, int j)
 {
-    float x = get_particle(i, j).pos_x;
-    float z = get_particle(i, j).pos_z;
+    Particle p = get_particle(i, j);
 
+    p.pos_x += deltatime * p.vel_x;
+    p.pos_y += deltatime * p.vel_y;
+    p.pos_z += deltatime * p.vel_z;
 
-    write_particle(i, j, vec3(x, sin(x + z + time / 1000), z));
+    write_particle(i, j, p);
 }
 
 void main()
