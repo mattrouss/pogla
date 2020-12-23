@@ -106,7 +106,9 @@ int main(int argc, char **argv)
 
     std::string v_shader = "../shaders/particle_vertex.shader";
     std::string f_shader = "../shaders/particle_fragment.shader";
-    std::string c_shader = "../shaders/spatial_sort.shader";
+
+    std::string c_shader = "../shaders/particle_compute.shader";
+    std::string sort_shader = "../shaders/spatial_sort.shader";
 
     auto prog_builder = mygl::ProgramBuilder{};
     prog_builder.add_shader(
@@ -116,9 +118,15 @@ int main(int argc, char **argv)
     compute_prog_builder.add_shader(
             mygl::shaders::ComputeShader{c_shader}
             );
+    auto sort_prog_builder = mygl::ProgramBuilder{};
+    sort_prog_builder.add_shader(
+            mygl::shaders::ComputeShader{sort_shader}
+    );
     auto prog_result = prog_builder.build();
     auto compute_result = compute_prog_builder.build();
-    if (prog_result == std::nullopt || compute_result == std::nullopt)
+    auto sort_result = sort_prog_builder.build();
+    if (prog_result == std::nullopt || compute_result == std::nullopt
+        || sort_result == std::nullopt)
     {
         std::cout << "Shader compilation failed.\n";
         return 1;
@@ -145,7 +153,7 @@ int main(int argc, char **argv)
     // Load particle mesh
     auto mesh = mygl::load_mesh("../meshes/monkey.obj");
 
-    particle_system.init_system(prog, compute_prog,  mesh);
+    particle_system.init_system(prog, compute_prog, sort_result->get(),  mesh);
 
     //start display timer and start main loop
     glutTimerFunc(1000/50, refresh_timer, 0);

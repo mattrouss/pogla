@@ -29,6 +29,10 @@ namespace mygl
         ParticleSystem(size_t N);
 
         void init_system(mygl::Program* display_prog, mygl::Program* compute_prog, std::shared_ptr<mygl::mesh> mesh);
+        void init_system(mygl::Program* display_prog,
+                mygl::Program* compute_prog,
+                mygl::Program* sort_prog,
+                std::shared_ptr<mygl::mesh> mesh);
 
         void render() const;
         void init_particles();
@@ -36,9 +40,12 @@ namespace mygl
     private:
         mygl::Program* display_prog_;
         mygl::Program* compute_prog_;
+        mygl::Program* sort_prog_;
         GLuint vao_;
 
         size_t N_;
+        size_t N_x_;
+        size_t N_y_;
         std::shared_ptr<mygl::mesh> particle_mesh_;
 
         std::vector<mygl::Vec3> positions_;

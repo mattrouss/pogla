@@ -2,14 +2,43 @@
 
 namespace mygl
 {
+    static void compute_workgroup_xy(const size_t N, size_t& x, size_t& y)
+    {
+        int result = N/2 - 1;
+        int best = N;
+        for (; result >= 2; result--)
+        {
+            if (N%result == 0 && result + N/result < best + N/best)
+            {
+                best = result;
+            }
+        }
+        int x_pad = best + (4 - best%4);
+        int y_pad = N/best + (4 - (N/best)%4);
+        x = x_pad;
+        y = y_pad;
+    }
+
     ParticleSystem::ParticleSystem(size_t N)
         : N_(N)
-    {}
+    {
+        compute_workgroup_xy(N, N_x_, N_y_);
+        N_ = N_x_ * N_y_;
+    }
 
     void ParticleSystem::init_system(mygl::Program* display_prog, mygl::Program* compute_prog, std::shared_ptr<mygl::mesh> mesh)
     {
+        init_system(display_prog, compute_prog, nullptr, mesh);
+    }
+
+    void ParticleSystem::init_system(mygl::Program* display_prog,
+                     mygl::Program* compute_prog,
+                     mygl::Program* sort_prog,
+                     std::shared_ptr<mygl::mesh> mesh)
+    {
         display_prog_ = display_prog;
         compute_prog_ = compute_prog;
+        sort_prog_ = sort_prog;
         particle_mesh_ = mesh;
 
         init_particles();
@@ -61,7 +90,6 @@ namespace mygl
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);gl_err()
-
     }
 
     void ParticleSystem::init_particles()
@@ -86,6 +114,20 @@ namespace mygl
 
     void ParticleSystem::render() const
     {
+        if (sort_prog_ != nullptr)
+        {
+            sort_prog_->use();
+
+            glBindVertexArray(vao_);
+            gl_err()
+            glDispatchCompute(N_x_ / 5, N_y_ / 5, 1);
+            gl_err();
+            glMemoryBarrier(GL_ALL_BARRIER_BITS);
+            glBindVertexArray(0);
+            gl_err();
+            glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+            gl_err();
+        }
         // Run compute program
         compute_prog_->use();
 
