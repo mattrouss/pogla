@@ -34,7 +34,7 @@ namespace mygl
                 mygl::Program* sort_prog,
                 std::shared_ptr<mygl::mesh> mesh);
 
-        void render() const;
+        void render();
         void init_particles();
 
     private:
@@ -48,7 +48,9 @@ namespace mygl
         size_t N_y_;
         std::shared_ptr<mygl::mesh> particle_mesh_;
 
-        std::vector<mygl::Vec3> positions_;
+        std::vector<mygl::Vec3> positions_a_;
+        std::vector<mygl::Vec3> positions_b_;
+        unsigned iteration_parity = 0;
 
     };
 }

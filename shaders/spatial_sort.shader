@@ -35,7 +35,7 @@ void swap_horizontal(uint i_a, uint i_b)
 
 void swap_vertical(uint i_a, uint i_b)
 {
-    if (particles[i_a].pos_y > particles[i_b].pos_y)
+    if (particles[i_a].pos_z > particles[i_b].pos_z)
     {
         float x = particles[i_a].pos_x;
         float y = particles[i_a].pos_y;
