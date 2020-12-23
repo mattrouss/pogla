@@ -5,6 +5,7 @@ const uint PARTICLE_NB = 5;
 layout (local_size_x = PARTICLE_NB, local_size_y = PARTICLE_NB) in;
 
 uniform float time;
+uniform uint parity;
 const float period = 2.0;
 
 struct Particle
@@ -12,40 +13,71 @@ struct Particle
     float pos_x, pos_y, pos_z;
 };
 
-layout (std430, binding=1) buffer particle_pos_buffer
+layout (std430, binding=1) buffer particle_pos_buffer_a
 {
-    Particle particles[];
+    Particle particles_a[];
+};
+
+layout (std430, binding=2) buffer particle_pos_buffer_b
+{
+    Particle particles_b[];
 };
 
 void swap_horizontal(uint i_a, uint i_b)
 {
-    if (particles[i_a].pos_x > particles[i_b].pos_x)
+    Particle tmp;
+    if (parity == 0)
     {
-        float x = particles[i_a].pos_x;
-        float y = particles[i_a].pos_y;
-        float z = particles[i_a].pos_z;
-        particles[i_a].pos_x = particles[i_b].pos_x;
-        particles[i_a].pos_y = particles[i_b].pos_y;
-        particles[i_a].pos_z = particles[i_b].pos_z;
-        particles[i_b].pos_x = x;
-        particles[i_b].pos_y = y;
-        particles[i_b].pos_z = z;
+        if (particles_a[i_a].pos_x > particles_a[i_b].pos_x)
+        {
+            tmp = particles_a[i_a];
+            particles_a[i_a].pos_x = particles_a[i_b].pos_x;
+            particles_a[i_a].pos_y = particles_a[i_b].pos_y;
+            particles_a[i_a].pos_z = particles_a[i_b].pos_z;
+            particles_a[i_b].pos_x = tmp.pos_x;
+            particles_a[i_b].pos_y = tmp.pos_y;
+            particles_a[i_b].pos_z = tmp.pos_z;
+        }
+    } else {
+        if (particles_b[i_a].pos_x > particles_b[i_b].pos_x)
+        {
+            tmp = particles_b[i_a];
+            particles_b[i_a].pos_x = particles_b[i_b].pos_x;
+            particles_b[i_a].pos_y = particles_b[i_b].pos_y;
+            particles_b[i_a].pos_z = particles_b[i_b].pos_z;
+            particles_b[i_b].pos_x = tmp.pos_x;
+            particles_b[i_b].pos_y = tmp.pos_y;
+            particles_b[i_b].pos_z = tmp.pos_z;
+        }
     }
 }
 
 void swap_vertical(uint i_a, uint i_b)
 {
-    if (particles[i_a].pos_z > particles[i_b].pos_z)
+    Particle tmp;
+    if (parity == 0)
     {
-        float x = particles[i_a].pos_x;
-        float y = particles[i_a].pos_y;
-        float z = particles[i_a].pos_z;
-        particles[i_a].pos_x = particles[i_b].pos_x;
-        particles[i_a].pos_y = particles[i_b].pos_y;
-        particles[i_a].pos_z = particles[i_b].pos_z;
-        particles[i_b].pos_x = x;
-        particles[i_b].pos_y = y;
-        particles[i_b].pos_z = z;
+        if (particles_a[i_a].pos_z > particles_a[i_b].pos_z)
+        {
+            tmp = particles_a[i_a];
+            particles_a[i_a].pos_x = particles_a[i_b].pos_x;
+            particles_a[i_a].pos_y = particles_a[i_b].pos_y;
+            particles_a[i_a].pos_z = particles_a[i_b].pos_z;
+            particles_a[i_b].pos_x = tmp.pos_x;
+            particles_a[i_b].pos_y = tmp.pos_y;
+            particles_a[i_b].pos_z = tmp.pos_z;
+        }
+    } else {
+        if (particles_b[i_a].pos_z > particles_b[i_b].pos_z)
+        {
+            tmp = particles_b[i_a];
+            particles_b[i_a].pos_x = particles_b[i_b].pos_x;
+            particles_b[i_a].pos_y = particles_b[i_b].pos_y;
+            particles_b[i_a].pos_z = particles_b[i_b].pos_z;
+            particles_b[i_b].pos_x = tmp.pos_x;
+            particles_b[i_b].pos_y = tmp.pos_y;
+            particles_b[i_b].pos_z = tmp.pos_z;
+        }
     }
 }
 

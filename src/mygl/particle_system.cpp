@@ -153,7 +153,7 @@ namespace mygl
         glUniform1ui(parity_id, iteration_parity);gl_err();
         iteration_parity = (iteration_parity + 1) % 2;
 
-        glBindVertexArray(vao_);gl_err()
+        glBindVertexArray(vao_);gl_err();
         glDispatchCompute(N_x_, N_y_, 1);gl_err();
         glMemoryBarrier(GL_ALL_BARRIER_BITS);
         glBindVertexArray(0);gl_err();
