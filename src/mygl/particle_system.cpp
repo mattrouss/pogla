@@ -120,7 +120,7 @@ namespace mygl
                 auto pos = grid_center
                    - mygl::Vec3{{grid_length / 2.0f, 0, grid_length / 2.0f}}
                    + mygl::Vec3{{i * offset, 0.0, j * offset}};
-                auto vel = Vec3{{0.0f, 0.0f, 1.0f}};
+                auto vel = Vec3{{0.0f, 0.0f, 3.0f}};
 
                 auto p = Particle(pos, vel);
 

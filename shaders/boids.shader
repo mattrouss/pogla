@@ -1,6 +1,6 @@
 #version 450
 
-const uint PARTICLE_NB = 5;
+const uint PARTICLE_NB = 1;
 
 layout (local_size_x = PARTICLE_NB, local_size_y = PARTICLE_NB) in;
 
