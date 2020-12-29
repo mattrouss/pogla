@@ -10,6 +10,10 @@
 #include "mygl/assets/mesh.h"
 #include "assets/cameratracking.h"
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_opengl3.h"
+#include "imgui/imgui_impl_glut.h"
+
 #include "mygl/particle_system.h"
 #include "mygl/basicmovable.h"
 #include "mygl/gl_err.h"
@@ -23,12 +27,31 @@ mygl::ParticleSystem particle_system(50u);
 std::function<void()> light_trajectory_callback;
 std::function<void()> cam_trajectory_callback;
 
+static bool show_demo_window = true;
+
 void display()
 {
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGLUT_NewFrame();
+
+    ImGui::NewFrame();
+
+    if (show_demo_window)
+        ImGui::ShowDemoWindow(&show_demo_window);
+
+    ImGui::Begin("Hello, world!");
+
+
+    ImGui::Render();
+    ImGuiIO& io = ImGui::GetIO();
+    glViewport(0, 0, (GLsizei)io.DisplaySize.x, (GLsizei)io.DisplaySize.y);
     glClearColor(0.95f, 0.93f, 0.9f, 1.0f) ;
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);gl_err();
 
     particle_system.render(mainClock.deltatime());
+
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 
     glutSwapBuffers();
     inputManager.send_input();
@@ -65,6 +88,10 @@ bool initGlut(int &argc, char **argv) {
     glutKeyboardFunc(keyDown);
     glutKeyboardUpFunc(keyUp);
     glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
+
+    const char* glsl_version = "#version 450";
+    ImGui_ImplOpenGL3_Init(glsl_version);
+
     return true;//thanks, now I can really test for errors
 }
 

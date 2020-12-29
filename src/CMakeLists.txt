@@ -16,4 +16,3 @@ target_link_libraries(${CROWD_SIM_EXECUTABLE_NAME} PUBLIC mygl utils)
 
 target_include_directories(mygl PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-
