@@ -148,10 +148,10 @@ int main(int argc, char **argv)
     lights.set_ambient(1, {{0,0,0}}, 0.2 * mygl::Vec3({1,1,1}));
     lights.set_lights_uniform(prog);
 
-    init_color_uniform(prog, {{1, 0.8, 0.9, 1}});
+    init_color_uniform(prog, {{0.6, 0.8, 0.9, 1}});
 
     // Load particle mesh
-    auto mesh = mygl::load_mesh("../meshes/monkey.obj");
+    auto mesh = mygl::load_mesh("../meshes/sphere.obj");
 
     particle_system.init_system(prog, compute_prog, sort_result->get(),  mesh);
 

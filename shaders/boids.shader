@@ -59,36 +59,109 @@ void write_particle(int i, int j, Particle p)
     }
 }
 
+Particle limit_bounds(Particle p)
+{
+    const float upper_bound = 20;
+    const float lower_bound = -20;
+
+    if (p.pos_x > upper_bound)
+    {
+        p.pos_x = lower_bound;
+    }
+    if (p.pos_y > upper_bound)
+    {
+        p.pos_y = lower_bound;
+    }
+    if (p.pos_z > upper_bound)
+    {
+        p.pos_z = lower_bound;
+    }
+    if (p.pos_x < lower_bound)
+    {
+        p.pos_x = upper_bound;
+    }
+    if (p.pos_y < lower_bound)
+    {
+        p.pos_y = upper_bound;
+    }
+    if (p.pos_z < lower_bound)
+    {
+        p.pos_z = upper_bound;
+    }
+
+    return p;
+    
+}
+
+Particle avoid_bounds(Particle p)
+{
+    const float upper_bound = 20;
+    const float lower_bound = -20;
+
+    const float margin = 1.5;
+    const float turnaround_factor = 1.0f;
+    if (p.pos_x > upper_bound - margin)
+    {
+        p.vel_x -= turnaround_factor;
+    }
+    if (p.pos_y > upper_bound - margin)
+    {
+        p.vel_y -= turnaround_factor;
+    }
+    if (p.pos_z > upper_bound - margin)
+    {
+        p.vel_z -= turnaround_factor;
+    }
+    if (p.pos_x < lower_bound + margin)
+    {
+        p.vel_x += turnaround_factor;
+    }
+    if (p.pos_y < lower_bound + margin)
+    {
+        p.vel_y += turnaround_factor;
+    }
+    if (p.pos_z < lower_bound + margin)
+    {
+        p.vel_z += turnaround_factor;
+    }
+
+    return p;
+}
+
+Particle limit_speed(Particle p)
+{
+    const float max_speed = 5.0;
+
+    vec3 p_vel = vec3(p.vel_x, p.vel_y, p.vel_z);
+    const float cur_speed = length(p_vel);
+
+    // Rescale speed if it exceeds max speed
+    if (cur_speed > max_speed)
+    {
+        p.vel_x = max_speed * p.vel_x / cur_speed;
+        p.vel_y = max_speed * p.vel_y / cur_speed;
+        p.vel_z = max_speed * p.vel_z / cur_speed;
+    }
+
+    return p;
+}
+
 void update_particle(int i, int j)
 {
     Particle p = get_particle(i, j);
-
-    p.pos_x += deltatime * p.vel_x;
-    p.pos_y += deltatime * p.vel_y;
-    p.pos_z += deltatime * p.vel_z;
-
-    if (p.pos_x > 10)
-    {
-        p.pos_x = 0;
-    }
-    if (p.pos_y > 10)
-    {
-        p.pos_y = 0;
-    }
-    if (p.pos_z > 10)
-    {
-        p.pos_z = 0;
-    }
+    vec3 p_vel = vec3(p.vel_x, p.vel_y, p.vel_z);
 
     //set velocity to average velocity of neighbours
-    vec3 vel = {0,0,0};
-    vec3 center = {0,0,0};
+    vec3 vel = {0, 0, 0};
+    vec3 center = {0, 0, 0};
     vec3 repulsion = {0, 0, 0};
-    for (int x = -1 + int(i == 0); x < 2 && i < gl_WorkGroupSize.x * gl_NumWorkGroups.x - 1; x++)
+    for (int x = -1 + int(i == 0); x < 2 && x + i < gl_WorkGroupSize.x * gl_NumWorkGroups.x - 1; x++)
     {
-        for (int y = -1 + int(j == 0); y < 2 && j < gl_WorkGroupSize.y * gl_NumWorkGroups.y - 1; y++)
+        for (int y = -1 + int(j == 0); y < 2 && y + j < gl_WorkGroupSize.y * gl_NumWorkGroups.y - 1; y++)
         {
-            Particle neighbour = get_particle(i, j);
+            if (x == 0 && y == 0)
+                continue;
+            Particle neighbour = get_particle(x + i, y + j);
             vel += vec3(neighbour.vel_x, neighbour.vel_y, neighbour.vel_z);
             center += vec3(neighbour.pos_x, neighbour.pos_y, neighbour.pos_z);
             vec3 n_offset = vec3(p.pos_x, p.pos_y, p.pos_z)
@@ -99,13 +172,28 @@ void update_particle(int i, int j)
     vel /= 9;
     center /= 9;
 
-    //point velocity towards center of group
-    //vel = 0.5 * vel + 0.5 * (center - vec3(p.pos_x, p.pos_y, p.pos_z));
-    vel = 0.5 * vel + 0.5 * repulsion;
+    // Cohesion: point velocity towards center of group
+    const vec3 v_cohesion = 0.01 * (center - vec3(p.pos_x, p.pos_y, p.pos_z));
 
-    p.vel_x = vel.x;
-    p.vel_y = vel.y;
-    p.vel_z = vel.z;
+    // Repulsion: avoid flockmates which are too close
+    const vec3 v_repulsion = 0.6 * repulsion;
+
+    // Alignment: align velocity to average flockmates
+    const vec3 v_alignment = 0.0125 * (vel - p_vel);
+
+    p_vel += v_cohesion + v_repulsion + v_alignment;
+
+    p.vel_x = p_vel.x;
+    p.vel_y = p_vel.y;
+    p.vel_z = p_vel.z;
+
+    p = limit_bounds(p);
+    p = limit_speed(p);
+
+    p.pos_x += deltatime * p.vel_x;
+    p.pos_y += deltatime * p.vel_y;
+    p.pos_z += deltatime * p.vel_z;
+
     write_particle(i, j, p);
 }
 

@@ -111,11 +111,11 @@ namespace mygl
         auto grid_center = mygl::Vec3{{0.0, 0.0, 0.0}};
         float offset = 5.0f;
 
-        size_t grid_width = static_cast<size_t>(std::sqrt(N_));
+        size_t grid_width = N_y_;
         size_t grid_length = offset * (grid_width - 1);
-        for (auto i = 0u; i < grid_width; ++i)
+        for (auto i = 0u; i < N_x_; ++i)
         {
-            for (auto j = 0u; j < grid_width; ++j)
+            for (auto j = 0u; j < N_y_;++j)
             {
                 auto pos = grid_center
                    - mygl::Vec3{{grid_length / 2.0f, 0, grid_length / 2.0f}}
