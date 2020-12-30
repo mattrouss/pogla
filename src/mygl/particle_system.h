@@ -40,6 +40,13 @@ namespace mygl
         void init_particles();
 
     private:
+        void retrieve_ssbo();
+        void print_buffer(std::string name, std::vector<mygl::Particle> buffer);
+        bool check_sorted(std::vector<mygl::Particle> buffer);
+        void print_sorted(std::string name, std::vector<mygl::Particle> buffer);
+        void print_ssbo();
+
+    private:
         mygl::Program* display_prog_;
         mygl::Program* compute_prog_;
         mygl::Program* sort_prog_;
@@ -51,7 +58,9 @@ namespace mygl
         std::shared_ptr<mygl::mesh> particle_mesh_;
 
         std::vector<mygl::Particle> particles_a_;
+        GLuint ssbo_a_;
         std::vector<mygl::Particle> particles_b_;
+        GLuint ssbo_b_;
         unsigned iteration_parity = 0;
 
     };

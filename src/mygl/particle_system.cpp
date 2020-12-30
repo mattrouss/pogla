@@ -62,6 +62,8 @@ namespace mygl
         GLuint instance_vertex_buffer_id_b;
         glGenBuffers(1, &instance_vertex_buffer_id_a);
         glGenBuffers(1, &instance_vertex_buffer_id_b);
+        ssbo_a_ = instance_vertex_buffer_id_a;
+        ssbo_b_ = instance_vertex_buffer_id_b;
 
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, instance_vertex_buffer_id_a);gl_err();
         glBufferData(GL_SHADER_STORAGE_BUFFER, particles_a_.size() * sizeof(mygl::Particle), particles_a_.data(), GL_STATIC_DRAW);gl_err();
@@ -103,6 +105,101 @@ namespace mygl
         glBindVertexArray(0);gl_err()
     }
 
+    void ParticleSystem::print_ssbo()
+    {
+        if (iteration_parity == 0)
+        {
+            print_buffer("A", particles_a_);
+            print_sorted("A", particles_a_);
+        }
+        else
+        {
+            print_buffer("B", particles_b_);
+            print_sorted("B", particles_b_);
+        }
+    }
+
+    void ParticleSystem::retrieve_ssbo()
+    {
+
+            glGetNamedBufferSubData(ssbo_a_, 0, particles_a_.size() * sizeof(Particle), particles_a_.data());
+            gl_err();
+
+
+            glGetNamedBufferSubData(ssbo_b_, 0, particles_b_.size() * sizeof(Particle), particles_b_.data());
+            gl_err();
+
+
+    }
+
+    void ParticleSystem::print_buffer(std::string name, std::vector<mygl::Particle> buffer)
+    {
+        size_t grid_width = N_x_;
+        std::cout << "\nBuffer: " << name << "\n";
+        for (size_t y = 0; y < N_y_; y++)
+        {
+            std::cout << "[";
+            for (size_t x = 0; x < N_x_; x++)
+            {
+                std::cout << "[" << buffer[x + grid_width * y].pos_ << "] ";
+                    //<< ":" << buffer[j + grid_width * i].velocity_ << "] ";
+            }
+            std::cout << "]\n";
+        }
+    }
+
+    void ParticleSystem::print_sorted(std::string name, std::vector<mygl::Particle> buffer)
+    {
+        std::cout << "\nBuffer: " << name << "\n";
+        if (check_sorted(buffer))
+        {
+            std::cout << "SORTED.\n";
+        }
+        else
+        {
+            std::cout << "NOT SORTED.\n";
+        }
+    }
+
+    bool ParticleSystem::check_sorted(std::vector<mygl::Particle> buffer)
+    {
+        size_t grid_width = N_x_;
+
+        bool sorted = true;
+        for (size_t y = 0; y < N_y_ - 1; y++)
+        {
+            for (size_t x = 0; x < N_x_ - 1; x++)
+            {
+                if (buffer[(x + 1) + grid_width * y].pos_[0]
+                    < buffer[x + grid_width * y].pos_[0])
+                {
+                    sorted = false;
+                }
+                else if (buffer[x + grid_width * (y + 1)].pos_[2]
+                    < buffer[x + grid_width * y].pos_[2])
+                {
+                    sorted = false;
+                }
+                else if (buffer[(x + 1) + grid_width * y].pos_[0]
+                         == buffer[x + grid_width * y].pos_[0]
+                         && buffer[(x + 1) + grid_width * y].pos_[2]
+                            < buffer[x + grid_width * y].pos_[2])
+                {
+                    sorted = false;
+                }
+                else if (buffer[x + grid_width * (y + 1)].pos_[2]
+                         == buffer[x + grid_width * y].pos_[2]
+                         && buffer[x + grid_width * (y + 1)].pos_[0]
+                            < buffer[x + grid_width * y].pos_[0])
+                {
+                    sorted = false;
+                }
+            }
+        }
+
+        return sorted;
+    }
+
     void ParticleSystem::init_particles()
     {
         particles_a_.resize(N_);
@@ -111,38 +208,50 @@ namespace mygl
         auto grid_center = mygl::Vec3{{0.0, 0.0, 0.0}};
         float offset = 5.0f;
 
-        size_t grid_width = N_y_;
+        size_t grid_width = N_x_;
         size_t grid_length = offset * (grid_width - 1);
-        for (auto i = 0u; i < N_x_; ++i)
+        for (auto y = 0u; y < N_y_; ++y)
         {
-            for (auto j = 0u; j < N_y_;++j)
+            for (auto x = 0u; x < N_x_;++x)
             {
                 auto pos = grid_center
                    - mygl::Vec3{{grid_length / 2.0f, 0, grid_length / 2.0f}}
-                   + mygl::Vec3{{i * offset, 0.0, j * offset}};
+                   + mygl::Vec3{{x * offset, 0.0, y * offset}};
                 auto vel = Vec3{{0.0f, 0.0f, 3.0f}};
 
                 auto p = Particle(pos, vel);
 
-                particles_a_[j + grid_width * i] = p;
-                particles_b_[j + grid_width * i] = p;
+                particles_a_[x + grid_width * y] = p;
+                particles_b_[x + grid_width * y] = p;
             }
         }
     }
 
     void ParticleSystem::render(float deltatime)
     {
+        GLint parity_id;
         if (sort_prog_ != nullptr)
         {
             sort_prog_->use();
 
-            glBindVertexArray(vao_);
-            gl_err()
-            glDispatchCompute(N_x_, N_y_, 1);
-            gl_err();
-            glMemoryBarrier(GL_ALL_BARRIER_BITS);
-            glBindVertexArray(0);
-            gl_err();
+            parity_id = glGetUniformLocation(sort_prog_->prog_id(), "parity");gl_err();
+            glUniform1ui(parity_id, iteration_parity);gl_err();
+
+            //std::cout << "====================\n";
+            do
+            {
+                //std::cout << "Execute sort.\n";
+                glBindVertexArray(vao_);
+                gl_err()
+                glDispatchCompute(N_x_, N_y_, 1);
+                gl_err();
+                glMemoryBarrier(GL_ALL_BARRIER_BITS);
+                glBindVertexArray(0);
+                gl_err();
+                retrieve_ssbo();
+                //print_ssbo();
+            } while (not check_sorted(iteration_parity == 0 ? particles_a_ : particles_b_));
+            //print_ssbo();
         }
         // Run compute program
         compute_prog_->use();
@@ -154,7 +263,7 @@ namespace mygl
         GLint deltatime_id = glGetUniformLocation(compute_prog_->prog_id(), "deltatime");gl_err();
         glUniform1f(deltatime_id, deltatime);gl_err();
 
-        GLint parity_id;
+
         parity_id = glGetUniformLocation(compute_prog_->prog_id(), "parity");gl_err();
         glUniform1ui(parity_id, iteration_parity);gl_err();
         iteration_parity = (iteration_parity + 1) % 2;
@@ -163,6 +272,10 @@ namespace mygl
         glDispatchCompute(N_x_, N_y_, 1);gl_err();
         glMemoryBarrier(GL_ALL_BARRIER_BITS);
         glBindVertexArray(0);gl_err();
+
+        //retrieve_ssbo();
+        //print_ssbo();
+        //std::cout << "===================\n";
 
         // Run display program
         display_prog_->use();
