@@ -217,7 +217,7 @@ namespace mygl
                 auto pos = grid_center
                    - mygl::Vec3{{grid_length / 2.0f, 0, grid_length / 2.0f}}
                    + mygl::Vec3{{x * offset, 0.0, y * offset}};
-                auto vel = Vec3{{0.0f, 0.0f, 3.0f}};
+                auto vel = Vec3{{0.0f, 0.0f, 6.0f}};
 
                 auto p = Particle(pos, vel);
 
@@ -273,7 +273,7 @@ namespace mygl
         glMemoryBarrier(GL_ALL_BARRIER_BITS);
         glBindVertexArray(0);gl_err();
 
-        //retrieve_ssbo();
+        retrieve_ssbo();
         //print_ssbo();
         //std::cout << "===================\n";
 

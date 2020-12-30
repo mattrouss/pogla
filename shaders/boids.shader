@@ -173,21 +173,21 @@ void update_particle(int i, int j)
     center /= 9;
 
     // Cohesion: point velocity towards center of group
-    const vec3 v_cohesion = 0.01 * (center - vec3(p.pos_x, p.pos_y, p.pos_z));
+    const vec3 v_cohesion = 0.005 * (center - vec3(p.pos_x, p.pos_y, p.pos_z));
 
     // Repulsion: avoid flockmates which are too close
-    const vec3 v_repulsion = 0.6 * repulsion;
+    const vec3 v_repulsion = 0.02 * repulsion;
 
     // Alignment: align velocity to average flockmates
-    const vec3 v_alignment = 0.0125 * (vel - p_vel);
+    const vec3 v_alignment = 0.0125 * vel;
 
-    p_vel += v_cohesion + v_repulsion + v_alignment;
+    p_vel += v_alignment + v_cohesion + v_repulsion;
 
     p.vel_x = p_vel.x;
     p.vel_y = p_vel.y;
     p.vel_z = p_vel.z;
 
-    p = limit_bounds(p);
+    p = avoid_bounds(p);
     p = limit_speed(p);
 
     p.pos_x += deltatime * p.vel_x;
