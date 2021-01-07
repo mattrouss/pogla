@@ -9,6 +9,9 @@ uniform float deltatime;
 uniform uint parity;
 const float period = 2.0;
 
+// Boid params
+const float avoid_distance = 2.0f;
+
 struct Particle
 {
     float pos_x, pos_y, pos_z;
@@ -61,8 +64,8 @@ void write_particle(int i, int j, Particle p)
 
 Particle limit_bounds(Particle p)
 {
-    const float upper_bound = 20;
-    const float lower_bound = -20;
+    const float upper_bound = 100;
+    const float lower_bound = -100;
 
     if (p.pos_x > upper_bound)
     {
@@ -154,7 +157,7 @@ void update_particle(int i, int j)
     //set velocity to average velocity of neighbours
     vec3 vel = {0, 0, 0};
     vec3 center = {0, 0, 0};
-    vec3 repulsion = {0, 0, 0};
+    vec3 separation = {0, 0, 0};
     for (int x = -1 + int(i == 0); x < 2 && x + i < gl_WorkGroupSize.x * gl_NumWorkGroups.x - 1; x++)
     {
         for (int y = -1 + int(j == 0); y < 2 && y + j < gl_WorkGroupSize.y * gl_NumWorkGroups.y - 1; y++)
@@ -166,22 +169,28 @@ void update_particle(int i, int j)
             center += vec3(neighbour.pos_x, neighbour.pos_y, neighbour.pos_z);
             vec3 n_offset = vec3(p.pos_x, p.pos_y, p.pos_z)
                 - vec3(neighbour.pos_x, neighbour.pos_y, neighbour.pos_z);
-            repulsion += 1 / (length(n_offset) + 0.001) * n_offset;
+
+            float sqr_dist = dot(n_offset, n_offset);
+            if (sqr_dist < avoid_distance * avoid_distance)
+                separation += 1 / (sqr_dist + 0.001) * n_offset;
         }
     }
     vel /= 9;
     center /= 9;
 
     // Cohesion: point velocity towards center of group
-    const vec3 v_cohesion = 0.005 * (center - vec3(p.pos_x, p.pos_y, p.pos_z));
+    const vec3 v_cohesion = 0.01 * (center - vec3(p.pos_x, p.pos_y, p.pos_z));
 
-    // Repulsion: avoid flockmates which are too close
-    const vec3 v_repulsion = 0.02 * repulsion;
+    // Separation: avoid flockmates which are too close
+    const vec3 v_separation = 10 * separation;
 
     // Alignment: align velocity to average flockmates
-    const vec3 v_alignment = 0.0125 * vel;
+    const vec3 v_alignment = 0.325 * vel;
 
-    p_vel += v_alignment + v_cohesion + v_repulsion;
+    vec3 acceleration = {0.0, 0.0, 0.0};
+    acceleration += v_alignment + v_cohesion + v_separation;
+
+    p_vel += deltatime * acceleration;
 
     p.vel_x = p_vel.x;
     p.vel_y = p_vel.y;

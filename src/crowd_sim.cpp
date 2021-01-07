@@ -19,7 +19,7 @@
 #include "utils/clock.h"
 #include "utils/matrix4.h"
 
-mygl::ParticleSystem particle_system(1u);
+mygl::ParticleSystem particle_system(30u);
 std::function<void()> light_trajectory_callback;
 std::function<void()> cam_trajectory_callback;
 
