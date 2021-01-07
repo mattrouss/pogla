@@ -10,7 +10,7 @@ uniform uint parity;
 const float period = 2.0;
 
 // Boid params
-const float avoid_distance = 2.0f;
+const float avoid_distance = 10.0f;
 
 struct Particle
 {
@@ -158,39 +158,49 @@ void update_particle(int i, int j)
     vec3 vel = {0, 0, 0};
     vec3 center = {0, 0, 0};
     vec3 separation = {0, 0, 0};
-    for (int x = -1 + int(i == 0); x < 2 && x + i < gl_WorkGroupSize.x * gl_NumWorkGroups.x - 1; x++)
+    vec3 vel_normalized = normalize(p_vel);
+
+    for (int x = -2 + int(i == 0) + int(i < 1); x < 3 && x + i < gl_WorkGroupSize.x * gl_NumWorkGroups.x - 2; x++)
     {
-        for (int y = -1 + int(j == 0); y < 2 && y + j < gl_WorkGroupSize.y * gl_NumWorkGroups.y - 1; y++)
+        for (int y = -2 + int(j == 0) + int(i < 1); y < 3 && y + j < gl_WorkGroupSize.y * gl_NumWorkGroups.y - 2; y++)
         {
             if (x == 0 && y == 0)
                 continue;
-            Particle neighbour = get_particle(x + i, y + j);
-            vel += vec3(neighbour.vel_x, neighbour.vel_y, neighbour.vel_z);
-            center += vec3(neighbour.pos_x, neighbour.pos_y, neighbour.pos_z);
-            vec3 n_offset = vec3(p.pos_x, p.pos_y, p.pos_z)
-                - vec3(neighbour.pos_x, neighbour.pos_y, neighbour.pos_z);
 
+            Particle neighbour = get_particle(x + i, y + j);
+            vec3 n_offset = vec3(p.pos_x, 0, p.pos_z)
+            - vec3(neighbour.pos_x, 0, neighbour.pos_z);
             float sqr_dist = dot(n_offset, n_offset);
-            if (sqr_dist < avoid_distance * avoid_distance)
-                separation += 1 / (sqr_dist + 0.001) * n_offset;
+            //if (dot(vel_normalized, -normalize(n_offset)) >= 0
+            //    || sqr_dist < 1)
+            {
+
+                vel += vec3(neighbour.vel_x, 0, neighbour.vel_z);
+                center += vec3(neighbour.pos_x, 0, neighbour.pos_z);
+
+
+
+                //if (sqr_dist < avoid_distance * avoid_distance)
+                    separation += normalize(n_offset) * (1 / sqr_dist + 0.000001);
+            }
         }
     }
     vel /= 9;
     center /= 9;
 
     // Cohesion: point velocity towards center of group
-    const vec3 v_cohesion = 0.01 * (center - vec3(p.pos_x, p.pos_y, p.pos_z));
+    const vec3 v_cohesion = 0.1 * (center - vec3(p.pos_x, 0, p.pos_z));
 
     // Separation: avoid flockmates which are too close
-    const vec3 v_separation = 10 * separation;
+    const vec3 v_separation = 100 * separation;
 
     // Alignment: align velocity to average flockmates
-    const vec3 v_alignment = 0.325 * vel;
+    const vec3 v_alignment = 1 * vel;
 
     vec3 acceleration = {0.0, 0.0, 0.0};
-    acceleration += v_alignment + v_cohesion + v_separation;
+    acceleration += 0*v_alignment + 0*v_cohesion + 1*v_separation;
 
-    p_vel += deltatime * acceleration;
+    p_vel += acceleration;
 
     p.vel_x = p_vel.x;
     p.vel_y = p_vel.y;
@@ -200,7 +210,7 @@ void update_particle(int i, int j)
     p = limit_speed(p);
 
     p.pos_x += deltatime * p.vel_x;
-    p.pos_y += deltatime * p.vel_y;
+    p.pos_y += 0;
     p.pos_z += deltatime * p.vel_z;
 
     write_particle(i, j, p);
