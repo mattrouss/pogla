@@ -10,7 +10,7 @@ uniform uint parity;
 const float period = 2.0;
 
 // Boid params
-const float avoid_distance = 10.0f;
+const float avoid_distance = 1.5f;
 
 struct Particle
 {
@@ -160,9 +160,10 @@ void update_particle(int i, int j)
     vec3 separation = {0, 0, 0};
     vec3 vel_normalized = normalize(p_vel);
 
-    for (int x = -2 + int(i == 0) + int(i < 1); x < 3 && x + i < gl_WorkGroupSize.x * gl_NumWorkGroups.x - 2; x++)
+    int n_neighbours = 0;
+    for (int x = -2 + int(i == 0) + int(i <= 1); x < 3 && x + i < gl_WorkGroupSize.x * gl_NumWorkGroups.x; x++)
     {
-        for (int y = -2 + int(j == 0) + int(i < 1); y < 3 && y + j < gl_WorkGroupSize.y * gl_NumWorkGroups.y - 2; y++)
+        for (int y = -2 + int(j == 0) + int(i <= 1); y < 3 && y + j < gl_WorkGroupSize.y * gl_NumWorkGroups.y; y++)
         {
             if (x == 0 && y == 0)
                 continue;
@@ -171,8 +172,7 @@ void update_particle(int i, int j)
             vec3 n_offset = vec3(p.pos_x, 0, p.pos_z)
             - vec3(neighbour.pos_x, 0, neighbour.pos_z);
             float sqr_dist = dot(n_offset, n_offset);
-            //if (dot(vel_normalized, -normalize(n_offset)) >= 0
-            //    || sqr_dist < 1)
+            if (dot(vel_normalized, -normalize(n_offset)) >= 0.1)
             {
 
                 vel += vec3(neighbour.vel_x, 0, neighbour.vel_z);
@@ -181,26 +181,32 @@ void update_particle(int i, int j)
 
 
                 //if (sqr_dist < avoid_distance * avoid_distance)
-                    separation += normalize(n_offset) * (1 / sqr_dist + 0.000001);
+                    separation += normalize(n_offset) * (1 / sqr_dist);
+                n_neighbours += 1;
             }
+            else if (sqr_dist < avoid_distance * avoid_distance)
+                separation += normalize(n_offset) * (1 / sqr_dist);
         }
     }
-    vel /= 9;
-    center /= 9;
+    if (n_neighbours > 0)
+    {
+        vel /= n_neighbours;
+        center /= n_neighbours;
+    }
 
     // Cohesion: point velocity towards center of group
     const vec3 v_cohesion = 0.1 * (center - vec3(p.pos_x, 0, p.pos_z));
 
     // Separation: avoid flockmates which are too close
-    const vec3 v_separation = 100 * separation;
+    const vec3 v_separation = 10 * separation;
 
     // Alignment: align velocity to average flockmates
     const vec3 v_alignment = 1 * vel;
 
     vec3 acceleration = {0.0, 0.0, 0.0};
-    acceleration += 0*v_alignment + 0*v_cohesion + 1*v_separation;
+    acceleration += (1*v_alignment + 1*v_cohesion) * int(n_neighbours > 0) + 1*v_separation;
 
-    p_vel += acceleration;
+    p_vel += deltatime * acceleration;
 
     p.vel_x = p_vel.x;
     p.vel_y = p_vel.y;
