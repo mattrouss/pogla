@@ -1,3 +1,4 @@
+#include <iomanip>
 #include "particle_system.h"
 
 namespace mygl
@@ -141,8 +142,21 @@ namespace mygl
             std::cout << "[";
             for (size_t x = 0; x < N_x_; x++)
             {
-                std::cout << "[" << buffer[x + grid_width * y].pos_ << "] ";
-                    //<< ":" << buffer[j + grid_width * i].velocity_ << "] ";
+                std::cout
+                    << "[" << buffer[x + grid_width * y].pos_ << "] ";
+                    //<< ":" << buffer[x + grid_width * y].velocity_ << "] ";
+            }
+            std::cout << "]\n";
+        }
+        std::cout << "\n\n";
+        for (size_t y = 0; y < N_y_; y++)
+        {
+            std::cout << "[";
+            for (size_t x = 0; x < N_x_; x++)
+            {
+                std::cout
+                        << "[" << buffer[x + grid_width * y].velocity_ << "] ";
+                        //<< ":" << buffer[x + grid_width * y].velocity_ << "] ";
             }
             std::cout << "]\n";
         }
@@ -246,11 +260,11 @@ namespace mygl
                 glDispatchCompute(N_x_, N_y_, 1);
                 gl_err();
                 glMemoryBarrier(GL_ALL_BARRIER_BITS);
-                glBindVertexArray(0);
-                gl_err();
                 retrieve_ssbo();
                 //print_ssbo();
             } while (not check_sorted(iteration_parity == 0 ? particles_a_ : particles_b_));
+            glBindVertexArray(0);
+            gl_err();
             //print_ssbo();
         }
         // Run compute program

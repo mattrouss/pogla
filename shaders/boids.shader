@@ -159,6 +159,10 @@ void update_particle(int i, int j)
     vec3 center = {0, 0, 0};
     vec3 separation = {0, 0, 0};
     vec3 vel_normalized = normalize(p_vel);
+    if (length(p_vel) == 0)
+    {
+        vel_normalized = p_vel;
+    }
 
     int n_neighbours = 0;
     for (int x = -2 + int(i == 0) + int(i <= 1); x < 3 && x + i < gl_WorkGroupSize.x * gl_NumWorkGroups.x; x++)
@@ -172,7 +176,7 @@ void update_particle(int i, int j)
             vec3 n_offset = vec3(p.pos_x, 0, p.pos_z)
             - vec3(neighbour.pos_x, 0, neighbour.pos_z);
             float sqr_dist = dot(n_offset, n_offset);
-            if (dot(vel_normalized, -normalize(n_offset)) >= 0.1)
+            if (length(n_offset) > 0 && dot(vel_normalized, -normalize(n_offset)) >= 0.1)
             {
 
                 vel += vec3(neighbour.vel_x, 0, neighbour.vel_z);
@@ -181,11 +185,11 @@ void update_particle(int i, int j)
 
 
                 //if (sqr_dist < avoid_distance * avoid_distance)
-                    separation += normalize(n_offset) * (1 / sqr_dist);
+                    separation += normalize(n_offset) * (1 / max(sqr_dist, 0.5));
                 n_neighbours += 1;
             }
-            else if (sqr_dist < avoid_distance * avoid_distance)
-                separation += normalize(n_offset) * (1 / sqr_dist);
+            else if (length(n_offset) > 0 && sqr_dist < avoid_distance * avoid_distance)
+                separation += normalize(n_offset) * (1 / max(sqr_dist, 0.5));
         }
     }
     if (n_neighbours > 0)
