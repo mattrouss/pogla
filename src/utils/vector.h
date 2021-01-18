@@ -86,7 +86,7 @@ namespace mygl {
 
         friend std::ostream& operator<<(std::ostream &out, const Vector<T, D> &vec) {
             out << "Vec( ";
-            for (auto i = 0; i < D; i++)
+            for (auto i = 0u; i < D; i++)
                 out << vec[i] << " ";
             out << ")";
             return out;

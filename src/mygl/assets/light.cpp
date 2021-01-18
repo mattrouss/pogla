@@ -15,6 +15,11 @@ void Light::translate(mygl::Vec3 v)
 {
     pos += v;
 }
+
+void Light::translate_local(mygl::Vec3)
+{
+}
+
 UniformLight::UniformLight(mygl::Vec3 pos, mygl::Vec3 color, float intensity)
     : Light(pos, color, LightType::UNIFORM, true), intensity{intensity}
 {
