@@ -96,13 +96,24 @@ Particle limit_bounds(Particle p)
     
 }
 
+float rand(vec2 st, vec2 seed)
+{
+    return fract(sin(dot(st.xy, seed))*43758.5453123);
+}
+
+vec2 randVec(vec2 st)
+{
+    return (vec2(rand(st, vec2(12.9898, 78.233)),
+        rand(st, vec2(15.5682, 45.2357))) - vec2(0.5,0.5))*2.0;
+}
+
 Particle avoid_bounds(Particle p)
 {
     const float upper_bound = 20;
     const float lower_bound = -20;
 
-    const float margin = 1.5;
-    const float turnaround_factor = 1.0f;
+    const float margin = 1.5f;
+    const float turnaround_factor = 0.05f;
     if (p.pos_x > upper_bound - margin)
     {
         p.vel_x -= turnaround_factor;
@@ -147,6 +158,16 @@ Particle limit_speed(Particle p)
     }
 
     return p;
+}
+
+vec2 center_repulsion(vec2 position)
+{
+    return normalize(position) / (length(position) * length(position));
+}
+
+vec2 center_attraction(vec2 position)
+{
+    return normalize(-position) * length(position) * length(position);
 }
 
 void update_particle(int i, int j)
@@ -208,7 +229,11 @@ void update_particle(int i, int j)
     const vec3 v_alignment = 1 * vel;
 
     vec3 acceleration = {0.0, 0.0, 0.0};
+    vec2 randDir = randVec(vec2(p.pos_x, p.pos_y)) * 0.1;
     acceleration += (1*v_alignment + 1*v_cohesion) * int(n_neighbours > 0) + 1*v_separation;
+    acceleration.xz += randDir * 50.0;
+    acceleration.xz += center_repulsion(vec2(p.pos_x, p.pos_z)) * 100.0f;
+    acceleration.xz += center_attraction(vec2(p.pos_x, p.pos_z)) * 0.001f;
 
     p_vel += deltatime * acceleration;
 
@@ -216,7 +241,7 @@ void update_particle(int i, int j)
     p.vel_y = p_vel.y;
     p.vel_z = p_vel.z;
 
-    p = avoid_bounds(p);
+    //p = avoid_bounds(p);
     p = limit_speed(p);
 
     p.pos_x += deltatime * p.vel_x;
