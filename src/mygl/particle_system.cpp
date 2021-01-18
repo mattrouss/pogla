@@ -247,9 +247,12 @@ namespace mygl
         if (sort_prog_ != nullptr)
         {
             sort_prog_->use();
+            GLint step_id;
 
             parity_id = glGetUniformLocation(sort_prog_->prog_id(), "parity");gl_err();
             glUniform1ui(parity_id, iteration_parity);gl_err();
+
+            step_id = glGetUniformLocation(sort_prog_->prog_id(), "sortStep");gl_err();
 
             //std::cout << "====================\n";
             do
@@ -257,6 +260,19 @@ namespace mygl
                 //std::cout << "Execute sort.\n";
                 glBindVertexArray(vao_);
                 gl_err()
+                glUniform1ui(step_id, 0);gl_err();
+                glDispatchCompute(N_x_, N_y_, 1);
+                gl_err();
+                glUniform1ui(step_id, 1);gl_err();
+                glMemoryBarrier(GL_ALL_BARRIER_BITS);
+                glDispatchCompute(N_x_, N_y_, 1);
+                gl_err();
+                glUniform1ui(step_id, 2);gl_err();
+                glMemoryBarrier(GL_ALL_BARRIER_BITS);
+                glDispatchCompute(N_x_, N_y_, 1);
+                gl_err();
+                glUniform1ui(step_id, 3);gl_err();
+                glMemoryBarrier(GL_ALL_BARRIER_BITS);
                 glDispatchCompute(N_x_, N_y_, 1);
                 gl_err();
                 glMemoryBarrier(GL_ALL_BARRIER_BITS);

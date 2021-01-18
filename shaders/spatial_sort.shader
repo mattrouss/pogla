@@ -6,6 +6,7 @@ layout (local_size_x = PARTICLE_NB, local_size_y = PARTICLE_NB) in;
 
 uniform float time;
 uniform uint parity;
+uniform uint sortStep;
 const float period = 2.0;
 
 struct Particle
@@ -82,8 +83,8 @@ void main()
 {
     uint i_a = gl_GlobalInvocationID.x + gl_GlobalInvocationID.y * gl_WorkGroupSize.x * gl_NumWorkGroups.x;
     uint i_b = i_a + 1;
-    if (gl_GlobalInvocationID.x % 2 == 0
-    && gl_GlobalInvocationID.x < gl_WorkGroupSize.x * gl_NumWorkGroups.x - 1)
+    if (sortStep == 0 && (gl_GlobalInvocationID.x % 2 == 0
+    && gl_GlobalInvocationID.x < gl_WorkGroupSize.x * gl_NumWorkGroups.x - 1))
     {
         swap_horizontal(i_a, i_b);
         //if (parity == 0)
@@ -91,9 +92,8 @@ void main()
         //else
         //particles_b[i_a].pos_y = i_b;
     }
-    barrier();
-    if (gl_GlobalInvocationID.x % 2 != 0
-    && gl_GlobalInvocationID.x < gl_WorkGroupSize.x * gl_NumWorkGroups.x - 1)
+    if (sortStep == 1 && (gl_GlobalInvocationID.x % 2 != 0
+    && gl_GlobalInvocationID.x < gl_WorkGroupSize.x * gl_NumWorkGroups.x - 1))
     {
         swap_horizontal(i_a, i_b);
         //if (parity == 0)
@@ -101,10 +101,9 @@ void main()
         //else
         //particles_b[i_a].pos_y = i_b;
     }
-    barrier();
     i_b = i_a + gl_WorkGroupSize.x * gl_NumWorkGroups.x;
-    if (gl_GlobalInvocationID.y % 2 == 0
-    && gl_GlobalInvocationID.y < gl_WorkGroupSize.y * gl_NumWorkGroups.y - 1)
+    if (sortStep == 2 && (gl_GlobalInvocationID.y % 2 == 0
+    && gl_GlobalInvocationID.y < gl_WorkGroupSize.y * gl_NumWorkGroups.y - 1))
     {
         swap_vertical(i_a, i_b);
         //if (parity == 0)
@@ -112,9 +111,8 @@ void main()
         //else
         //particles_b[i_a].pos_y = i_b;
     }
-    barrier();
-    if (gl_GlobalInvocationID.y % 2 != 0
-    && gl_GlobalInvocationID.y < gl_WorkGroupSize.y * gl_NumWorkGroups.y - 1)
+    if (sortStep == 3 && (gl_GlobalInvocationID.y % 2 != 0
+    && gl_GlobalInvocationID.y < gl_WorkGroupSize.y * gl_NumWorkGroups.y - 1))
     {
         swap_vertical(i_a, i_b);
         //if (parity == 0)
