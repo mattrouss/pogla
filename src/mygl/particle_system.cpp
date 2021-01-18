@@ -216,6 +216,7 @@ namespace mygl
 
     void ParticleSystem::init_particles()
     {
+        std::cout << "Init boids with " << N_ << " agents.\n";
         particles_a_.resize(N_);
         particles_b_.resize(N_);
 
@@ -276,9 +277,10 @@ namespace mygl
                 glDispatchCompute(N_x_, N_y_, 1);
                 gl_err();
                 glMemoryBarrier(GL_ALL_BARRIER_BITS);
-                retrieve_ssbo();
+                if (N_x_ * N_y_ <= 1000)
+                    retrieve_ssbo();
                 //print_ssbo();
-            } while (not check_sorted(iteration_parity == 0 ? particles_a_ : particles_b_));
+            } while (N_x_ * N_y_ <= 1000 and not check_sorted(iteration_parity == 0 ? particles_a_ : particles_b_));
             glBindVertexArray(0);
             gl_err();
             //print_ssbo();

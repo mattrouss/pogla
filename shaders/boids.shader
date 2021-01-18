@@ -165,9 +165,11 @@ vec2 center_repulsion(vec2 position)
     return normalize(position) / (length(position) * length(position));
 }
 
-vec2 center_attraction(vec2 position)
+vec2 center_attraction(vec2 position, float radius)
 {
-    return normalize(-position) * length(position) * length(position);
+    return int(length(position) > radius)
+        * normalize(-position)
+        * (length(position) - radius) * (length(position) - radius);
 }
 
 void update_particle(int i, int j)
@@ -230,10 +232,10 @@ void update_particle(int i, int j)
 
     vec3 acceleration = {0.0, 0.0, 0.0};
     vec2 randDir = randVec(vec2(p.pos_x, p.pos_y)) * 0.1;
-    acceleration += (1*v_alignment + 1*v_cohesion) * int(n_neighbours > 0) + 1*v_separation;
+    acceleration += (1.5*v_alignment + 1*v_cohesion) * int(n_neighbours > 0) + 1*v_separation;
     acceleration.xz += randDir * 50.0;
-    acceleration.xz += center_repulsion(vec2(p.pos_x, p.pos_z)) * 100.0f;
-    acceleration.xz += center_attraction(vec2(p.pos_x, p.pos_z)) * 0.001f;
+    acceleration.xz += center_repulsion(vec2(p.pos_x, p.pos_z)) * 10.0f;
+    acceleration.xz += center_attraction(vec2(p.pos_x, p.pos_z), 20) * 0.001;
 
     p_vel += deltatime * acceleration;
 
