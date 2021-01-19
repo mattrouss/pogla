@@ -19,7 +19,7 @@
 #include "utils/clock.h"
 #include "utils/matrix4.h"
 
-ParticleSystem particle_system(1000u);
+mygl::ParticleSystem particle_system(200u);
 std::function<void()> light_trajectory_callback;
 std::function<void()> cam_trajectory_callback;
 
@@ -28,7 +28,7 @@ void display()
     glClearColor(0.95f, 0.93f, 0.9f, 1.0f) ;
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);gl_err();
 
-    particle_system.render();
+    particle_system.render(mainClock.deltatime());
 
     glutSwapBuffers();
     inputManager.send_mouse_input();
@@ -118,20 +118,35 @@ int main(int argc, char **argv)
     initGlew();
     init_gl();
 
-    std::string v_shader = "../shaders/particle_vertex.shd";
-    std::string f_shader = "../shaders/particle_fragment.shd";
+    std::string v_shader = "../shaders/particle_vertex.shader";
+    std::string f_shader = "../shaders/particle_fragment.shader";
+
+    std::string c_shader = "../shaders/boids.shader";
+    std::string sort_shader = "../shaders/spatial_sort.shader";
 
     auto prog_builder = mygl::ProgramBuilder{};
     prog_builder.add_shader(
             mygl::shaders::DisplayShadersBase{v_shader, f_shader}
             );
+    auto compute_prog_builder = mygl::ProgramBuilder{};
+    compute_prog_builder.add_shader(
+            mygl::shaders::ComputeShader{c_shader}
+            );
+    auto sort_prog_builder = mygl::ProgramBuilder{};
+    sort_prog_builder.add_shader(
+            mygl::shaders::ComputeShader{sort_shader}
+    );
     auto prog_result = prog_builder.build();
-    if (prog_result == std::nullopt)
+    auto compute_result = compute_prog_builder.build();
+    auto sort_result = sort_prog_builder.build();
+    if (prog_result == std::nullopt || compute_result == std::nullopt
+        || sort_result == std::nullopt)
     {
         std::cout << "Shader compilation failed.\n";
         return 1;
     }
     auto prog = prog_result->get();
+    auto compute_prog = compute_result->get();
     prog->use();
 
     //init camera
@@ -148,12 +163,12 @@ int main(int argc, char **argv)
     lights.set_ambient(1, {{0,0,0}}, 0.2 * mygl::Vec3({1,1,1}));
     lights.set_lights_uniform(prog);
 
-    init_color_uniform(prog, {{1, 0.8, 0.9, 1}});
+    init_color_uniform(prog, {{0.6, 0.8, 0.9, 1}});
 
     // Load particle mesh
-    auto mesh = mygl::load_mesh("../meshes/monkey.obj");
+    auto mesh = mygl::load_mesh("../meshes/sphere.obj");
 
-    particle_system.init_system(prog, mesh);
+    particle_system.init_system(prog, compute_prog, sort_result->get(),  mesh);
 
     //start display timer and start main loop
     glutTimerFunc(1000/50, refresh_timer, 0);

@@ -11,26 +11,59 @@
 #include "utils/vector.h"
 #include "assets/mesh.h"
 
-
-class ParticleSystem
+namespace mygl
 {
-public:
-    ParticleSystem(size_t N);
+    struct Particle
+    {
+    public:
+        Particle() = default;
+        Particle(const mygl::Vec3& pos): pos_(pos) {}
+        Particle(const mygl::Vec3& pos, const mygl::Vec3& velocity): pos_(pos), velocity_(velocity) {}
 
-    void init_system(mygl::Program* prog, std::shared_ptr<mygl::mesh> mesh);
+        mygl::Vec3 pos_;
+        mygl::Vec3 velocity_;
 
-    void render() const;
-    void init_particles();
+    };
 
-private:
-    mygl::Program* prog_;
-    GLuint vao_;
+    class ParticleSystem
+    {
+    public:
+        ParticleSystem(size_t N);
 
-    size_t N_;
-    std::shared_ptr<mygl::mesh> particle_mesh_;
+        void init_system(mygl::Program* display_prog, mygl::Program* compute_prog, std::shared_ptr<mygl::mesh> mesh);
+        void init_system(mygl::Program* display_prog,
+                mygl::Program* compute_prog,
+                mygl::Program* sort_prog,
+                std::shared_ptr<mygl::mesh> mesh);
 
-    std::vector<mygl::Vec3> positions_;
+        void render(float deltatime);
+        void init_particles();
 
-};
+    private:
+        void retrieve_ssbo();
+        void print_buffer(std::string name, std::vector<mygl::Particle> buffer);
+        bool check_sorted(std::vector<mygl::Particle> buffer);
+        void print_sorted(std::string name, std::vector<mygl::Particle> buffer);
+        void print_ssbo();
+
+    private:
+        mygl::Program* display_prog_;
+        mygl::Program* compute_prog_;
+        mygl::Program* sort_prog_;
+        GLuint vao_;
+
+        size_t N_;
+        size_t N_x_;
+        size_t N_y_;
+        std::shared_ptr<mygl::mesh> particle_mesh_;
+
+        std::vector<mygl::Particle> particles_a_;
+        GLuint ssbo_a_;
+        std::vector<mygl::Particle> particles_b_;
+        GLuint ssbo_b_;
+        unsigned iteration_parity = 0;
+
+    };
+}
 
 #endif //PARTICLE_SYSTEM_H

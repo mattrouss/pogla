@@ -120,8 +120,8 @@ int main(int argc, char **argv)
     initGlew();
     init_gl();
 
-    std::string v_shader = "../shaders/vertex.shd";
-    std::string f_shader = "../shaders/fragment.shd";
+    std::string v_shader = "../shaders/vertex.shader";
+    std::string f_shader = "../shaders/fragment.shader";
     //auto prog = mygl::Program::make_program(v_shader, f_shader);
     auto prog_builder = mygl::ProgramBuilder{};
     prog_builder.add_shader(
