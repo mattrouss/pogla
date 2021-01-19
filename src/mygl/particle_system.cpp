@@ -44,7 +44,7 @@ namespace mygl
 
         init_particles();
 
-        auto vertex_attribs = std::vector<GLuint>{0, 1, 2, 3, 4, 5};
+        auto vertex_attribs = std::vector<GLuint>{0, 1, 2, 3, 4, 5, 6};
 
         glGenVertexArrays(1, &vao_);gl_err()
         glBindVertexArray(vao_);gl_err()
@@ -92,15 +92,21 @@ namespace mygl
         glVertexAttribPointer(vertex_attribs[3], 3, GL_FLOAT, GL_FALSE, sizeof(mygl::Vertex), (void *)(offsetof(mygl::Vertex, tangent)));gl_err();
         glEnableVertexAttribArray(vertex_attribs[3]);gl_err();
 
+        // Instance offset a
         glBindBuffer(GL_ARRAY_BUFFER, instance_vertex_buffer_id_a);
         glVertexAttribPointer(vertex_attribs[4], 3, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)0);
         glEnableVertexAttribArray(vertex_attribs[4]);gl_err();
         glVertexAttribDivisor(vertex_attribs[4], 1); // Instanced attribute
 
-        glBindBuffer(GL_ARRAY_BUFFER, instance_vertex_buffer_id_b);
-        glVertexAttribPointer(vertex_attribs[5], 3, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)0);
+        // Instace orientation angle a
+        glVertexAttribPointer(vertex_attribs[5], 1, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)(offsetof(mygl::Particle, orientation_angle_)));gl_err();
         glEnableVertexAttribArray(vertex_attribs[5]);gl_err();
         glVertexAttribDivisor(vertex_attribs[5], 1); // Instanced attribute
+
+        glBindBuffer(GL_ARRAY_BUFFER, instance_vertex_buffer_id_b);
+        glVertexAttribPointer(vertex_attribs[6], 3, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)0);
+        glEnableVertexAttribArray(vertex_attribs[6]);gl_err();
+        glVertexAttribDivisor(vertex_attribs[6], 1); // Instanced attribute
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);gl_err()

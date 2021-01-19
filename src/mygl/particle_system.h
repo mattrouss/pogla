@@ -22,6 +22,7 @@ namespace mygl
 
         mygl::Vec3 pos_;
         mygl::Vec3 velocity_;
+        float orientation_angle_;
 
     };
 

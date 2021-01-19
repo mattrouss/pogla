@@ -13,6 +13,7 @@ struct Particle
 {
     float pos_x, pos_y, pos_z;
     float vel_x, vel_y, vel_z;
+    float orientation_angle;
 };
 
 layout (std430, binding=1) buffer particle_pos_buffer_a

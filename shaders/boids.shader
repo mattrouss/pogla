@@ -16,6 +16,7 @@ struct Particle
 {
     float pos_x, pos_y, pos_z;
     float vel_x, vel_y, vel_z;
+    float orientation_angle;
 };
 
 layout (std430, binding=1) buffer particle_pos_buffer_a
@@ -50,6 +51,7 @@ void write_particle(int i, int j, Particle p)
         particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].vel_x = p.vel_x;
         particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].vel_y = p.vel_y;
         particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].vel_z = p.vel_z;
+        particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].orientation_angle = p.orientation_angle;
     }
     else
     {
@@ -58,7 +60,7 @@ void write_particle(int i, int j, Particle p)
         particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].pos_z = p.pos_z;
         particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].vel_x = p.vel_x;
         particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].vel_y = p.vel_y;
-        particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].vel_z = p.vel_z;
+        particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].orientation_angle = p.orientation_angle;
     }
 }
 
@@ -249,6 +251,11 @@ void update_particle(int i, int j)
     p.pos_x += deltatime * p.vel_x;
     p.pos_y += 0;
     p.pos_z += deltatime * p.vel_z;
+
+    if (p.vel_x == 0)
+        p.orientation_angle = 0;
+    else
+        p.orientation_angle = atan(p.vel_z, p.vel_x);
 
     write_particle(i, j, p);
 }

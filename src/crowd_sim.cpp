@@ -166,7 +166,7 @@ int main(int argc, char **argv)
     init_color_uniform(prog, {{0.6, 0.8, 0.9, 1}});
 
     // Load particle mesh
-    auto mesh = mygl::load_mesh("../meshes/sphere.obj");
+    auto mesh = mygl::load_mesh("../meshes/monkey.obj");
 
     particle_system.init_system(prog, compute_prog, sort_result->get(),  mesh);
 
