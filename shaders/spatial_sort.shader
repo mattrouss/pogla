@@ -11,9 +11,8 @@ const float period = 2.0;
 
 struct Particle
 {
-    float pos_x, pos_y, pos_z;
+    mat4 transform;
     float vel_x, vel_y, vel_z;
-    float orientation_angle;
 };
 
 layout (std430, binding=1) buffer particle_pos_buffer_a
@@ -26,14 +25,28 @@ layout (std430, binding=2) buffer particle_pos_buffer_b
     Particle particles_b[];
 };
 
+vec3 get_position(Particle p)
+{
+    return vec3(p.transform[3][0], p.transform[3][1], p.transform[3][2]);
+}
+
+Particle set_position(Particle p, vec3 pos)
+{
+    p.transform[3][0] = pos.x;
+    p.transform[3][1] = pos.y;
+    p.transform[3][2] = pos.z;
+
+    return p;
+}
+
 void swap_horizontal(uint i_a, uint i_b)
 {
     Particle tmp;
     if (parity == 0)
     {
-        if (particles_a[i_a].pos_x > particles_a[i_b].pos_x
-            || (particles_a[i_a].pos_x == particles_a[i_b].pos_x
-                && particles_a[i_a].pos_z > particles_a[i_b].pos_z))
+        vec3 pos_a = get_position(particles_a[i_a]);
+        vec3 pos_b = get_position(particles_a[i_b]);
+        if (pos_a.x > pos_b.x || (pos_a.x == pos_b.x && pos_a.z > pos_b.z))
         {
             tmp = particles_a[i_a];
             particles_a[i_a] = particles_a[i_b];
@@ -41,9 +54,9 @@ void swap_horizontal(uint i_a, uint i_b)
             particles_a[i_b] = tmp;
         }
     } else {
-        if (particles_b[i_a].pos_x > particles_b[i_b].pos_x
-            || (particles_b[i_a].pos_x == particles_b[i_b].pos_x
-                && particles_b[i_a].pos_z > particles_b[i_b].pos_z))
+        vec3 pos_a = get_position(particles_b[i_a]);
+        vec3 pos_b = get_position(particles_b[i_b]);
+        if (pos_a.x > pos_b.x || (pos_a.x == pos_b.x && pos_a.z > pos_b.z))
         {
             tmp = particles_b[i_a];
             particles_b[i_a] = particles_b[i_b];
@@ -58,9 +71,9 @@ void swap_vertical(uint i_a, uint i_b)
     Particle tmp;
     if (parity == 0)
     {
-        if (particles_a[i_a].pos_z > particles_a[i_b].pos_z
-            || (particles_a[i_a].pos_z == particles_a[i_b].pos_z
-                && particles_a[i_a].pos_x > particles_a[i_b].pos_x))
+        vec3 pos_a = get_position(particles_a[i_a]);
+        vec3 pos_b = get_position(particles_a[i_b]);
+        if (pos_a.z > pos_b.z || (pos_a.z == pos_b.z && pos_a.x > pos_b.x))
         {
             tmp = particles_a[i_a];
             particles_a[i_a] = particles_a[i_b];
@@ -68,9 +81,9 @@ void swap_vertical(uint i_a, uint i_b)
             particles_a[i_b] = tmp;
         }
     } else {
-        if (particles_b[i_a].pos_z > particles_b[i_b].pos_z
-            || (particles_b[i_a].pos_z == particles_b[i_b].pos_z
-                && particles_b[i_a].pos_x > particles_b[i_b].pos_x))
+        vec3 pos_a = get_position(particles_b[i_a]);
+        vec3 pos_b = get_position(particles_b[i_b]);
+        if (pos_a.z > pos_b.z || (pos_a.z == pos_b.z && pos_a.x > pos_b.x))
         {
             tmp = particles_b[i_a];
             particles_b[i_a] = particles_b[i_b];
