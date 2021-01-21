@@ -181,7 +181,7 @@ namespace mygl
             for (size_t x = 0; x < N_x_; x++)
             {
                 std::cout
-                    << "[" << buffer[x + grid_width * y].pos() << "] ";
+                    << "[" << buffer[x + grid_width * y].transform_ << "] ";
                     //<< ":" << buffer[x + grid_width * y].velocity_ << "] ";
             }
             std::cout << "]\n";
@@ -288,7 +288,6 @@ namespace mygl
     void ParticleSystem::render(float deltatime)
     {
         GLint parity_id;
-        /*
         if (sort_prog_ != nullptr)
         {
             sort_prog_->use();
@@ -329,8 +328,6 @@ namespace mygl
             gl_err();
             //print_ssbo();
         }
-        */
-        /*
         // Run compute program
         compute_prog_->use();
 
@@ -354,7 +351,6 @@ namespace mygl
         retrieve_ssbo();
         //print_ssbo();
         //std::cout << "===================\n";
-        */
         // Run display program
         display_prog_->use();
         glBindVertexArray(vao_);gl_err()

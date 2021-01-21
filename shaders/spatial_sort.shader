@@ -12,7 +12,8 @@ const float period = 2.0;
 struct Particle
 {
     mat4 transform;
-    float vel_x, vel_y, vel_z;
+    vec3 vel;
+    float padding;
 };
 
 layout (std430, binding=1) buffer particle_pos_buffer_a

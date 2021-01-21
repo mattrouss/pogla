@@ -22,6 +22,7 @@ namespace mygl
 
         mygl::matrix4 transform_;
         mygl::Vec3 velocity_;
+        float __padding;
 
         mygl::Vec3 pos() const;
 
