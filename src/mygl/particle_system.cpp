@@ -48,7 +48,7 @@ namespace mygl
 
         init_particles();
 
-        auto vertex_attribs = std::vector<GLuint>{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
+        auto vertex_attribs = std::vector<GLuint>{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 
         glGenVertexArrays(1, &vao_);gl_err()
         glBindVertexArray(vao_);gl_err()
@@ -113,32 +113,42 @@ namespace mygl
         glVertexAttribPointer(vertex_attribs[8], 3, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)(offsetof(mygl::Particle, velocity_)));gl_err();
         glEnableVertexAttribArray(vertex_attribs[8]);gl_err();
 
+        // Instance rotation angle a
+        glVertexAttribPointer(vertex_attribs[9], 1, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)(offsetof(mygl::Particle, angle)));gl_err();
+        glEnableVertexAttribArray(vertex_attribs[9]);gl_err();
+
         glVertexAttribDivisor(vertex_attribs[4], 1);gl_err();
         glVertexAttribDivisor(vertex_attribs[5], 1);gl_err();
         glVertexAttribDivisor(vertex_attribs[6], 1);gl_err();
         glVertexAttribDivisor(vertex_attribs[7], 1);gl_err();
         glVertexAttribDivisor(vertex_attribs[8], 1);gl_err();
+        glVertexAttribDivisor(vertex_attribs[9], 1);gl_err();
 
         // Instance transform matrix b
         glBindBuffer(GL_ARRAY_BUFFER, instance_vertex_buffer_id_a);
-        glVertexAttribPointer(vertex_attribs[9], 4, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)0);gl_err();
-        glEnableVertexAttribArray(vertex_attribs[9]);gl_err();
-        glVertexAttribPointer(vertex_attribs[10], 4, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)(1 * vec4_size));gl_err();
+        glVertexAttribPointer(vertex_attribs[10], 4, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)0);gl_err();
         glEnableVertexAttribArray(vertex_attribs[10]);gl_err();
-        glVertexAttribPointer(vertex_attribs[11], 4, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)(2 * vec4_size));gl_err();
+        glVertexAttribPointer(vertex_attribs[11], 4, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)(1 * vec4_size));gl_err();
         glEnableVertexAttribArray(vertex_attribs[11]);gl_err();
-        glVertexAttribPointer(vertex_attribs[12], 4, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)(3 * vec4_size));gl_err();
+        glVertexAttribPointer(vertex_attribs[12], 4, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)(2 * vec4_size));gl_err();
         glEnableVertexAttribArray(vertex_attribs[12]);gl_err();
-
-        // Instance velocity vector b
-        glVertexAttribPointer(vertex_attribs[13], 3, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)(offsetof(mygl::Particle, velocity_)));gl_err();
+        glVertexAttribPointer(vertex_attribs[13], 4, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)(3 * vec4_size));gl_err();
         glEnableVertexAttribArray(vertex_attribs[13]);gl_err();
 
-        glVertexAttribDivisor(vertex_attribs[9], 1);gl_err();
+        // Instance velocity vector b
+        glVertexAttribPointer(vertex_attribs[14], 3, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)(offsetof(mygl::Particle, velocity_)));gl_err();
+        glEnableVertexAttribArray(vertex_attribs[14]);gl_err();
+
+        // Instance rotation angle b
+        glVertexAttribPointer(vertex_attribs[15], 1, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)(offsetof(mygl::Particle, angle)));gl_err();
+        glEnableVertexAttribArray(vertex_attribs[15]);gl_err();
+
         glVertexAttribDivisor(vertex_attribs[10], 1);gl_err();
         glVertexAttribDivisor(vertex_attribs[11], 1);gl_err();
         glVertexAttribDivisor(vertex_attribs[12], 1);gl_err();
         glVertexAttribDivisor(vertex_attribs[13], 1);gl_err();
+        glVertexAttribDivisor(vertex_attribs[14], 1);gl_err();
+        glVertexAttribDivisor(vertex_attribs[15], 1);gl_err();
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);gl_err();
         glBindVertexArray(0);gl_err();
@@ -194,6 +204,18 @@ namespace mygl
             {
                 std::cout
                         << "[" << buffer[x + grid_width * y].velocity_ << "] ";
+                        //<< ":" << buffer[x + grid_width * y].velocity_ << "] ";
+            }
+            std::cout << "]\n";
+        }
+        std::cout << "\n\n";
+        for (size_t y = 0; y < N_y_; y++)
+        {
+            std::cout << "[";
+            for (size_t x = 0; x < N_x_; x++)
+            {
+                std::cout
+                        << "[" << buffer[x + grid_width * y].angle << "] ";
                         //<< ":" << buffer[x + grid_width * y].velocity_ << "] ";
             }
             std::cout << "]\n";

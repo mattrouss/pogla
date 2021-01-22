@@ -16,7 +16,7 @@ struct Particle
 {
     mat4 transform;
     vec3 vel;
-    float padding;
+    float angle;
 };
 
 layout (std430, binding=1) buffer particle_pos_buffer_a
@@ -43,13 +43,6 @@ Particle set_position(Particle p, vec3 pos)
     return p;
 }
 
-mat4 translate(mat4 m, vec3 t)
-{
-    m[3].xyz += t;
-    return m;
-}
-
-
 mat4 rot_y(float angle)
 {
     float cos_a = cos(angle);
@@ -60,6 +53,16 @@ mat4 rot_y(float angle)
         -sin_a, 0, cos_a, 0,
              0, 0,     0, 1
             );
+}
+
+mat4 translate(vec3 t)
+{
+    return transpose(mat4(
+            1, 0, 0, t.x,
+            0, 1, 0, t.y,
+            0, 0, 1, t.z,
+            0, 0, 0, 1
+        ));
 }
 
 Particle get_particle(int i, int j)
@@ -80,11 +83,13 @@ void write_particle(int i, int j, Particle p)
     {
         particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].transform = p.transform;
         particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].vel = p.vel;
+        particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].angle = p.angle;
     }
     else
     {
         particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].transform = p.transform;
         particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].vel = p.vel;
+        particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].angle = p.angle;
     }
 }
 
@@ -173,16 +178,12 @@ Particle avoid_bounds(Particle p)
 Particle limit_speed(Particle p)
 {
     const float max_speed = 5.0;
-
-    vec3 p_vel = p.vel;
-    const float cur_speed = length(p_vel);
+    const float cur_speed = length(p.vel);
 
     // Rescale speed if it exceeds max speed
     if (cur_speed > max_speed)
     {
-        p.vel.x = max_speed * p.vel.x / cur_speed;
-        p.vel.y = max_speed * p.vel.y / cur_speed;
-        p.vel.z = max_speed * p.vel.z / cur_speed;
+        p.vel = max_speed * p.vel / cur_speed;
     }
 
     return p;
@@ -210,10 +211,10 @@ void update_particle(int i, int j)
     vec3 vel = {0, 0, 0};
     vec3 center = {0, 0, 0};
     vec3 separation = {0, 0, 0};
-    vec3 vel_normalized = normalize(p_vel);
-    if (length(p_vel) == 0)
+    vec3 vel_normalized = normalize(p.vel);
+    if (length(p.vel) == 0)
     {
-        vel_normalized = p_vel;
+        vel_normalized = p.vel;
     }
 
     int n_neighbours = 0;
@@ -267,11 +268,8 @@ void update_particle(int i, int j)
     acceleration.xz += center_repulsion(vec2(pos.x, pos.z)) * 10.0f;
     acceleration.xz += center_attraction(vec2(pos.x, pos.z), 20) * 0.001;
 
-    p_vel += deltatime * acceleration;
-
-    p.vel.x = p_vel.x;
-    p.vel.y = p_vel.y;
-    p.vel.z = p_vel.z;
+    vec3 old_vel = p.vel;
+    p.vel += deltatime * acceleration;
 
     //p = avoid_bounds(p);
     p = limit_speed(p);
@@ -280,24 +278,15 @@ void update_particle(int i, int j)
     pos.y += 0;
     pos.z += deltatime * p.vel.z;
 
-    p.transform = p.transform * rot_y(0.01);
+    p.angle = acos(dot(normalize(old_vel), normalize(p.vel)));
 
-    p = set_position(p, pos);
+    mat4 translation = translate(vec3(deltatime * p.vel.x, 0.0f, deltatime * p.vel.z));
 
+    p.transform = p.transform * translation;
     write_particle(i, j, p);
 }
 
 void main()
 {
-    /*
-    if (int(gl_GlobalInvocationID.x) == 0 && int(gl_GlobalInvocationID.y) == 0)
-    {
-        Particle p = get_particle(int(gl_GlobalInvocationID.x), int(gl_GlobalInvocationID.y));
-        vec3 pos = get_position(p);
-        p.transform = translate(p.transform, vec3(0, 20, 0));
-
-
-    }
-    */
     update_particle(int(gl_GlobalInvocationID.x), int(gl_GlobalInvocationID.y));
 }

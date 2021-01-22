@@ -31,15 +31,6 @@ vec3 get_position(Particle p)
     return vec3(p.transform[3][0], p.transform[3][1], p.transform[3][2]);
 }
 
-Particle set_position(Particle p, vec3 pos)
-{
-    p.transform[3][0] = pos.x;
-    p.transform[3][1] = pos.y;
-    p.transform[3][2] = pos.z;
-
-    return p;
-}
-
 void swap_horizontal(uint i_a, uint i_b)
 {
     Particle tmp;

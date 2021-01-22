@@ -5,7 +5,12 @@ layout(location = 1) in vec3 normals;
 layout(location = 2) in vec2 uv_coord;
 layout(location = 3) in vec3 tangent;
 layout(location = 4) in mat4 transform_a;
-layout(location = 9) in mat4 transform_b;
+layout(location = 8) in vec3 velocity_a;
+layout(location = 9) in float angle_a;
+layout(location = 10) in mat4 transform_b;
+layout(location = 14) in vec3 velocity_b;
+layout(location = 15) in float angle_b;
+
 uniform vec4 color;
 uniform mat4 view_matrix;// = mat4(
 			      //0, 0, 1, 0,
@@ -26,8 +31,21 @@ out vec3 normal;
 out vec2 tex_coord;
 out mat3 TBN;
 
+mat4 rot_y(float angle)
+{
+    float cos_a = cos(angle);
+    float sin_a = sin(angle);
+    return transpose(mat4(
+        cos_a, 0, sin_a, 0,
+             0, 1,     0, 0,
+        -sin_a, 0, cos_a, 0,
+             0, 0,     0, 1
+            ));
+}
+
 void main() {
-    gl_Position = projection_matrix * view_matrix * transform_a * vec4(position, 1.0);
+    mat4 rot = rot_y(angle_a);
+    gl_Position = projection_matrix * view_matrix * rot * transform_a * vec4(position, 1.0);
     vColor = color;
     normal = normals;
 
