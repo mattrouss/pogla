@@ -14,8 +14,9 @@ const float avoid_distance = 1.5f;
 
 struct Particle
 {
-    float pos_x, pos_y, pos_z;
-    float vel_x, vel_y, vel_z;
+    mat4 transform;
+    vec3 vel;
+    float angle;
 };
 
 layout (std430, binding=1) buffer particle_pos_buffer_a
@@ -27,6 +28,42 @@ layout (std430, binding=2) buffer particle_pos_buffer_b
 {
     Particle particles_b[];
 };
+
+vec3 get_position(Particle p)
+{
+    return vec3(p.transform[3][0], p.transform[3][1], p.transform[3][2]);
+}
+
+Particle set_position(Particle p, vec3 pos)
+{
+    p.transform[3][0] = pos.x;
+    p.transform[3][1] = pos.y;
+    p.transform[3][2] = pos.z;
+
+    return p;
+}
+
+mat4 rot_y(float angle)
+{
+    float cos_a = cos(angle);
+    float sin_a = sin(angle);
+    return mat4(
+        cos_a, 0, sin_a, 0,
+             0, 1,     0, 0,
+        -sin_a, 0, cos_a, 0,
+             0, 0,     0, 1
+            );
+}
+
+mat4 translate(vec3 t)
+{
+    return transpose(mat4(
+            1, 0, 0, t.x,
+            0, 1, 0, t.y,
+            0, 0, 1, t.z,
+            0, 0, 0, 1
+        ));
+}
 
 Particle get_particle(int i, int j)
 {
@@ -44,21 +81,15 @@ void write_particle(int i, int j, Particle p)
 {
     if (parity == 0)
     {
-        particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].pos_x = p.pos_x;
-        particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].pos_y = p.pos_y;
-        particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].pos_z = p.pos_z;
-        particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].vel_x = p.vel_x;
-        particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].vel_y = p.vel_y;
-        particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].vel_z = p.vel_z;
+        particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].transform = p.transform;
+        particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].vel = p.vel;
+        particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].angle = p.angle;
     }
     else
     {
-        particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].pos_x = p.pos_x;
-        particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].pos_y = p.pos_y;
-        particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].pos_z = p.pos_z;
-        particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].vel_x = p.vel_x;
-        particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].vel_y = p.vel_y;
-        particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].vel_z = p.vel_z;
+        particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].transform = p.transform;
+        particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].vel = p.vel;
+        particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].angle = p.angle;
     }
 }
 
@@ -67,32 +98,33 @@ Particle limit_bounds(Particle p)
     const float upper_bound = 100;
     const float lower_bound = -100;
 
-    if (p.pos_x > upper_bound)
+    vec3 pos = get_position(p);
+    if (pos.x > upper_bound)
     {
-        p.pos_x = lower_bound;
+        pos.x = lower_bound;
     }
-    if (p.pos_y > upper_bound)
+    if (pos.y > upper_bound)
     {
-        p.pos_y = lower_bound;
+        pos.y = lower_bound;
     }
-    if (p.pos_z > upper_bound)
+    if (pos.z > upper_bound)
     {
-        p.pos_z = lower_bound;
+        pos.z = lower_bound;
     }
-    if (p.pos_x < lower_bound)
+    if (pos.x < lower_bound)
     {
-        p.pos_x = upper_bound;
+        pos.x = upper_bound;
     }
-    if (p.pos_y < lower_bound)
+    if (pos.y < lower_bound)
     {
-        p.pos_y = upper_bound;
+        pos.y = upper_bound;
     }
-    if (p.pos_z < lower_bound)
+    if (pos.z < lower_bound)
     {
-        p.pos_z = upper_bound;
+        pos.z = upper_bound;
     }
 
-    return p;
+    return set_position(p, pos);
     
 }
 
@@ -114,29 +146,30 @@ Particle avoid_bounds(Particle p)
 
     const float margin = 1.5f;
     const float turnaround_factor = 0.05f;
-    if (p.pos_x > upper_bound - margin)
+    vec3 pos = get_position(p);
+    if (pos.x > upper_bound - margin)
     {
-        p.vel_x -= turnaround_factor;
+        p.vel.x -= turnaround_factor;
     }
-    if (p.pos_y > upper_bound - margin)
+    if (pos.y> upper_bound - margin)
     {
-        p.vel_y -= turnaround_factor;
+        p.vel.y -= turnaround_factor;
     }
-    if (p.pos_z > upper_bound - margin)
+    if (pos.z> upper_bound - margin)
     {
-        p.vel_z -= turnaround_factor;
+        p.vel.z -= turnaround_factor;
     }
-    if (p.pos_x < lower_bound + margin)
+    if (pos.x< lower_bound + margin)
     {
-        p.vel_x += turnaround_factor;
+        p.vel.x += turnaround_factor;
     }
-    if (p.pos_y < lower_bound + margin)
+    if (pos.y< lower_bound + margin)
     {
-        p.vel_y += turnaround_factor;
+        p.vel.y += turnaround_factor;
     }
-    if (p.pos_z < lower_bound + margin)
+    if (pos.z< lower_bound + margin)
     {
-        p.vel_z += turnaround_factor;
+        p.vel.z += turnaround_factor;
     }
 
     return p;
@@ -145,16 +178,12 @@ Particle avoid_bounds(Particle p)
 Particle limit_speed(Particle p)
 {
     const float max_speed = 5.0;
-
-    vec3 p_vel = vec3(p.vel_x, p.vel_y, p.vel_z);
-    const float cur_speed = length(p_vel);
+    const float cur_speed = length(p.vel);
 
     // Rescale speed if it exceeds max speed
     if (cur_speed > max_speed)
     {
-        p.vel_x = max_speed * p.vel_x / cur_speed;
-        p.vel_y = max_speed * p.vel_y / cur_speed;
-        p.vel_z = max_speed * p.vel_z / cur_speed;
+        p.vel = max_speed * p.vel / cur_speed;
     }
 
     return p;
@@ -175,16 +204,17 @@ vec2 center_attraction(vec2 position, float radius)
 void update_particle(int i, int j)
 {
     Particle p = get_particle(i, j);
-    vec3 p_vel = vec3(p.vel_x, p.vel_y, p.vel_z);
+    vec3 pos = get_position(p);
+    vec3 p_vel = p.vel;
 
     //set velocity to average velocity of neighbours
     vec3 vel = {0, 0, 0};
     vec3 center = {0, 0, 0};
     vec3 separation = {0, 0, 0};
-    vec3 vel_normalized = normalize(p_vel);
-    if (length(p_vel) == 0)
+    vec3 vel_normalized = normalize(p.vel);
+    if (length(p.vel) == 0)
     {
-        vel_normalized = p_vel;
+        vel_normalized = p.vel;
     }
 
     int n_neighbours = 0;
@@ -196,14 +226,15 @@ void update_particle(int i, int j)
                 continue;
 
             Particle neighbour = get_particle(x + i, y + j);
-            vec3 n_offset = vec3(p.pos_x, 0, p.pos_z)
-            - vec3(neighbour.pos_x, 0, neighbour.pos_z);
+            vec3 neighbour_pos = get_position(neighbour);
+            vec3 n_offset = vec3(pos.x, 0, pos.z)
+                - vec3(neighbour_pos.x, 0, neighbour_pos.z);
             float sqr_dist = dot(n_offset, n_offset);
             if (length(n_offset) > 0 && dot(vel_normalized, -normalize(n_offset)) >= 0.1)
             {
 
-                vel += vec3(neighbour.vel_x, 0, neighbour.vel_z);
-                center += vec3(neighbour.pos_x, 0, neighbour.pos_z);
+                vel += vec3(neighbour.vel.x, 0, neighbour.vel.z);
+                center += vec3(neighbour_pos[0], 0, neighbour_pos[2]);
 
 
 
@@ -222,7 +253,7 @@ void update_particle(int i, int j)
     }
 
     // Cohesion: point velocity towards center of group
-    const vec3 v_cohesion = 0.1 * (center - vec3(p.pos_x, 0, p.pos_z));
+    const vec3 v_cohesion = 0.1 * (center - vec3(pos.x, 0, pos.z));
 
     // Separation: avoid flockmates which are too close
     const vec3 v_separation = 10 * separation;
@@ -231,25 +262,27 @@ void update_particle(int i, int j)
     const vec3 v_alignment = 1 * vel;
 
     vec3 acceleration = {0.0, 0.0, 0.0};
-    vec2 randDir = randVec(vec2(p.pos_x, p.pos_y)) * 0.1;
-    acceleration += (1.5*v_alignment + 1*v_cohesion) * int(n_neighbours > 0) + 1*v_separation;
+    vec2 randDir = randVec(vec2(pos.x, pos.y)) * 0.1;
+    acceleration += (1.5*v_alignment + 1*v_cohesion) * int(n_neighbours > 0) + 0.7*v_separation;
     acceleration.xz += randDir * 50.0;
-    acceleration.xz += center_repulsion(vec2(p.pos_x, p.pos_z)) * 10.0f;
-    acceleration.xz += center_attraction(vec2(p.pos_x, p.pos_z), 20) * 0.001;
+    acceleration.xz += center_repulsion(vec2(pos.x, pos.z)) * 10.0f;
+    acceleration.xz += center_attraction(vec2(pos.x, pos.z), 20) * 0.001;
 
-    p_vel += deltatime * acceleration;
-
-    p.vel_x = p_vel.x;
-    p.vel_y = p_vel.y;
-    p.vel_z = p_vel.z;
+    vec3 old_vel = p.vel;
+    p.vel += deltatime * acceleration;
 
     //p = avoid_bounds(p);
     p = limit_speed(p);
 
-    p.pos_x += deltatime * p.vel_x;
-    p.pos_y += 0;
-    p.pos_z += deltatime * p.vel_z;
+    pos.x += deltatime * p.vel.x;
+    pos.y += 0;
+    pos.z += deltatime * p.vel.z;
 
+    p.angle = acos(dot(normalize(old_vel), normalize(p.vel)));
+
+    mat4 translation = translate(vec3(deltatime * p.vel.x, 0.0f, deltatime * p.vel.z));
+
+    p.transform = p.transform * translation;
     write_particle(i, j, p);
 }
 

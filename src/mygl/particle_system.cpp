@@ -20,6 +20,10 @@ namespace mygl
         y = y_pad;
     }
 
+    Vec3 Particle::pos() const {
+        return Vec3{{transform_.data[3], transform_.data[7], transform_.data[11]}};
+    }
+
     ParticleSystem::ParticleSystem(size_t N)
         : N_(N)
     {
@@ -44,7 +48,7 @@ namespace mygl
 
         init_particles();
 
-        auto vertex_attribs = std::vector<GLuint>{0, 1, 2, 3, 4, 5};
+        auto vertex_attribs = std::vector<GLuint>{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 
         glGenVertexArrays(1, &vao_);gl_err()
         glBindVertexArray(vao_);gl_err()
@@ -66,16 +70,16 @@ namespace mygl
         ssbo_a_ = instance_vertex_buffer_id_a;
         ssbo_b_ = instance_vertex_buffer_id_b;
 
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, instance_vertex_buffer_id_a);gl_err();
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_a_);gl_err();
         glBufferData(GL_SHADER_STORAGE_BUFFER, particles_a_.size() * sizeof(mygl::Particle), particles_a_.data(), GL_STATIC_DRAW);gl_err();
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, instance_vertex_buffer_id_a);
 
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, instance_vertex_buffer_id_b);gl_err();
-        glBufferData(GL_SHADER_STORAGE_BUFFER, particles_b_.size() * sizeof(mygl::Particle), particles_b_.data(), GL_STATIC_DRAW);gl_err();
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, instance_vertex_buffer_id_b);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_b_);gl_err();
+        glBufferData(GL_SHADER_STORAGE_BUFFER, particles_b_.size() * sizeof(mygl::Particle), particles_b_.data(), GL_STATIC_DRAW);gl_err();gl_err();
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, instance_vertex_buffer_id_b);gl_err();
 
 
-        glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_id);
+        glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_id);gl_err();
         //positions
         glVertexAttribPointer(vertex_attribs[0], 3, GL_FLOAT, GL_FALSE, sizeof(mygl::Vertex), (void *)(offsetof(mygl::Vertex, pos)));gl_err();
         glEnableVertexAttribArray(vertex_attribs[0]);gl_err();
@@ -92,18 +96,62 @@ namespace mygl
         glVertexAttribPointer(vertex_attribs[3], 3, GL_FLOAT, GL_FALSE, sizeof(mygl::Vertex), (void *)(offsetof(mygl::Vertex, tangent)));gl_err();
         glEnableVertexAttribArray(vertex_attribs[3]);gl_err();
 
+        auto vec4_size = sizeof(mygl::Vec4);
+
+        // Instance transform matrix a
         glBindBuffer(GL_ARRAY_BUFFER, instance_vertex_buffer_id_a);
-        glVertexAttribPointer(vertex_attribs[4], 3, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)0);
+        glVertexAttribPointer(vertex_attribs[4], 4, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)0);gl_err();
         glEnableVertexAttribArray(vertex_attribs[4]);gl_err();
-        glVertexAttribDivisor(vertex_attribs[4], 1); // Instanced attribute
-
-        glBindBuffer(GL_ARRAY_BUFFER, instance_vertex_buffer_id_b);
-        glVertexAttribPointer(vertex_attribs[5], 3, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)0);
+        glVertexAttribPointer(vertex_attribs[5], 4, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)(1 * vec4_size));gl_err();
         glEnableVertexAttribArray(vertex_attribs[5]);gl_err();
-        glVertexAttribDivisor(vertex_attribs[5], 1); // Instanced attribute
+        glVertexAttribPointer(vertex_attribs[6], 4, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)(2 * vec4_size));gl_err();
+        glEnableVertexAttribArray(vertex_attribs[6]);gl_err();
+        glVertexAttribPointer(vertex_attribs[7], 4, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)(3 * vec4_size));gl_err();
+        glEnableVertexAttribArray(vertex_attribs[7]);gl_err();
 
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);gl_err()
+        // Instance velocity vector a
+        glVertexAttribPointer(vertex_attribs[8], 3, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)(offsetof(mygl::Particle, velocity_)));gl_err();
+        glEnableVertexAttribArray(vertex_attribs[8]);gl_err();
+
+        // Instance rotation angle a
+        glVertexAttribPointer(vertex_attribs[9], 1, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)(offsetof(mygl::Particle, angle)));gl_err();
+        glEnableVertexAttribArray(vertex_attribs[9]);gl_err();
+
+        glVertexAttribDivisor(vertex_attribs[4], 1);gl_err();
+        glVertexAttribDivisor(vertex_attribs[5], 1);gl_err();
+        glVertexAttribDivisor(vertex_attribs[6], 1);gl_err();
+        glVertexAttribDivisor(vertex_attribs[7], 1);gl_err();
+        glVertexAttribDivisor(vertex_attribs[8], 1);gl_err();
+        glVertexAttribDivisor(vertex_attribs[9], 1);gl_err();
+
+        // Instance transform matrix b
+        glBindBuffer(GL_ARRAY_BUFFER, instance_vertex_buffer_id_a);
+        glVertexAttribPointer(vertex_attribs[10], 4, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)0);gl_err();
+        glEnableVertexAttribArray(vertex_attribs[10]);gl_err();
+        glVertexAttribPointer(vertex_attribs[11], 4, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)(1 * vec4_size));gl_err();
+        glEnableVertexAttribArray(vertex_attribs[11]);gl_err();
+        glVertexAttribPointer(vertex_attribs[12], 4, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)(2 * vec4_size));gl_err();
+        glEnableVertexAttribArray(vertex_attribs[12]);gl_err();
+        glVertexAttribPointer(vertex_attribs[13], 4, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)(3 * vec4_size));gl_err();
+        glEnableVertexAttribArray(vertex_attribs[13]);gl_err();
+
+        // Instance velocity vector b
+        glVertexAttribPointer(vertex_attribs[14], 3, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)(offsetof(mygl::Particle, velocity_)));gl_err();
+        glEnableVertexAttribArray(vertex_attribs[14]);gl_err();
+
+        // Instance rotation angle b
+        glVertexAttribPointer(vertex_attribs[15], 1, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)(offsetof(mygl::Particle, angle)));gl_err();
+        glEnableVertexAttribArray(vertex_attribs[15]);gl_err();
+
+        glVertexAttribDivisor(vertex_attribs[10], 1);gl_err();
+        glVertexAttribDivisor(vertex_attribs[11], 1);gl_err();
+        glVertexAttribDivisor(vertex_attribs[12], 1);gl_err();
+        glVertexAttribDivisor(vertex_attribs[13], 1);gl_err();
+        glVertexAttribDivisor(vertex_attribs[14], 1);gl_err();
+        glVertexAttribDivisor(vertex_attribs[15], 1);gl_err();
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);gl_err();
+        glBindVertexArray(0);gl_err();
     }
 
     void ParticleSystem::print_ssbo()
@@ -143,7 +191,7 @@ namespace mygl
             for (size_t x = 0; x < N_x_; x++)
             {
                 std::cout
-                    << "[" << buffer[x + grid_width * y].pos_ << "] ";
+                    << "[" << buffer[x + grid_width * y].transform_ << "] ";
                     //<< ":" << buffer[x + grid_width * y].velocity_ << "] ";
             }
             std::cout << "]\n";
@@ -156,6 +204,18 @@ namespace mygl
             {
                 std::cout
                         << "[" << buffer[x + grid_width * y].velocity_ << "] ";
+                        //<< ":" << buffer[x + grid_width * y].velocity_ << "] ";
+            }
+            std::cout << "]\n";
+        }
+        std::cout << "\n\n";
+        for (size_t y = 0; y < N_y_; y++)
+        {
+            std::cout << "[";
+            for (size_t x = 0; x < N_x_; x++)
+            {
+                std::cout
+                        << "[" << buffer[x + grid_width * y].angle << "] ";
                         //<< ":" << buffer[x + grid_width * y].velocity_ << "] ";
             }
             std::cout << "]\n";
@@ -184,27 +244,27 @@ namespace mygl
         {
             for (size_t x = 0; x < N_x_ - 1; x++)
             {
-                if (buffer[(x + 1) + grid_width * y].pos_[0]
-                    < buffer[x + grid_width * y].pos_[0])
+                if (buffer[(x + 1) + grid_width * y].pos()[0]
+                    < buffer[x + grid_width * y].pos()[0])
                 {
                     sorted = false;
                 }
-                else if (buffer[x + grid_width * (y + 1)].pos_[2]
-                    < buffer[x + grid_width * y].pos_[2])
+                else if (buffer[x + grid_width * (y + 1)].pos()[2]
+                    < buffer[x + grid_width * y].pos()[2])
                 {
                     sorted = false;
                 }
-                else if (buffer[(x + 1) + grid_width * y].pos_[0]
-                         == buffer[x + grid_width * y].pos_[0]
-                         && buffer[(x + 1) + grid_width * y].pos_[2]
-                            < buffer[x + grid_width * y].pos_[2])
+                else if (buffer[(x + 1) + grid_width * y].pos()[0]
+                         == buffer[x + grid_width * y].pos()[0]
+                         && buffer[(x + 1) + grid_width * y].pos()[2]
+                            < buffer[x + grid_width * y].pos()[2])
                 {
                     sorted = false;
                 }
-                else if (buffer[x + grid_width * (y + 1)].pos_[2]
-                         == buffer[x + grid_width * y].pos_[2]
-                         && buffer[x + grid_width * (y + 1)].pos_[0]
-                            < buffer[x + grid_width * y].pos_[0])
+                else if (buffer[x + grid_width * (y + 1)].pos()[2]
+                         == buffer[x + grid_width * y].pos()[2]
+                         && buffer[x + grid_width * (y + 1)].pos()[0]
+                            < buffer[x + grid_width * y].pos()[0])
                 {
                     sorted = false;
                 }
@@ -232,9 +292,14 @@ namespace mygl
                 auto pos = grid_center
                    - mygl::Vec3{{grid_length / 2.0f, 0, grid_length / 2.0f}}
                    + mygl::Vec3{{x * offset, 0.0, y * offset}};
+
+                auto transform = mygl::matrix4();
+                transform.translate(pos);
+                transform.rotate(Vec3{{0.0f, 0.0f, 0.0f}});
+                transform = transform.transpose();
                 auto vel = Vec3{{0.0f, 0.0f, 6.0f}};
 
-                auto p = Particle(pos, vel);
+                auto p = Particle(transform, vel);
 
                 particles_a_[x + grid_width * y] = p;
                 particles_b_[x + grid_width * y] = p;
@@ -308,11 +373,8 @@ namespace mygl
         retrieve_ssbo();
         //print_ssbo();
         //std::cout << "===================\n";
-
         // Run display program
         display_prog_->use();
-        auto transform_id = glGetUniformLocation(display_prog_->prog_id(), "model_matrix");gl_err()
-        glUniformMatrix4fv(transform_id, 1, GL_FALSE, particle_mesh_->get_transform().transpose().data.data());gl_err()
         glBindVertexArray(vao_);gl_err()
         glDrawArraysInstanced(GL_TRIANGLES, 0, particle_mesh_->verts.size() * 3, N_);gl_err()
         glBindVertexArray(0);gl_err()

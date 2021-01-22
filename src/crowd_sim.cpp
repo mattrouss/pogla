@@ -19,7 +19,7 @@
 #include "utils/clock.h"
 #include "utils/matrix4.h"
 
-mygl::ParticleSystem particle_system(200u);
+mygl::ParticleSystem particle_system(1000u);
 std::function<void()> light_trajectory_callback;
 std::function<void()> cam_trajectory_callback;
 
@@ -166,7 +166,11 @@ int main(int argc, char **argv)
     init_color_uniform(prog, {{0.6, 0.8, 0.9, 1}});
 
     // Load particle mesh
-    auto mesh = mygl::load_mesh("../meshes/sphere.obj");
+    auto mesh = mygl::load_mesh("../meshes/fish.obj");
+
+    // Load texture
+    auto material = Material(std::make_shared<TextureManager>(), prog, "../textures/fish_uv.tga");
+    material.use();
 
     particle_system.init_system(prog, compute_prog, sort_result->get(),  mesh);
 

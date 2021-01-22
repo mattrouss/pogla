@@ -17,11 +17,14 @@ namespace mygl
     {
     public:
         Particle() = default;
-        Particle(const mygl::Vec3& pos): pos_(pos) {}
-        Particle(const mygl::Vec3& pos, const mygl::Vec3& velocity): pos_(pos), velocity_(velocity) {}
+        Particle(const mygl::matrix4& transform): transform_(transform) {}
+        Particle(const mygl::matrix4& tranform, const mygl::Vec3& velocity): transform_(tranform), velocity_(velocity) {}
 
-        mygl::Vec3 pos_;
+        mygl::matrix4 transform_;
         mygl::Vec3 velocity_;
+        float angle;
+
+        mygl::Vec3 pos() const;
 
     };
 
