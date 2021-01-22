@@ -16,7 +16,7 @@ struct Particle
 {
     mat4 transform;
     vec3 vel;
-    float angle;
+    uint flock;
 };
 
 layout (std430, binding=1) buffer particle_pos_buffer_a
@@ -93,7 +93,7 @@ void write_particle(int i, int j, int k, Particle p)
         + k * gl_WorkGroupSize.x * gl_NumWorkGroups.x * gl_WorkGroupSize.y * gl_NumWorkGroups.y].vel = p.vel;
         particles_b[i
         + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x
-        + k * gl_WorkGroupSize.x * gl_NumWorkGroups.x * gl_WorkGroupSize.y * gl_NumWorkGroups.y].angle = p.angle;
+        + k * gl_WorkGroupSize.x * gl_NumWorkGroups.x * gl_WorkGroupSize.y * gl_NumWorkGroups.y].flock = p.flock;
     }
     else
     {
@@ -105,7 +105,7 @@ void write_particle(int i, int j, int k, Particle p)
         + k * gl_WorkGroupSize.x * gl_NumWorkGroups.x * gl_WorkGroupSize.y * gl_NumWorkGroups.y].vel = p.vel;
         particles_a[i
         + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x
-        + k * gl_WorkGroupSize.x * gl_NumWorkGroups.x * gl_WorkGroupSize.y * gl_NumWorkGroups.y].angle = p.angle;
+        + k * gl_WorkGroupSize.x * gl_NumWorkGroups.x * gl_WorkGroupSize.y * gl_NumWorkGroups.y].flock = p.flock;
     }
 }
 
@@ -250,14 +250,16 @@ void update_particle(int i, int j, int k)
                 float sqr_dist = dot(n_offset, n_offset);
                 if (length(n_offset) > 0 && dot(vel_normalized, -normalize(n_offset)) >= 0.1)
                 {
-
-                    vel += neighbour.vel;
-                    center += neighbour_pos;
+                    if (p.flock == neighbour.flock)
+                    {
+                        vel += neighbour.vel;
+                        center += neighbour_pos;
+                        n_neighbours += 1;
+                    }
 
 
                     //if (sqr_dist < avoid_distance * avoid_distance)
                     separation += normalize(n_offset) * (1 / max(sqr_dist, 0.5));
-                    n_neighbours += 1;
                 }
                 else if (length(n_offset) > 0 && sqr_dist < avoid_distance * avoid_distance)
                 separation += normalize(n_offset) * (1 / max(sqr_dist, 0.5));
@@ -281,10 +283,10 @@ void update_particle(int i, int j, int k)
 
     vec3 acceleration = {0.0, 0.0, 0.0};
     vec3 randDir = randVec(pos) * 0.1;
-    acceleration += (0.3*v_alignment + 0.5*v_cohesion) * int(n_neighbours > 0) + 0.7*v_separation;
+    acceleration += (0.4*v_alignment + 0.6*v_cohesion) * int(n_neighbours > 0) + 0.7*v_separation;
     acceleration += randDir * 50.0;
     acceleration += center_repulsion(pos) * 10.0f;
-    acceleration += center_attraction(pos, 20) * 0.001;
+    acceleration += center_attraction(pos, 20) * 0.0001;
 
     p.vel += deltatime * acceleration;
 

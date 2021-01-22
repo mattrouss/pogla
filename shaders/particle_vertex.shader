@@ -6,10 +6,10 @@ layout(location = 2) in vec2 uv_coord;
 layout(location = 3) in vec3 tangent;
 layout(location = 4) in mat4 transform_a;
 layout(location = 8) in vec3 velocity_a;
-layout(location = 9) in float angle_a;
+layout(location = 9) in uint flock_a;
 layout(location = 10) in mat4 transform_b;
 layout(location = 14) in vec3 velocity_b;
-layout(location = 15) in float angle_b;
+layout(location = 15) in uint flock_b;
 
 uniform vec4 color;
 uniform mat4 view_matrix;// = mat4(
@@ -30,6 +30,7 @@ out vec4 vPos;
 out vec3 normal;
 out vec2 tex_coord;
 out mat3 TBN;
+out uint flock;
 
 mat4 look_at(vec3 forward)
 {
@@ -63,6 +64,7 @@ void main() {
 
     tex_coord = uv_coord;
     vPos = vec4(position, 1.0);
+    flock = flock_a;
 }
 
 

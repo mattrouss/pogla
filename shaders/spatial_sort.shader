@@ -13,7 +13,7 @@ struct Particle
 {
     mat4 transform;
     vec3 vel;
-    float padding;
+    uint flock;
 };
 
 layout (std430, binding=1) buffer particle_pos_buffer_a

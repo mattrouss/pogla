@@ -146,7 +146,7 @@ namespace mygl
         glEnableVertexAttribArray(vertex_attribs[8]);gl_err();
 
         // Instance rotation angle a
-        glVertexAttribPointer(vertex_attribs[9], 1, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)(offsetof(mygl::Particle, angle)));gl_err();
+        glVertexAttribIPointer(vertex_attribs[9], 1, GL_UNSIGNED_INT, sizeof(mygl::Particle), (void *)(offsetof(mygl::Particle, flock_)));gl_err();
         glEnableVertexAttribArray(vertex_attribs[9]);gl_err();
 
         glVertexAttribDivisor(vertex_attribs[4], 1);gl_err();
@@ -172,7 +172,7 @@ namespace mygl
         glEnableVertexAttribArray(vertex_attribs[14]);gl_err();
 
         // Instance rotation angle b
-        glVertexAttribPointer(vertex_attribs[15], 1, GL_FLOAT, GL_FALSE, sizeof(mygl::Particle), (void *)(offsetof(mygl::Particle, angle)));gl_err();
+        glVertexAttribIPointer(vertex_attribs[15], 1, GL_UNSIGNED_INT, sizeof(mygl::Particle), (void *)(offsetof(mygl::Particle, flock_)));gl_err();
         glEnableVertexAttribArray(vertex_attribs[15]);gl_err();
 
         glVertexAttribDivisor(vertex_attribs[10], 1);gl_err();
@@ -241,15 +241,15 @@ namespace mygl
             std::cout << "]\n";
         }
         std::cout << "\n\n";
-        for (size_t y = 0; y < N_y_; y++)
+        for (size_t y = 0; y < N_y_ * N_x_ * N_z_; y++)
         {
             std::cout << "[";
-            for (size_t x = 0; x < N_x_; x++)
-            {
+            //for (size_t x = 0; x < N_x_; x++)
+            //{
                 std::cout
-                        << "[" << buffer[x + grid_width * y].angle << "] ";
+                        << "[" << buffer[y].flock_ << "] ";
                         //<< ":" << buffer[x + grid_width * y].velocity_ << "] ";
-            }
+            //}
             std::cout << "]\n";
         }
     }
@@ -334,7 +334,7 @@ namespace mygl
                     transform = transform.transpose();
                     auto vel = Vec3{{0.0f, 0.0f, 6.0f}};
 
-                    auto p = Particle(transform, vel);
+                    auto p = Particle(transform, vel, (GLuint)(z % 4));
 
                     particles_a_[x + grid_width * y + grid_width * grid_length * z] = p;
                     particles_b_[x + grid_width * y + grid_width * grid_length * z] = p;

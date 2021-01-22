@@ -5,6 +5,7 @@ in vec4 vPos;
 in vec3 normal;
 in vec2 tex_coord;
 in mat3 TBN;
+flat in uint flock;
 
 struct light
 {
@@ -30,6 +31,22 @@ uniform vec4 color;
 uniform int enableBumpMapping;
 
 layout(location=0) out vec4 output_color;
+
+vec4 lut(uint flock)
+{
+    switch (flock)
+    {
+        case 0:
+            return vec4(1);
+        case 1:
+            return vec4(0.8, 1, 1, 1);
+        case 2:
+            return vec4(1, 0.8, 1, 1);
+        case 3:
+            return vec4(1, 1, 0.8, 1);
+    }
+    return vec4(0.8, 0.6, 0.5, 1);
+}
 
 void main() {
     vec3 surface_normal;
@@ -58,6 +75,7 @@ void main() {
 
         output_color += texture2D(tex_sampler, tex_coord) * light;
     }
+    output_color *= lut(flock);
 }
 
 

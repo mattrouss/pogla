@@ -19,10 +19,13 @@ namespace mygl
         Particle() = default;
         Particle(const mygl::matrix4& transform): transform_(transform) {}
         Particle(const mygl::matrix4& tranform, const mygl::Vec3& velocity): transform_(tranform), velocity_(velocity) {}
+        Particle(const mygl::matrix4& tranform, const mygl::Vec3& velocity,
+                GLuint flock): transform_(tranform), velocity_(velocity),
+                    flock_(flock){}
 
         mygl::matrix4 transform_;
         mygl::Vec3 velocity_;
-        float angle;
+        GLuint flock_;
 
         mygl::Vec3 pos() const;
 
