@@ -2,7 +2,7 @@
 
 const uint PARTICLE_NB = 1;
 
-layout (local_size_x = PARTICLE_NB, local_size_y = PARTICLE_NB) in;
+layout (local_size_x = PARTICLE_NB, local_size_y = PARTICLE_NB, local_size_z = PARTICLE_NB) in;
 
 uniform float time;
 uniform float deltatime;
@@ -65,31 +65,47 @@ mat4 translate(vec3 t)
         ));
 }
 
-Particle get_particle(int i, int j)
+Particle get_particle(int i, int j, int k)
 {
     if (parity == 0)
     {
-        return particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x];
+        return particles_a[i
+            + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x
+            + k * gl_WorkGroupSize.x * gl_NumWorkGroups.x * gl_WorkGroupSize.y * gl_NumWorkGroups.y];
     }
     else
     {
-        return particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x];
+        return particles_b[i
+        + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x
+        + k * gl_WorkGroupSize.x * gl_NumWorkGroups.x * gl_WorkGroupSize.y * gl_NumWorkGroups.y];
     }
 }
 
-void write_particle(int i, int j, Particle p)
+void write_particle(int i, int j, int k, Particle p)
 {
     if (parity == 0)
     {
-        particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].transform = p.transform;
-        particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].vel = p.vel;
-        particles_b[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].angle = p.angle;
+        particles_b[i
+        + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x
+        + k * gl_WorkGroupSize.x * gl_NumWorkGroups.x * gl_WorkGroupSize.y * gl_NumWorkGroups.y].transform = p.transform;
+        particles_b[i
+        + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x
+        + k * gl_WorkGroupSize.x * gl_NumWorkGroups.x * gl_WorkGroupSize.y * gl_NumWorkGroups.y].vel = p.vel;
+        particles_b[i
+        + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x
+        + k * gl_WorkGroupSize.x * gl_NumWorkGroups.x * gl_WorkGroupSize.y * gl_NumWorkGroups.y].angle = p.angle;
     }
     else
     {
-        particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].transform = p.transform;
-        particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].vel = p.vel;
-        particles_a[i + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x].angle = p.angle;
+        particles_a[i
+        + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x
+        + k * gl_WorkGroupSize.x * gl_NumWorkGroups.x * gl_WorkGroupSize.y * gl_NumWorkGroups.y].transform = p.transform;
+        particles_a[i
+        + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x
+        + k * gl_WorkGroupSize.x * gl_NumWorkGroups.x * gl_WorkGroupSize.y * gl_NumWorkGroups.y].vel = p.vel;
+        particles_a[i
+        + j * gl_WorkGroupSize.x * gl_NumWorkGroups.x
+        + k * gl_WorkGroupSize.x * gl_NumWorkGroups.x * gl_WorkGroupSize.y * gl_NumWorkGroups.y].angle = p.angle;
     }
 }
 
@@ -128,15 +144,16 @@ Particle limit_bounds(Particle p)
     
 }
 
-float rand(vec2 st, vec2 seed)
+float rand(vec3 st, vec3 seed)
 {
-    return fract(sin(dot(st.xy, seed))*43758.5453123);
+    return fract(sin(dot(st, seed))*43758.5453123);
 }
 
-vec2 randVec(vec2 st)
+vec3 randVec(vec3 st)
 {
-    return (vec2(rand(st, vec2(12.9898, 78.233)),
-        rand(st, vec2(15.5682, 45.2357))) - vec2(0.5,0.5))*2.0;
+    return (vec3(rand(st, vec3(12.9898, 78.233, 52.568)),
+        rand(st, vec3(15.5682, 45.2357, 24.526)),
+        rand(st, vec3(56.235, 95.256, 12.7310))) - vec3(0.5,0.5,0.5))*2.0;
 }
 
 Particle avoid_bounds(Particle p)
@@ -189,21 +206,21 @@ Particle limit_speed(Particle p)
     return p;
 }
 
-vec2 center_repulsion(vec2 position)
+vec3 center_repulsion(vec3 position)
 {
     return normalize(position) / (length(position) * length(position));
 }
 
-vec2 center_attraction(vec2 position, float radius)
+vec3 center_attraction(vec3 position, float radius)
 {
     return int(length(position) > radius)
         * normalize(-position)
         * (length(position) - radius) * (length(position) - radius);
 }
 
-void update_particle(int i, int j)
+void update_particle(int i, int j, int k)
 {
-    Particle p = get_particle(i, j);
+    Particle p = get_particle(i, j, k);
     vec3 pos = get_position(p);
     vec3 p_vel = p.vel;
 
@@ -220,30 +237,31 @@ void update_particle(int i, int j)
     int n_neighbours = 0;
     for (int x = -2 + int(i == 0) + int(i <= 1); x < 3 && x + i < gl_WorkGroupSize.x * gl_NumWorkGroups.x; x++)
     {
-        for (int y = -2 + int(j == 0) + int(i <= 1); y < 3 && y + j < gl_WorkGroupSize.y * gl_NumWorkGroups.y; y++)
+        for (int y = -2 + int(j == 0) + int(j <= 1); y < 3 && y + j < gl_WorkGroupSize.y * gl_NumWorkGroups.y; y++)
         {
-            if (x == 0 && y == 0)
+            for (int z = -2 + int(k == 0) + int(k <= 1); z < 3 && z + k < gl_WorkGroupSize.z * gl_NumWorkGroups.z; z++)
+            {
+                if (x == 0 && y == 0 && z == 0)
                 continue;
 
-            Particle neighbour = get_particle(x + i, y + j);
-            vec3 neighbour_pos = get_position(neighbour);
-            vec3 n_offset = vec3(pos.x, 0, pos.z)
-                - vec3(neighbour_pos.x, 0, neighbour_pos.z);
-            float sqr_dist = dot(n_offset, n_offset);
-            if (length(n_offset) > 0 && dot(vel_normalized, -normalize(n_offset)) >= 0.1)
-            {
+                Particle neighbour = get_particle(x + i, y + j, z + k);
+                vec3 neighbour_pos = get_position(neighbour);
+                vec3 n_offset = pos - neighbour_pos;
+                float sqr_dist = dot(n_offset, n_offset);
+                if (length(n_offset) > 0 && dot(vel_normalized, -normalize(n_offset)) >= 0.1)
+                {
 
-                vel += vec3(neighbour.vel.x, 0, neighbour.vel.z);
-                center += vec3(neighbour_pos[0], 0, neighbour_pos[2]);
-
+                    vel += neighbour.vel;
+                    center += neighbour_pos;
 
 
-                //if (sqr_dist < avoid_distance * avoid_distance)
+                    //if (sqr_dist < avoid_distance * avoid_distance)
                     separation += normalize(n_offset) * (1 / max(sqr_dist, 0.5));
-                n_neighbours += 1;
-            }
-            else if (length(n_offset) > 0 && sqr_dist < avoid_distance * avoid_distance)
+                    n_neighbours += 1;
+                }
+                else if (length(n_offset) > 0 && sqr_dist < avoid_distance * avoid_distance)
                 separation += normalize(n_offset) * (1 / max(sqr_dist, 0.5));
+            }
         }
     }
     if (n_neighbours > 0)
@@ -253,7 +271,7 @@ void update_particle(int i, int j)
     }
 
     // Cohesion: point velocity towards center of group
-    const vec3 v_cohesion = 0.1 * (center - vec3(pos.x, 0, pos.z));
+    const vec3 v_cohesion = 0.1 * (center - pos);
 
     // Separation: avoid flockmates which are too close
     const vec3 v_separation = 10 * separation;
@@ -262,31 +280,27 @@ void update_particle(int i, int j)
     const vec3 v_alignment = 1 * vel;
 
     vec3 acceleration = {0.0, 0.0, 0.0};
-    vec2 randDir = randVec(vec2(pos.x, pos.y)) * 0.1;
-    acceleration += (1.5*v_alignment + 1*v_cohesion) * int(n_neighbours > 0) + 0.7*v_separation;
-    acceleration.xz += randDir * 50.0;
-    acceleration.xz += center_repulsion(vec2(pos.x, pos.z)) * 10.0f;
-    acceleration.xz += center_attraction(vec2(pos.x, pos.z), 20) * 0.001;
+    vec3 randDir = randVec(pos) * 0.1;
+    acceleration += (0.3*v_alignment + 0.5*v_cohesion) * int(n_neighbours > 0) + 0.7*v_separation;
+    acceleration += randDir * 50.0;
+    acceleration += center_repulsion(pos) * 10.0f;
+    acceleration += center_attraction(pos, 20) * 0.001;
 
-    vec3 old_vel = p.vel;
     p.vel += deltatime * acceleration;
 
     //p = avoid_bounds(p);
     p = limit_speed(p);
 
-    pos.x += deltatime * p.vel.x;
-    pos.y += 0;
-    pos.z += deltatime * p.vel.z;
+    pos += deltatime * p.vel;
 
-    p.angle = acos(dot(normalize(old_vel), normalize(p.vel)));
-
-    mat4 translation = translate(vec3(deltatime * p.vel.x, 0.0f, deltatime * p.vel.z));
+    mat4 translation = translate(deltatime * p.vel);
 
     p.transform = p.transform * translation;
-    write_particle(i, j, p);
+    write_particle(i, j, k, p);
 }
 
 void main()
 {
-    update_particle(int(gl_GlobalInvocationID.x), int(gl_GlobalInvocationID.y));
+    update_particle(int(gl_GlobalInvocationID.x), int(gl_GlobalInvocationID.y),
+        int(gl_GlobalInvocationID.z));
 }
