@@ -58,6 +58,7 @@ namespace mygl
         size_t N_;
         size_t N_x_;
         size_t N_y_;
+        size_t N_z_;
         std::shared_ptr<mygl::mesh> particle_mesh_;
 
         std::vector<mygl::Particle> particles_a_;

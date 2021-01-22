@@ -1,4 +1,7 @@
 #include <iomanip>
+#include <climits>
+#include <algorithm>
+#include <cmath>
 #include "particle_system.h"
 
 namespace mygl
@@ -14,10 +17,39 @@ namespace mygl
                 best = result;
             }
         }
-        int x_pad = best + (4 - best%4);
-        int y_pad = N/best + (4 - (N/best)%4);
+        int x_pad = best + (1 - best%1);
+        int y_pad = N/best + (1 - (N/best)%1);
         x = x_pad;
         y = y_pad;
+    }
+
+    static void compute_workgroup_xyz(const size_t N, size_t& x, size_t& y, size_t& z)
+    {
+        size_t result_x = N/2 - 1;
+        size_t best_x = N;
+        size_t best_y = N;
+        size_t best_N = INT_MAX;
+        for (; result_x >= 2; result_x--)
+        {
+            for (size_t result_y = N/2 - 1; result_y >= 2; result_y--)
+            {
+                size_t result_n = result_x * result_y * (N / (result_x * result_y));
+                if (N % result_x == 0 && N % result_y == 0 &&
+                    //result_x + result_y + N / (result_x * result_y)
+                    //    < best_x + best_y + N / (best_x * best_y) &&
+                    std::abs((long long int)(result_n - N)) <= best_N
+                    && std::max(result_x, std::max(result_y, N / (result_x * result_y)))
+                       < std::max(best_x, std::max(best_y, N / (best_x * best_y))))
+                {
+                    best_x = result_x;
+                    best_y = result_y;
+                    best_N = std::abs((long long int)(result_n - N));
+                }
+            }
+        }
+        x = best_x;
+        y = best_y;
+        z = N / (best_x * best_y);
     }
 
     Vec3 Particle::pos() const {
@@ -27,8 +59,8 @@ namespace mygl
     ParticleSystem::ParticleSystem(size_t N)
         : N_(N)
     {
-        compute_workgroup_xy(N, N_x_, N_y_);
-        N_ = N_x_ * N_y_;
+        compute_workgroup_xyz(N, N_x_, N_y_, N_z_);
+        N_ = N_x_ * N_y_ * N_z_;
     }
 
     void ParticleSystem::init_system(mygl::Program* display_prog, mygl::Program* compute_prog, std::shared_ptr<mygl::mesh> mesh)
@@ -284,25 +316,29 @@ namespace mygl
         float offset = 5.0f;
 
         size_t grid_width = N_x_;
-        size_t grid_length = offset * (grid_width - 1);
+        size_t grid_length = N_y_;
+        size_t grid_height = offset * (grid_width - 1);
         for (auto y = 0u; y < N_y_; ++y)
         {
             for (auto x = 0u; x < N_x_;++x)
             {
-                auto pos = grid_center
-                   - mygl::Vec3{{grid_length / 2.0f, 0, grid_length / 2.0f}}
-                   + mygl::Vec3{{x * offset, 0.0, y * offset}};
+                for (auto z = 0u; z < N_z_; z++)
+                {
+                    auto pos = grid_center
+                               - mygl::Vec3{{grid_height / 2.0f, grid_height / 2.0f, grid_height / 2.0f}}
+                               + mygl::Vec3{{x * offset, z * offset, y * offset}};
 
-                auto transform = mygl::matrix4();
-                transform.translate(pos);
-                transform.rotate(Vec3{{0.0f, 0.0f, 0.0f}});
-                transform = transform.transpose();
-                auto vel = Vec3{{0.0f, 0.0f, 6.0f}};
+                    auto transform = mygl::matrix4();
+                    transform.translate(pos);
+                    transform.rotate(Vec3{{0.0f, 0.0f, 0.0f}});
+                    transform = transform.transpose();
+                    auto vel = Vec3{{0.0f, 0.0f, 6.0f}};
 
-                auto p = Particle(transform, vel);
+                    auto p = Particle(transform, vel);
 
-                particles_a_[x + grid_width * y] = p;
-                particles_b_[x + grid_width * y] = p;
+                    particles_a_[x + grid_width * y + grid_width * grid_length * z] = p;
+                    particles_b_[x + grid_width * y + grid_width * grid_length * z] = p;
+                }
             }
         }
     }
@@ -321,31 +357,39 @@ namespace mygl
             step_id = glGetUniformLocation(sort_prog_->prog_id(), "sortStep");gl_err();
 
             //std::cout << "====================\n";
-            do
-            {
+            //do
+            //{
                 //std::cout << "Execute sort.\n";
                 glBindVertexArray(vao_);
                 gl_err()
                 glUniform1ui(step_id, 0);gl_err();
-                glDispatchCompute(N_x_, N_y_, 1);
+                glDispatchCompute(N_x_, N_y_, N_z_);
                 gl_err();
                 glUniform1ui(step_id, 1);gl_err();
                 glMemoryBarrier(GL_ALL_BARRIER_BITS);
-                glDispatchCompute(N_x_, N_y_, 1);
+                glDispatchCompute(N_x_, N_y_, N_z_);
                 gl_err();
                 glUniform1ui(step_id, 2);gl_err();
                 glMemoryBarrier(GL_ALL_BARRIER_BITS);
-                glDispatchCompute(N_x_, N_y_, 1);
+                glDispatchCompute(N_x_, N_y_, N_z_);
                 gl_err();
                 glUniform1ui(step_id, 3);gl_err();
                 glMemoryBarrier(GL_ALL_BARRIER_BITS);
-                glDispatchCompute(N_x_, N_y_, 1);
+                glDispatchCompute(N_x_, N_y_, N_z_);
+                gl_err();
+                glUniform1ui(step_id, 4);gl_err();
+                glMemoryBarrier(GL_ALL_BARRIER_BITS);
+                glDispatchCompute(N_x_, N_y_, N_z_);
+                gl_err();
+                glUniform1ui(step_id, 5);gl_err();
+                glMemoryBarrier(GL_ALL_BARRIER_BITS);
+                glDispatchCompute(N_x_, N_y_, N_z_);
                 gl_err();
                 glMemoryBarrier(GL_ALL_BARRIER_BITS);
-                if (N_x_ * N_y_ <= 1000)
-                    retrieve_ssbo();
+                //if (N_x_ * N_y_ <= 1000)
+                //    retrieve_ssbo();
                 //print_ssbo();
-            } while (N_x_ * N_y_ <= 1000 and not check_sorted(iteration_parity == 0 ? particles_a_ : particles_b_));
+            //} while (N_x_ * N_y_ <= 1000 and not check_sorted(iteration_parity == 0 ? particles_a_ : particles_b_));
             glBindVertexArray(0);
             gl_err();
             //print_ssbo();
@@ -366,7 +410,7 @@ namespace mygl
         iteration_parity = (iteration_parity + 1) % 2;
 
         glBindVertexArray(vao_);gl_err();
-        glDispatchCompute(N_x_, N_y_, 1);gl_err();
+        glDispatchCompute(N_x_, N_y_, N_z_);gl_err();
         glMemoryBarrier(GL_ALL_BARRIER_BITS);
         glBindVertexArray(0);gl_err();
 

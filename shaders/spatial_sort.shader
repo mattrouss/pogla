@@ -31,6 +31,12 @@ vec3 get_position(Particle p)
     return vec3(p.transform[3][0], p.transform[3][1], p.transform[3][2]);
 }
 
+bool check_horizontal(vec3 pos_a, vec3 pos_b)
+{
+    return pos_a.x > pos_b.x || (pos_a.x == pos_b.x && pos_a.z > pos_b.z)
+        || (pos_a.x == pos_b.x && pos_a.z <= pos_b.z && pos_a.y > pos_b.y);
+}
+
 void swap_horizontal(uint i_a, uint i_b)
 {
     Particle tmp;
@@ -38,7 +44,7 @@ void swap_horizontal(uint i_a, uint i_b)
     {
         vec3 pos_a = get_position(particles_a[i_a]);
         vec3 pos_b = get_position(particles_a[i_b]);
-        if (pos_a.x > pos_b.x || (pos_a.x == pos_b.x && pos_a.z > pos_b.z))
+        if (check_horizontal(pos_a, pos_b))
         {
             tmp = particles_a[i_a];
             particles_a[i_a] = particles_a[i_b];
@@ -48,7 +54,7 @@ void swap_horizontal(uint i_a, uint i_b)
     } else {
         vec3 pos_a = get_position(particles_b[i_a]);
         vec3 pos_b = get_position(particles_b[i_b]);
-        if (pos_a.x > pos_b.x || (pos_a.x == pos_b.x && pos_a.z > pos_b.z))
+        if (check_horizontal(pos_a, pos_b))
         {
             tmp = particles_b[i_a];
             particles_b[i_a] = particles_b[i_b];
@@ -58,6 +64,12 @@ void swap_horizontal(uint i_a, uint i_b)
     }
 }
 
+bool check_vertical(vec3 pos_a, vec3 pos_b)
+{
+    return pos_a.z > pos_b.z || (pos_a.z == pos_b.z && pos_a.y > pos_b.y)
+        || (pos_a.z == pos_b.z && pos_a.y <= pos_b.y && pos_a.x > pos_b.x);
+}
+
 void swap_vertical(uint i_a, uint i_b)
 {
     Particle tmp;
@@ -65,7 +77,7 @@ void swap_vertical(uint i_a, uint i_b)
     {
         vec3 pos_a = get_position(particles_a[i_a]);
         vec3 pos_b = get_position(particles_a[i_b]);
-        if (pos_a.z > pos_b.z || (pos_a.z == pos_b.z && pos_a.x > pos_b.x))
+        if (check_vertical(pos_a, pos_b))
         {
             tmp = particles_a[i_a];
             particles_a[i_a] = particles_a[i_b];
@@ -75,7 +87,40 @@ void swap_vertical(uint i_a, uint i_b)
     } else {
         vec3 pos_a = get_position(particles_b[i_a]);
         vec3 pos_b = get_position(particles_b[i_b]);
-        if (pos_a.z > pos_b.z || (pos_a.z == pos_b.z && pos_a.x > pos_b.x))
+        if (check_vertical(pos_a, pos_b))
+        {
+            tmp = particles_b[i_a];
+            particles_b[i_a] = particles_b[i_b];
+            //particles_a[i_a].pos_y = i_b;
+            particles_b[i_b] = tmp;
+        }
+    }
+}
+
+bool check_depth(vec3 pos_a, vec3 pos_b)
+{
+    return pos_a.y > pos_b.y || (pos_a.y == pos_b.y && pos_a.x > pos_b.x)
+        || (pos_a.y == pos_b.y && pos_a.x <= pos_b.x && pos_a.z > pos_b.z);
+}
+
+void swap_depth(uint i_a, uint i_b)
+{
+    Particle tmp;
+    if (parity == 0)
+    {
+        vec3 pos_a = get_position(particles_a[i_a]);
+        vec3 pos_b = get_position(particles_a[i_b]);
+        if (check_depth(pos_a, pos_b))
+        {
+            tmp = particles_a[i_a];
+            particles_a[i_a] = particles_a[i_b];
+            //particles_a[i_a].pos_y = i_b;
+            particles_a[i_b] = tmp;
+        }
+    } else {
+        vec3 pos_a = get_position(particles_b[i_a]);
+        vec3 pos_b = get_position(particles_b[i_b]);
+        if (check_depth(pos_a, pos_b))
         {
             tmp = particles_b[i_a];
             particles_b[i_a] = particles_b[i_b];
@@ -121,6 +166,26 @@ void main()
     && gl_GlobalInvocationID.y < gl_WorkGroupSize.y * gl_NumWorkGroups.y - 1))
     {
         swap_vertical(i_a, i_b);
+        //if (parity == 0)
+        //particles_a[i_a].pos_y = i_b;
+        //else
+        //particles_b[i_a].pos_y = i_b;
+    }
+    i_b = i_a + gl_WorkGroupSize.x * gl_NumWorkGroups.x
+        * gl_WorkGroupSize.y * gl_NumWorkGroups.y;
+    if (sortStep == 4 && (gl_GlobalInvocationID.z % 2 == 0
+    && gl_GlobalInvocationID.z < gl_WorkGroupSize.z * gl_NumWorkGroups.z - 1))
+    {
+        swap_depth(i_a, i_b);
+        //if (parity == 0)
+        //particles_a[i_a].pos_y = i_b;
+        //else
+        //particles_b[i_a].pos_y = i_b;
+    }
+    if (sortStep == 5 && (gl_GlobalInvocationID.z % 2 != 0
+    && gl_GlobalInvocationID.z < gl_WorkGroupSize.z * gl_NumWorkGroups.z - 1))
+    {
+        swap_depth(i_a, i_b);
         //if (parity == 0)
         //particles_a[i_a].pos_y = i_b;
         //else
