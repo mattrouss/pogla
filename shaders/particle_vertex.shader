@@ -31,29 +31,23 @@ out vec3 normal;
 out vec2 tex_coord;
 out mat3 TBN;
 
-mat4 rot_y(float angle)
+mat4 look_at(vec3 forward)
 {
-    float cos_a = cos(angle);
-    float sin_a = sin(angle);
-    return transpose(mat4(
-        cos_a, 0, sin_a, 0,
-             0, 1,     0, 0,
-        -sin_a, 0, cos_a, 0,
-             0, 0,     0, 1
-            ));
-}
-
-void main() {
-    vec3 f = normalize(velocity_a);
+    vec3 f = normalize(forward);
     vec3 l = normalize(cross(vec3(0, 1, 0), f));
     vec3 u = cross(f, l);
 
-    mat4 rot = mat4(
+    return mat4(
          l[0],  l[1],  l[2], 0,
          u[0],  u[1],  u[2], 0,
         f[0], f[1], f[2], 0,
             0,     0,     0, 1
         );
+
+}
+
+void main() {
+    mat4 rot = look_at(velocity_a);
     gl_Position = projection_matrix * view_matrix * transform_a * rot * vec4(position, 1.0);
     vColor = color;
     normal = (rot * vec4(normals, 1.0)).xyz;

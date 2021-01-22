@@ -263,7 +263,7 @@ void update_particle(int i, int j)
 
     vec3 acceleration = {0.0, 0.0, 0.0};
     vec2 randDir = randVec(vec2(pos.x, pos.y)) * 0.1;
-    acceleration += (1.5*v_alignment + 1*v_cohesion) * int(n_neighbours > 0) + 1*v_separation;
+    acceleration += (1.5*v_alignment + 1*v_cohesion) * int(n_neighbours > 0) + 0.7*v_separation;
     acceleration.xz += randDir * 50.0;
     acceleration.xz += center_repulsion(vec2(pos.x, pos.z)) * 10.0f;
     acceleration.xz += center_attraction(vec2(pos.x, pos.z), 20) * 0.001;

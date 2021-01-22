@@ -56,7 +56,7 @@ void main() {
             light = vec4(lights[i].color, 1.0) * clamp(dot(surface_normal, dir), 0, 1) * intensity;
         }
 
-        output_color += color * light;
+        output_color += texture2D(tex_sampler, tex_coord) * light;
     }
 }
 
