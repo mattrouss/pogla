@@ -44,10 +44,19 @@ mat4 rot_y(float angle)
 }
 
 void main() {
-    mat4 rot = rot_y(angle_a);
-    gl_Position = projection_matrix * view_matrix * rot * transform_a * vec4(position, 1.0);
+    vec3 f = normalize(velocity_a);
+    vec3 l = normalize(cross(vec3(0, 1, 0), f));
+    vec3 u = cross(f, l);
+
+    mat4 rot = mat4(
+         l[0],  l[1],  l[2], 0,
+         u[0],  u[1],  u[2], 0,
+        f[0], f[1], f[2], 0,
+            0,     0,     0, 1
+        );
+    gl_Position = projection_matrix * view_matrix * transform_a * rot * vec4(position, 1.0);
     vColor = color;
-    normal = normals;
+    normal = (rot * vec4(normals, 1.0)).xyz;
 
     if (enableBumpMapping == 1) {
         vec3 bitangent = normalize(cross(tangent, normal));
