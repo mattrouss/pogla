@@ -38,7 +38,7 @@ public:
     mygl::matrix4 get_projection_matrix() const;
 
     void set_prog_proj(mygl::Program* p) const;
-    void set_prog(mygl::Program* p);
+    void add_prog(mygl::Program* p);
 
 private:
     mygl::matrix4 projection;
@@ -48,7 +48,7 @@ private:
     mygl::Vec3 left;
     mygl::Vec3 forward;
 
-    mygl::Program* prog = nullptr;
+    std::vector<mygl::Program*> progs;
 };
 
 

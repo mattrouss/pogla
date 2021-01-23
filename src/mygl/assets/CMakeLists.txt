@@ -8,6 +8,9 @@ set(assets_src_files
     # Camera
     camera.cpp camera.h
     cameratracking.cpp cameratracking.h
+
+    # Skybox
+    skybox.cpp skybox.h
 )
 
 add_library(assets ${assets_src_files})

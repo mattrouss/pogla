@@ -345,6 +345,7 @@ namespace mygl
 
     void ParticleSystem::render(float deltatime)
     {
+        glBindVertexArray(vao_);
         GLint parity_id;
         if (sort_prog_ != nullptr)
         {

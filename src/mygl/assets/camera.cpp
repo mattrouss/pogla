@@ -29,7 +29,8 @@ void Camera::translate(const mygl::Vec3 v)
 
     set_pos(pos + (translation * cam_speed * mainClock.deltatime()), true);
 
-    set_prog_proj(prog);
+    for(auto* p: progs)
+        set_prog_proj(p);
 }
 
 void Camera::translate_local(const mygl::Vec3 v)
@@ -38,7 +39,8 @@ void Camera::translate_local(const mygl::Vec3 v)
     auto translation = v[0] * left + v[1] * up  + v[2] * forward;
     set_pos(pos + (translation * mainClock.deltatime()), true);
 
-    set_prog_proj(prog);
+    for(auto* p: progs)
+        set_prog_proj(p);
 }
 
 void Camera::set_pos(const mygl::Vec3 v, bool update)
@@ -47,7 +49,8 @@ void Camera::set_pos(const mygl::Vec3 v, bool update)
     pos = v;
     if (update)//a bit dirty but does the trick for now
         look_at(pos, {{0,0,0}}, {{0,1,0}}, true);
-    set_prog_proj(prog);
+    for(auto* p: progs)
+        set_prog_proj(p);
 }
 
 mygl::matrix4 Camera::get_view_matrix() const
@@ -62,6 +65,7 @@ mygl::matrix4 Camera::get_projection_matrix() const
 
 void Camera::set_prog_proj(mygl::Program *p) const
 {
+    p->use();
     GLint mat_proj_id;
     GLint mat_obj_id;
 
@@ -76,9 +80,9 @@ void Camera::rotate(mygl::Vec3 rotation)
     this->projection.rotate(rotation);
 }
 
-void Camera::set_prog(mygl::Program* p)
+void Camera::add_prog(mygl::Program* p)
 {
-    prog = p;
+    progs.push_back(p);
 }
 
 void Camera::set_pos(const mygl::Vec3 p)
@@ -90,12 +94,14 @@ void Camera::set_rot(mygl::Vec3 r)
 {
     r = -1 * r; //on the camera we need to invert the view matrix
     projection.set_rot(r);
-    set_prog_proj(prog);
+    for(auto* p: progs)
+        set_prog_proj(p);
 }
 
 void Camera::update()
 {
-    set_prog_proj(prog);
+    for(auto* p: progs)
+        set_prog_proj(p);
 }
 
 mygl::Vec3 Camera::get_pos()

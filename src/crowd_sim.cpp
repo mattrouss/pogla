@@ -9,6 +9,7 @@
 #include "assets/scene.h"
 #include "mygl/assets/mesh.h"
 #include "assets/cameratracking.h"
+#include "assets/skybox.h"
 
 #include "mygl/particle_system.h"
 #include "mygl/basicmovable.h"
@@ -20,6 +21,7 @@
 #include "utils/matrix4.h"
 
 mygl::ParticleSystem particle_system(1000u);
+mygl::Skybox skybox;
 std::function<void()> light_trajectory_callback;
 std::function<void()> cam_trajectory_callback;
 
@@ -29,6 +31,7 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);gl_err();
 
     particle_system.render(mainClock.deltatime());
+    skybox.render(mainClock.deltatime());
 
     glutSwapBuffers();
     inputManager.send_mouse_input();
@@ -121,12 +124,19 @@ int main(int argc, char **argv)
     std::string v_shader = "../shaders/particle_vertex.shader";
     std::string f_shader = "../shaders/particle_fragment.shader";
 
+    std::string skybox_v_shader = "../shaders/skybox_vertex.shader";
+    std::string skybox_f_shader = "../shaders/skybox_fragment.shader";
+
     std::string c_shader = "../shaders/boids.shader";
     std::string sort_shader = "../shaders/spatial_sort.shader";
 
     auto prog_builder = mygl::ProgramBuilder{};
     prog_builder.add_shader(
             mygl::shaders::DisplayShadersBase{v_shader, f_shader}
+            );
+    auto skybox_prog_builder = mygl::ProgramBuilder{};
+    skybox_prog_builder.add_shader(
+            mygl::shaders::DisplayShadersBase{skybox_v_shader, skybox_f_shader}
             );
     auto compute_prog_builder = mygl::ProgramBuilder{};
     compute_prog_builder.add_shader(
@@ -137,21 +147,24 @@ int main(int argc, char **argv)
             mygl::shaders::ComputeShader{sort_shader}
     );
     auto prog_result = prog_builder.build();
+    auto skybox_result = skybox_prog_builder.build();
     auto compute_result = compute_prog_builder.build();
     auto sort_result = sort_prog_builder.build();
-    if (prog_result == std::nullopt || compute_result == std::nullopt
+    if (prog_result == std::nullopt || skybox_result == std::nullopt
+        || compute_result == std::nullopt
         || sort_result == std::nullopt)
     {
         std::cout << "Shader compilation failed.\n";
         return 1;
     }
     auto prog = prog_result->get();
+    auto skybox_prog = skybox_result->get();
     auto compute_prog = compute_result->get();
     prog->use();
 
     //init camera
     auto cam = std::make_shared<Camera>(-1, 1, -1, 1, 5, 2000);
-    cam->set_prog(prog);
+    cam->add_prog(prog);
     cam->look_at({{0, 0, 10}}, {{0, 0, 0}}, {{0, 1, 0}});
 
     cam->set_prog_proj(prog);
@@ -164,6 +177,13 @@ int main(int argc, char **argv)
     lights.set_lights_uniform(prog);
 
     init_color_uniform(prog, {{0.6, 0.8, 0.9, 1}});
+
+    // Setup skybox program
+    skybox_prog->use();
+    skybox.init_skybox(skybox_prog, "../textures/skybox");
+
+    cam->add_prog(skybox_prog);
+    cam->set_prog_proj(skybox_prog);
 
     // Load particle mesh
     auto mesh = mygl::load_mesh("../meshes/fish.obj");
