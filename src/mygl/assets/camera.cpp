@@ -65,6 +65,7 @@ mygl::matrix4 Camera::get_projection_matrix() const
 
 void Camera::set_prog_proj(mygl::Program *p) const
 {
+    p->use();
     GLint mat_proj_id;
     GLint mat_obj_id;
 

@@ -30,7 +30,7 @@ void display()
     glClearColor(0.95f, 0.93f, 0.9f, 1.0f) ;
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);gl_err();
 
-    //particle_system.render(mainClock.deltatime());
+    particle_system.render(mainClock.deltatime());
     skybox.render(mainClock.deltatime());
 
     glutSwapBuffers();
@@ -94,7 +94,6 @@ bool init_gl()
     glEnable(GL_DEPTH_TEST);gl_err();
     glDepthFunc(GL_LESS);gl_err();
     glDepthRange(0.0, 1.0);gl_err();
-    glDepthMask(GL_FALSE);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);gl_err();
     glEnable(GL_CULL_FACE);gl_err();
     glCullFace(GL_FRONT);gl_err();
@@ -184,7 +183,7 @@ int main(int argc, char **argv)
     skybox.init_skybox(skybox_prog, "../textures/skybox");
 
     cam->add_prog(skybox_prog);
-    cam->set_prog_proj(prog);
+    cam->set_prog_proj(skybox_prog);
 
     // Load particle mesh
     auto mesh = mygl::load_mesh("../meshes/fish.obj");

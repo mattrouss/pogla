@@ -7,49 +7,51 @@ namespace mygl
         prog_ = prog;
         texture_manager_ = TextureManager();
         texture_manager_.load_cubemap(cubemap_path);
+        prog_->use();
 
+        float skybox_size = 100.f;
         verts_ = std::vector<mygl::Vec3>{
-            Vec3{{ -1.0f,  1.0f, -1.0f }},
-            Vec3{{ -1.0f, -1.0f, -1.0f }},
-            Vec3{{  1.0f, -1.0f, -1.0f }},
-            Vec3{{  1.0f, -1.0f, -1.0f }},
-            Vec3{{  1.0f,  1.0f, -1.0f }},
-            Vec3{{ -1.0f,  1.0f, -1.0f }},
+            skybox_size * Vec3{{ -1.0f,  1.0f, -1.0f }},
+            skybox_size * Vec3{{ -1.0f, -1.0f, -1.0f }},
+            skybox_size * Vec3{{  1.0f, -1.0f, -1.0f }},
+            skybox_size * Vec3{{  1.0f, -1.0f, -1.0f }},
+            skybox_size * Vec3{{  1.0f,  1.0f, -1.0f }},
+            skybox_size * Vec3{{ -1.0f,  1.0f, -1.0f }},
 
-            Vec3{{ -1.0f, -1.0f,  1.0f }},
-            Vec3{{ -1.0f, -1.0f, -1.0f }},
-            Vec3{{ -1.0f,  1.0f, -1.0f }},
-            Vec3{{ -1.0f,  1.0f, -1.0f }},
-            Vec3{{ -1.0f,  1.0f,  1.0f }},
-            Vec3{{ -1.0f, -1.0f,  1.0f }},
+            skybox_size * Vec3{{ -1.0f, -1.0f,  1.0f }},
+            skybox_size * Vec3{{ -1.0f, -1.0f, -1.0f }},
+            skybox_size * Vec3{{ -1.0f,  1.0f, -1.0f }},
+            skybox_size * Vec3{{ -1.0f,  1.0f, -1.0f }},
+            skybox_size * Vec3{{ -1.0f,  1.0f,  1.0f }},
+            skybox_size * Vec3{{ -1.0f, -1.0f,  1.0f }},
 
-            Vec3{{  1.0f, -1.0f, -1.0f }},
-            Vec3{{  1.0f, -1.0f,  1.0f }},
-            Vec3{{  1.0f,  1.0f,  1.0f }},
-            Vec3{{  1.0f,  1.0f,  1.0f }},
-            Vec3{{  1.0f,  1.0f, -1.0f }},
-            Vec3{{  1.0f, -1.0f, -1.0f }},
+            skybox_size * Vec3{{  1.0f, -1.0f, -1.0f }},
+            skybox_size * Vec3{{  1.0f, -1.0f,  1.0f }},
+            skybox_size * Vec3{{  1.0f,  1.0f,  1.0f }},
+            skybox_size * Vec3{{  1.0f,  1.0f,  1.0f }},
+            skybox_size * Vec3{{  1.0f,  1.0f, -1.0f }},
+            skybox_size * Vec3{{  1.0f, -1.0f, -1.0f }},
 
-            Vec3{{ -1.0f, -1.0f,  1.0f }},
-            Vec3{{ -1.0f,  1.0f,  1.0f }},
-            Vec3{{  1.0f,  1.0f,  1.0f }},
-            Vec3{{  1.0f,  1.0f,  1.0f }},
-            Vec3{{  1.0f, -1.0f,  1.0f }},
-            Vec3{{ -1.0f, -1.0f,  1.0f }},
+            skybox_size * Vec3{{ -1.0f, -1.0f,  1.0f }},
+            skybox_size * Vec3{{ -1.0f,  1.0f,  1.0f }},
+            skybox_size * Vec3{{  1.0f,  1.0f,  1.0f }},
+            skybox_size * Vec3{{  1.0f,  1.0f,  1.0f }},
+            skybox_size * Vec3{{  1.0f, -1.0f,  1.0f }},
+            skybox_size * Vec3{{ -1.0f, -1.0f,  1.0f }},
 
-            Vec3{{ -1.0f,  1.0f, -1.0f }},
-            Vec3{{  1.0f,  1.0f, -1.0f }},
-            Vec3{{  1.0f,  1.0f,  1.0f }},
-            Vec3{{  1.0f,  1.0f,  1.0f }},
-            Vec3{{ -1.0f,  1.0f,  1.0f }},
-            Vec3{{ -1.0f,  1.0f, -1.0f }},
+            skybox_size * Vec3{{ -1.0f,  1.0f, -1.0f }},
+            skybox_size * Vec3{{  1.0f,  1.0f, -1.0f }},
+            skybox_size * Vec3{{  1.0f,  1.0f,  1.0f }},
+            skybox_size * Vec3{{  1.0f,  1.0f,  1.0f }},
+            skybox_size * Vec3{{ -1.0f,  1.0f,  1.0f }},
+            skybox_size * Vec3{{ -1.0f,  1.0f, -1.0f }},
 
-            Vec3{{ -1.0f, -1.0f, -1.0f }},
-            Vec3{{ -1.0f, -1.0f,  1.0f }},
-            Vec3{{  1.0f, -1.0f, -1.0f }},
-            Vec3{{  1.0f, -1.0f, -1.0f }},
-            Vec3{{ -1.0f, -1.0f,  1.0f }},
-            Vec3{{  1.0f, -1.0f,  1.0f }}
+            skybox_size * Vec3{{ -1.0f, -1.0f, -1.0f }},
+            skybox_size * Vec3{{ -1.0f, -1.0f,  1.0f }},
+            skybox_size * Vec3{{  1.0f, -1.0f, -1.0f }},
+            skybox_size * Vec3{{  1.0f, -1.0f, -1.0f }},
+            skybox_size * Vec3{{ -1.0f, -1.0f,  1.0f }},
+            skybox_size * Vec3{{  1.0f, -1.0f,  1.0f }}
         };
         
         glGenVertexArrays(1, &vao_);gl_err()
@@ -71,6 +73,7 @@ namespace mygl
 
     void Skybox::render(float deltatime)
     {
+        glDepthMask(GL_FALSE);
         prog_->use();
 
         glBindVertexArray(vao_);

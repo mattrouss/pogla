@@ -6,7 +6,7 @@
 #define gl_err() \
 {\
     GLenum err = glGetError();\
-    if (err != GL_NO_ERROR) std::cerr << "OpenGL error l." << __LINE__ << ": " << err << std::endl;\
+    if (err != GL_NO_ERROR) std::cerr << "OpenGL error in file "<< __FILE__ <<" l." << __LINE__ << ": " << err << std::endl;\
 }
 
 #endif //BUMP_GL_ERR_H

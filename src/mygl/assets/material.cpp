@@ -50,6 +50,7 @@ void Material::set_bump(unsigned value)
 
 void Material::use() const
 {
+    program->use();
     glActiveTexture(GL_TEXTURE0 + texture_manager->get(texture_id));gl_err()
     texture_manager->use(texture_id);
 
