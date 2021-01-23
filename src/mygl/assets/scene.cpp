@@ -56,7 +56,7 @@ std::shared_ptr<Camera> Scene::init_camera(const YAML::Node &cam_node) {
             : mygl::Vec3{{0, 1, 0}};
 
     auto cam = std::make_shared<Camera>(-1, 1, -1, 1, z_near, z_far);
-    cam->set_prog(prog_);
+    cam->add_prog(prog_);
 
     mygl::Vec3 target = mygl::Vec3{{0.001,0,0}};//not origin to prevent problems with initial
     //lookat call

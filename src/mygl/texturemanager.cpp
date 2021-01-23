@@ -41,6 +41,45 @@ unsigned TextureManager::load(std::string path)
     return texture_ids.size() - 1;//return index of the texture
 }
 
+unsigned TextureManager::load_cubemap(std::string path)
+{
+    GLuint texture_id;
+    glGenTextures(1, &texture_id);gl_err()
+
+    glBindTexture(GL_TEXTURE_CUBE_MAP, texture_id);gl_err()
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    
+    std::vector<std::string> file_paths{
+            "posx.tga",
+            "negx.tga",
+            "posy.tga",
+            "negy.tga",
+            "posz.tga",
+            "negz.tga"
+            };
+    for (auto i = 0u; i < 6u; i++)
+    {
+
+        auto texture = io::load_image((path + "/" + file_paths[i]).c_str());
+        if (!texture)
+            return 0;//error
+
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB,
+                texture->width, texture->height, 0, GL_RGB, GL_UNSIGNED_BYTE,
+                texture->pixels);
+
+        delete texture;
+    }
+    texture_ids.push_back(texture_id);
+    return texture_ids.size() - 1;//return index of the texture
+
+}
+
 GLuint TextureManager::get(unsigned i) const
 {
     if (i >= texture_ids.size())

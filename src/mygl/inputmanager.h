@@ -30,7 +30,7 @@ private:
     std::vector<std::shared_ptr<Movable>> mouse_movement_listeners;
     std::array<bool, 256> state;
 
-    float drag_speed = 1000.0f;
+    float drag_speed = 10000.0f;
     int mouse_type;
     mygl::Vec2 mouse_coords;
     mygl::Vec2 previous_mouse_coords;

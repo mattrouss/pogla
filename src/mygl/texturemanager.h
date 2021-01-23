@@ -14,6 +14,7 @@ public:
     void use(unsigned i);
     void reset_use();
     unsigned load(std::string path);
+    unsigned load_cubemap(std::string path);
     GLuint get(unsigned i) const;
 
 private:
