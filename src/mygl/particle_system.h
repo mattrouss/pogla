@@ -34,10 +34,10 @@ namespace mygl
     class ParticleSystem
     {
     public:
-        ParticleSystem(size_t N);
+        ParticleSystem() = default;
 
-        void init_system(mygl::Program* display_prog, mygl::Program* compute_prog, std::shared_ptr<mygl::mesh> mesh);
-        void init_system(mygl::Program* display_prog,
+        void init_system(size_t N, mygl::Program* display_prog, mygl::Program* compute_prog, std::shared_ptr<mygl::mesh> mesh);
+        void init_system(size_t N, mygl::Program* display_prog,
                 mygl::Program* compute_prog,
                 mygl::Program* sort_prog,
                 std::shared_ptr<mygl::mesh> mesh);

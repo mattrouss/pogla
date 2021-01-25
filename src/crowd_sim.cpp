@@ -20,7 +20,7 @@
 #include "utils/clock.h"
 #include "utils/matrix4.h"
 
-mygl::ParticleSystem particle_system(1000u);
+mygl::ParticleSystem particle_system;
 mygl::Skybox skybox;
 std::function<void()> light_trajectory_callback;
 std::function<void()> cam_trajectory_callback;
@@ -111,9 +111,9 @@ void init_color_uniform(mygl::Program* prog, std::array<float, 4> color)
 
 int main(int argc, char **argv)
 {
-    if (argc != 1)
+    if (argc != 2)
     {
-        std::cout << "usage: ./crowd_sim\n";
+        std::cout << "usage error: number of particles required\n";
         return 1;
     }
 
@@ -192,7 +192,7 @@ int main(int argc, char **argv)
     auto material = Material(std::make_shared<TextureManager>(), prog, "../textures/fish_uv.tga");
     material.use();
 
-    particle_system.init_system(prog, compute_prog, sort_result->get(),  mesh);
+    particle_system.init_system(std::stoul(std::string(argv[1])), prog, compute_prog, sort_result->get(),  mesh);
 
     //start display timer and start main loop
     glutTimerFunc(1000/50, refresh_timer, 0);

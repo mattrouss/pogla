@@ -56,27 +56,24 @@ namespace mygl
         return Vec3{{transform_.data[3], transform_.data[7], transform_.data[11]}};
     }
 
-    ParticleSystem::ParticleSystem(size_t N)
-        : N_(N)
+    void ParticleSystem::init_system(size_t N, mygl::Program* display_prog, mygl::Program* compute_prog, std::shared_ptr<mygl::mesh> mesh)
     {
-        compute_workgroup_xyz(N, N_x_, N_y_, N_z_);
-        N_ = N_x_ * N_y_ * N_z_;
+        init_system(N, display_prog, compute_prog, nullptr, mesh);
     }
 
-    void ParticleSystem::init_system(mygl::Program* display_prog, mygl::Program* compute_prog, std::shared_ptr<mygl::mesh> mesh)
-    {
-        init_system(display_prog, compute_prog, nullptr, mesh);
-    }
-
-    void ParticleSystem::init_system(mygl::Program* display_prog,
+    void ParticleSystem::init_system(size_t N, mygl::Program* display_prog,
                      mygl::Program* compute_prog,
                      mygl::Program* sort_prog,
                      std::shared_ptr<mygl::mesh> mesh)
     {
+        N_ = N;
         display_prog_ = display_prog;
         compute_prog_ = compute_prog;
         sort_prog_ = sort_prog;
         particle_mesh_ = mesh;
+
+        compute_workgroup_xyz(N, N_x_, N_y_, N_z_);
+        N_ = N_x_ * N_y_ * N_z_;
 
         init_particles();
 
