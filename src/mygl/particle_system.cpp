@@ -25,31 +25,40 @@ namespace mygl
 
     static void compute_workgroup_xyz(const size_t N, size_t& x, size_t& y, size_t& z)
     {
-        size_t result_x = N/2 - 1;
-        size_t best_x = N;
-        size_t best_y = N;
-        size_t best_N = INT_MAX;
-        for (; result_x >= 2; result_x--)
+        if (N > 10000)
         {
-            for (size_t result_y = N/2 - 1; result_y >= 2; result_y--)
+            x = std::pow(N, 1.0/3.0);
+            y = std::pow(N, 1.0/3.0);
+            z = std::pow(N, 1.0/3.0);
+        }
+        else
+        {
+            size_t result_x = N / 2 - 1;
+            size_t best_x = N;
+            size_t best_y = N;
+            size_t best_N = INT_MAX;
+            for (; result_x >= 2; result_x--)
             {
-                size_t result_n = result_x * result_y * (N / (result_x * result_y));
-                if (N % result_x == 0 && N % result_y == 0 &&
-                    //result_x + result_y + N / (result_x * result_y)
-                    //    < best_x + best_y + N / (best_x * best_y) &&
-                    std::abs((long long int)(result_n - N)) <= best_N
-                    && std::max(result_x, std::max(result_y, N / (result_x * result_y)))
-                       < std::max(best_x, std::max(best_y, N / (best_x * best_y))))
+                for (size_t result_y = N / 2 - 1; result_y >= 2; result_y--)
                 {
-                    best_x = result_x;
-                    best_y = result_y;
-                    best_N = std::abs((long long int)(result_n - N));
+                    size_t result_n = result_x * result_y * (N / (result_x * result_y));
+                    if (N % result_x == 0 && N % result_y == 0 &&
+                        //result_x + result_y + N / (result_x * result_y)
+                        //    < best_x + best_y + N / (best_x * best_y) &&
+                        std::abs((long long int) (result_n - N)) <= best_N
+                        && std::max(result_x, std::max(result_y, N / (result_x * result_y)))
+                           < std::max(best_x, std::max(best_y, N / (best_x * best_y))))
+                    {
+                        best_x = result_x;
+                        best_y = result_y;
+                        best_N = std::abs((long long int) (result_n - N));
+                    }
                 }
             }
+            x = best_x;
+            y = best_y;
+            z = N / (best_x * best_y);
         }
-        x = best_x;
-        y = best_y;
-        z = N / (best_x * best_y);
     }
 
     Vec3 Particle::pos() const {

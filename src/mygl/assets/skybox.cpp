@@ -9,7 +9,7 @@ namespace mygl
         texture_manager_.load_cubemap(cubemap_path);
         prog_->use();
 
-        float skybox_size = 200.f;
+        float skybox_size = 2000.f;
         verts_ = std::vector<mygl::Vec3>{
             skybox_size * Vec3{{ -1.0f,  1.0f, -1.0f }},
             skybox_size * Vec3{{ -1.0f, -1.0f, -1.0f }},

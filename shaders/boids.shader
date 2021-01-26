@@ -285,8 +285,8 @@ void update_particle(int i, int j, int k)
     vec3 randDir = randVec(pos) * 0.1;
     acceleration += (0.4*v_alignment + 0.6*v_cohesion) * int(n_neighbours > 0) + 0.7*v_separation;
     acceleration += randDir * 50.0;
-    acceleration += center_repulsion(pos) * 10.0f;
-    acceleration += center_attraction(pos, 20) * 0.0001;
+    //acceleration += center_repulsion(pos) * 10.0f;
+    acceleration += center_attraction(pos, 50) * 0.0001;
 
     p.vel += deltatime * acceleration;
 

@@ -72,7 +72,7 @@ bool initGlut(int &argc, char **argv) {
     glutInitContextVersion(4, 5);
     glutInitContextProfile(GLUT_CORE_PROFILE);
     glutInitDisplayMode(GLUT_RGBA|GLUT_DOUBLE|GLUT_DEPTH);
-    glutInitWindowSize(1024, 1024);
+    glutInitWindowSize(1900, 1000);
     glutInitWindowPosition(10, 10);
     glutCreateWindow("Crowd Simulation");
     glutDisplayFunc(display);
@@ -163,7 +163,7 @@ int main(int argc, char **argv)
     prog->use();
 
     //init camera
-    auto cam = std::make_shared<Camera>(-1, 1, -1, 1, 5, 2000);
+    auto cam = std::make_shared<Camera>(-1, 1, -1, 1, 5, 20000);
     cam->add_prog(prog);
     cam->look_at({{0, 0, 10}}, {{0, 0, 0}}, {{0, 1, 0}});
 
